@@ -1,0 +1,267 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="obj\from_hdd_lg_to_pc.exe"/>
+    <OBJFILES value="obj\from_hdd_lg_to_pc.obj obj\hdd_lg_read.obj obj\hdd_lg_copy.obj 
+      obj\progress.obj obj\hdd_lg_func_io.obj obj\hdd_lg_func_1.obj 
+      obj\hdd_lg_config.obj obj\hdd_lg_language.obj obj\hdd_lg_test1.obj 
+      obj\hdd_lg_test2.obj obj\hdd_lg_out_test.obj obj\hdd_lg_read_io.obj 
+      obj\hdd_lg_emulator.obj obj\hdd_lg_mme_db.obj obj\hdd_lg_test0.obj 
+      obj\hdd_lg_make_tree.obj obj\hdd_lg_mk_name.obj obj\hdd_lg_map_hdd.obj 
+      obj\hdd_lg_ctrl_fat.obj obj\hdd_lg_to_txt.obj 
+      obj\hdd_lg_sec_67_68_70_71.obj obj\hdd_lg_remake_tree.obj 
+      obj\hdd_lg_func_folder.obj obj\hdd_lg_func_io_1.obj obj\hdd_lg_func.obj 
+      obj\hdd_lg_test_idx.obj obj\hdd_lg_write.obj obj\hdd_lg_write_1.obj 
+      obj\hdd_lg_write_io.obj obj\hdd_lg_write_2.obj obj\hdd_lg_find_zero.obj"/>
+    <RESFILES value="obj\from_hdd_lg_to_pc_rc.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value="vcl.lib rtl.lib"/>
+    <SPARELIBS value="rtl.lib vcl.lib"/>
+    <PACKAGES value="rtl.bpi vcl.bpi dbrtl.bpi vcldb.bpi bdertl.bpi ibsmp.bpi vclx.bpi 
+      nmfast.bpi bcbsmp.bpi vcldbx.bpi dss.bpi inetdb.bpi inet.bpi dsnap.bpi 
+      dclocx.bpi qrpt.bpi bcbdrt40.bpi vcljpg.bpi crbide40.bpi teeui.bpi 
+      teedb.bpi tee.bpi proide40.bpi stride40.bpi"/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value="_DEBUG"/>
+    <SYSDEFINES value="NO_STRICT;_VIS_NOLIB"/>
+    <MAINSOURCE value="from_hdd_lg_to_pc.cpp"/>
+    <INCLUDEPATH value="$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="$(BCB)\lib\obj;$(BCB)\lib"/>
+    <WARNINGS value="-w-par -w-8027 -w-8026"/>
+    <WARNOPTSTR value=""/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-I$(BCB)\include -I$(BCB)\include\vcl -src_suffix cpp -D_DEBUG -boa"/>
+    <CFLAG1 value="-Od -H=from_hdd_lg_to_pc.csm -Hc -w -Vx -Ve -ff -X- -r- -a1 -6 -b- -d -k 
+      -y -v -vi- -c -tW -tWM"/>
+    <PFLAGS value="-N2obj -N0obj -$Y+ -$W -$O- -$A8 -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zi"/>
+    <LFLAGS value="-Iobj -D&quot;&quot; -aa -Tpe -x -Gn -w -v"/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0w32.obj sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib"/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="from_hdd_lg_to_pc.cpp" FORMNAME="" UNITNAME="from_hdd_lg_to_pc" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_read.cpp" FORMNAME="" UNITNAME="hdd_lg_read" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_copy.cpp" FORMNAME="" UNITNAME="hdd_lg_copy" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="from_hdd_lg_to_pc_rc.rc" FORMNAME="" UNITNAME="from_hdd_lg_to_pc_rc.rc" CONTAINERID="RCCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="progress.cpp" FORMNAME="" UNITNAME="progress" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_func_io.cpp" FORMNAME="" UNITNAME="hdd_lg_func_io.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_func_1.cpp" FORMNAME="" UNITNAME="hdd_lg_func_1.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_config.cpp" FORMNAME="" UNITNAME="hdd_lg_config" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_language.cpp" FORMNAME="" UNITNAME="hdd_lg_language" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_test1.cpp" FORMNAME="" UNITNAME="hdd_lg_test1" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_test2.cpp" FORMNAME="" UNITNAME="hdd_lg_test2" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_out_test.cpp" FORMNAME="" UNITNAME="hdd_lg_out_test" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_read_io.cpp" FORMNAME="" UNITNAME="hdd_lg_read_io" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_emulator.cpp" FORMNAME="" UNITNAME="hdd_lg_emulator" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_mme_db.cpp" FORMNAME="" UNITNAME="hdd_lg_mme_db" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_test0.cpp" FORMNAME="" UNITNAME="hdd_lg_test0" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_make_tree.cpp" FORMNAME="" UNITNAME="hdd_lg_make_tree" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_mk_name.cpp" FORMNAME="" UNITNAME="hdd_lg_mk_name" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_map_hdd.cpp" FORMNAME="" UNITNAME="hdd_lg_map_hdd" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_ctrl_fat.cpp" FORMNAME="" UNITNAME="hdd_lg_ctrl_fat" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_to_txt.cpp" FORMNAME="" UNITNAME="hdd_lg_to_txt" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_sec_67_68_70_71.cpp" FORMNAME="" UNITNAME="hdd_lg_sec_67_68_70_71" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_remake_tree.cpp" FORMNAME="" UNITNAME="hdd_lg_remake_tree" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_func_folder.cpp" FORMNAME="" UNITNAME="hdd_lg_func_folder" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_func_io_1.cpp" FORMNAME="" UNITNAME="hdd_lg_func_io_1" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_func.cpp" FORMNAME="" UNITNAME="hdd_lg_func" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_test_idx.cpp" FORMNAME="" UNITNAME="hdd_lg_test_idx" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_write.cpp" FORMNAME="" UNITNAME="hdd_lg_write" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_write_1.cpp" FORMNAME="" UNITNAME="hdd_lg_write_1" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_write_io.cpp" FORMNAME="" UNITNAME="hdd_lg_write_io" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_write_2.cpp" FORMNAME="" UNITNAME="hdd_lg_write_2" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="hdd_lg_find_zero.cpp" FORMNAME="" UNITNAME="hdd_lg_find_zero" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=9
+Build=22
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=KVSoft
+FileDescription=
+FileVersion=1.0.9.22
+InternalName=
+LegalCopyright=KVSoft
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=12
+Item0=$(BCB)\include;$(BCB)\include\vcl
+Item1=$(BCB)\include;$(BCB)\include\vcl;..\..\..\fotoplan\lib_foto
+Item2=$(BCB)\include;$(BCB)\include\vcl;W:\kudr\programm\fotoplan\lib_foto
+Item3=jpeg;$(BCB)\include;$(BCB)\include\vcl
+Item4=jpeg;$(BCB)\include;$(BCB)\include\vcl;h
+Item5=$(BCB)\include;$(BCB)\include\vcl;h
+Item6=!\;!;ocenka;$(BCB)\include;$(BCB)\include\vcl;h
+Item7=!\;ocenka;$(BCB)\include;$(BCB)\include\vcl;h
+Item8=$(BCB)\include;$(BCB)\include\vcl;..\lib_foto
+Item9=..\lib_val\cpp;$(BCB)\include;$(BCB)\include\vcl;..\lib_foto
+Item10=..\hasp\haspctrl;$(BCB)\include;$(BCB)\include\vcl;..\lib_foto
+Item11=..\lib_wmem\cpp;$(BCB)\include;$(BCB)\include\vcl;..\lib_foto
+
+[HistoryLists\hlLibraryPath]
+Count=8
+Item0=$(BCB)\lib\obj;$(BCB)\lib
+Item1=jpeg;$(BCB)\lib\obj;$(BCB)\lib
+Item2=!\;!;ocenka;$(BCB)\lib\obj;$(BCB)\lib
+Item3=!\;ocenka;$(BCB)\lib\obj;$(BCB)\lib
+Item4=..\lib_val\cpp;$(BCB)\lib\obj;$(BCB)\lib
+Item5=..\lib_val\cpp;..\hasp\haspctrl;$(BCB)\lib\obj;$(BCB)\lib
+Item6=..\hasp\haspctrl;$(BCB)\lib\obj;$(BCB)\lib
+Item7=..\lib_wmem\cpp;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=13
+Item0=_DEBUG
+Item1=UNICODE
+Item2=SCSI_DEVICE;WIN32
+Item3=SCSI_DEVICE
+Item4=_VASKIN;
+Item5=FOTO_PLAN;
+Item6=FOTO_PLAN;HASP_YES;
+Item7=FOTO_PLAN
+Item8=FOTO_PLAN;HASP_YES
+Item9=FOTO_PLAN,HASP_YES
+Item10=LEARN_VER;FOTO_PLAN;
+Item11=LEARN_VER;RAB_VER;
+Item12=RAB_VER
+
+[HistoryLists\hlIntOutputDir]
+Count=3
+Item0=obj
+Item1=obj_o
+Item2=obj_f
+
+[HistoryLists\hlRunParameters]
+Count=22
+Item0=e:\snimki\разное\mira_5.tif
+Item1=e:\snimki\разное\mira_7.tif
+Item2=e:\snimki\raznoe\mira_7.tif
+Item3=e:\snimki\mira_7.tif
+Item4=e:\snimki\n.pki
+Item5=e:\snimki\n3292.tif
+Item6=e:\snimki\color.tif
+Item7=d:\kudr\urus_.mti
+Item8=e:\snimki\mira_rgb.TIF
+Item9=e:\snimki\0.tif
+Item10=e:\snimki\mira7.tif
+Item11=e:\snimki\mira_rgb.bmp
+Item12=e:\snimki\mira_rgb.sim
+Item13=e:\snimki\afs\trs_3506.mti
+Item14=e:\snimki\afs\trs_3508.mti
+Item15=e:\snimki\3_rgb.sim
+Item16=e:\snimki\1_rgb.sim
+Item17=e:\snimki\p_rgb.sim
+Item18=e:\snimki\afs\3506.sim
+Item19=e:\snimki\afs\3508.mti
+Item20=e:\snimki\afs\3506.mti
+Item21=e:\snimki\afs\3506.mpi
+
+[HistoryLists\hlFinalOutputDir]
+Count=30
+Item0=obj\
+Item1=..\..\..\fotoplan\scimwork\obj\
+Item2=obj
+Item3=objItem1=objItem1=objItem1=obj
+Item4=
+Item5=
+Item6=
+Item7=..\fotoplan\conv_img\objItem1=objItem1=objItem1=obj
+Item8=
+Item9=
+Item10=
+Item11=..\any\proba\jpeg_lib\objItem1=obj
+Item12=
+Item13=objItem1=obj
+Item14=
+Item15=objItem1=obj
+Item16=
+Item17=objItem1=obj
+Item18=
+Item19=objItem1=obj
+Item20=
+Item21=..\fotoplan\w_trs\objItem1=obj
+Item22=
+Item23=objItem1=obj
+Item24=
+Item25=objItem1=..\fotoplan\conv_cmr\objItem1=obj
+Item26=
+Item27=
+Item28=objItem1=obj
+Item29=
+
+[Debugging]
+DebugSourceDirs=
+
+[Parameters]
+RunParams=
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>
