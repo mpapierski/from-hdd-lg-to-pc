@@ -6,62 +6,62 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_func =====================================
-int  CreateMyFont(void);                                     //Создание фонта
-char *Char_Dig_p(char *CharDig, int N);                      //Преобразование символьного числа в разрядку
-char *Char_Dig_p_n(char *CharDig, int N, int n);             //Преобразование символьного числа в разрядку с "n" знаками после запятой
-char *FileSize_Txt(DWORDLONG Size);                          //Размер файла в текст
-void CenterDlg(HWND hDlg, int yPoz);                         //Центрирование окна диалога в главном окне
-void OutNameDlg(HWND hDlg, int ID_T, char *inText);          //Усечение имени
-void UnicodeToAnsi(WCHAR *inUNI, char *outANSI, int maxN);   //Преобразование Unicode в символы
-void Open_Wait_Found_HDD(void);                              //Окошко со словами подождите
-void Close_Wait_Found_HDD(void);                             //Окошко со словами подождите
-int  Ctrl_Adm(void);                                         //Проверка наличия прав администратора
+int  CreateMyFont(void);                                     //РЎРѕР·РґР°РЅРёРµ С„РѕРЅС‚Р°
+char *Char_Dig_p(char *CharDig, int N);                      //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
+char *Char_Dig_p_n(char *CharDig, int N, int n);             //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ СЃ "n" Р·РЅР°РєР°РјРё РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№
+char *FileSize_Txt(DWORDLONG Size);                          //Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ С‚РµРєСЃС‚
+void CenterDlg(HWND hDlg, int yPoz);                         //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РґРёР°Р»РѕРіР° РІ РіР»Р°РІРЅРѕРј РѕРєРЅРµ
+void OutNameDlg(HWND hDlg, int ID_T, char *inText);          //РЈСЃРµС‡РµРЅРёРµ РёРјРµРЅРё
+void UnicodeToAnsi(WCHAR *inUNI, char *outANSI, int maxN);   //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Unicode РІ СЃРёРјРІРѕР»С‹
+void Open_Wait_Found_HDD(void);                              //РћРєРѕС€РєРѕ СЃРѕ СЃР»РѕРІР°РјРё РїРѕРґРѕР¶РґРёС‚Рµ
+void Close_Wait_Found_HDD(void);                             //РћРєРѕС€РєРѕ СЃРѕ СЃР»РѕРІР°РјРё РїРѕРґРѕР¶РґРёС‚Рµ
+int  Ctrl_Adm(void);                                         //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїСЂР°РІ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°
 void About(void);
-void AddToSpecSpis_VerWin(void);                             //Запись в дамп версии Windows
+void AddToSpecSpis_VerWin(void);                             //Р—Р°РїРёСЃСЊ РІ РґР°РјРї РІРµСЂСЃРёРё Windows
 
 static HWND hWaitDlg;
-
+
 //------------------------------------------------------------------------------
 
-int CreateMyFont(void)                                       //Создание фонта
+int CreateMyFont(void)                                       //РЎРѕР·РґР°РЅРёРµ С„РѕРЅС‚Р°
 {
    LOGFONT LogFont;
 
-   memset(&LogFont, 0, sizeof(LOGFONT));                     //Заполнили нулями
+   memset(&LogFont, 0, sizeof(LOGFONT));                     //Р—Р°РїРѕР»РЅРёР»Рё РЅСѓР»СЏРјРё
 // LogFont.lfCharSet = DEFAULT_CHARSET;
    LogFont.lfHeight = 16;
    strcpy(LogFont.lfFaceName, "MS Sans Serif");
    MyFont = CreateFontIndirect(&LogFont);
    if(MyFont == NULL)
-      return Error1((Lan+7)->msg);                           //"Ошибка при создании шрифта."
+      return Error1((Lan+7)->msg);                           //"РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё С€СЂРёС„С‚Р°."
 
-   memset(&LogFont, 0, sizeof(LOGFONT));                     //Заполнили нулями
+   memset(&LogFont, 0, sizeof(LOGFONT));                     //Р—Р°РїРѕР»РЅРёР»Рё РЅСѓР»СЏРјРё
    LogFont.lfCharSet = DEFAULT_CHARSET;
    LogFont.lfHeight = 12;
    strcpy(LogFont.lfFaceName, "Arial");
    MyFontSm = CreateFontIndirect(&LogFont);
    if(MyFontSm == NULL)
-      return Error1((Lan+7)->msg);                           //"Ошибка при создании шрифта."
+      return Error1((Lan+7)->msg);                           //"РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё С€СЂРёС„С‚Р°."
 
-   memset(&LogFont, 0, sizeof(LOGFONT));                     //Заполнили нулями
+   memset(&LogFont, 0, sizeof(LOGFONT));                     //Р—Р°РїРѕР»РЅРёР»Рё РЅСѓР»СЏРјРё
    LogFont.lfCharSet = DEFAULT_CHARSET;
-   LogFont.lfHeight = 15;   LogFont.lfPitchAndFamily = FF_MODERN;                     //Моноширинный
+   LogFont.lfHeight = 15;   LogFont.lfPitchAndFamily = FF_MODERN;                     //РњРѕРЅРѕС€РёСЂРёРЅРЅС‹Р№
    strcpy(LogFont.lfFaceName, "Courier New");
    MyFont_Cur = CreateFontIndirect(&LogFont);
    if(MyFont_Cur == NULL)
-      return Error1((Lan+7)->msg);                           //"Ошибка при создании шрифта."
+      return Error1((Lan+7)->msg);                           //"РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё С€СЂРёС„С‚Р°."
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-char *Char_Dig_p(char *CharDig, int N)                       //Преобразование символьного числа в разрядку (целого)
-{                                                            //N-общее число символов в выходной строке
-   static char Ss[100];                                      //Символьное число в разрядку
-   int l = lstrlen(CharDig);                                 //Число символов во входной строке
-   for(int i=0; i<N; i++) *(Ss + i) = ' ';                   //Очистили строку
-   *(Ss + N) = 0;                                            //Отметили конец строки
-   for(int i=1,k=N-1,j=l-1; i<=l; i++,k--,j--)               //Пересылка символов с вставкой пробела
+char *Char_Dig_p(char *CharDig, int N)                       //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ (С†РµР»РѕРіРѕ)
+{                                                            //N-РѕР±С‰РµРµ С‡РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ РІС‹С…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
+   static char Ss[100];                                      //РЎРёРјРІРѕР»СЊРЅРѕРµ С‡РёСЃР»Рѕ РІ СЂР°Р·СЂСЏРґРєСѓ
+   int l = lstrlen(CharDig);                                 //Р§РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІРѕ РІС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
+   for(int i=0; i<N; i++) *(Ss + i) = ' ';                   //РћС‡РёСЃС‚РёР»Рё СЃС‚СЂРѕРєСѓ
+   *(Ss + N) = 0;                                            //РћС‚РјРµС‚РёР»Рё РєРѕРЅРµС† СЃС‚СЂРѕРєРё
+   for(int i=1,k=N-1,j=l-1; i<=l; i++,k--,j--)               //РџРµСЂРµСЃС‹Р»РєР° СЃРёРјРІРѕР»РѕРІ СЃ РІСЃС‚Р°РІРєРѕР№ РїСЂРѕР±РµР»Р°
    {  if(k < 0) break;
       *(Ss + k) = *(CharDig + j);
       if(i % 3 == 0) k--;
@@ -70,113 +70,113 @@ char *Char_Dig_p(char *CharDig, int N)                       //Преобразование си
 }
 
 //------------------------------------------------------------------------------
-
-char *Char_Dig_p_n(char *CharDig, int N, int n)              //Преобразование символьного числа в разрядку с "n" знаками после запятой
-{                                                            //N-общее число символов в выходной строке
-   static char Ss[100];                                      //Символьное число в разрядку
+
+char *Char_Dig_p_n(char *CharDig, int N, int n)              //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ СЃ "n" Р·РЅР°РєР°РјРё РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№
+{                                                            //N-РѕР±С‰РµРµ С‡РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ РІС‹С…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
+   static char Ss[100];                                      //РЎРёРјРІРѕР»СЊРЅРѕРµ С‡РёСЃР»Рѕ РІ СЂР°Р·СЂСЏРґРєСѓ
    int i, j, k;
 
    *Ss = 0;
    if(N >= 99)  { Error1("Char_Dig"); return Ss; }
-   int l = lstrlen(CharDig);                                 //Число символов в исходной строке
-   int m = n;                                                //Число символов которые не разряжаются (n-после запятой + точка)
+   int l = lstrlen(CharDig);                                 //Р§РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
+   int m = n;                                                //Р§РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РєРѕС‚РѕСЂС‹Рµ РЅРµ СЂР°Р·СЂСЏР¶Р°СЋС‚СЃСЏ (n-РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№ + С‚РѕС‡РєР°)
    if(n != 0) m++;
    if(m > l) m = l;
    if(l+(l-m)/3 >= 99)  { Error1("Char_Dig"); return Ss; }
-   for(i=0; i<N; i++) *(Ss + i) = ' ';                       //Очистили строку
-   *(Ss + N) = 0;                                            //Отметили конец строки
-   for(i=1,j=l-1,k=N-1; i<=m; i++,j--,k--)                   //Переслали неизменяемую часть числа (n-после запятой + точка)
+   for(i=0; i<N; i++) *(Ss + i) = ' ';                       //РћС‡РёСЃС‚РёР»Рё СЃС‚СЂРѕРєСѓ
+   *(Ss + N) = 0;                                            //РћС‚РјРµС‚РёР»Рё РєРѕРЅРµС† СЃС‚СЂРѕРєРё
+   for(i=1,j=l-1,k=N-1; i<=m; i++,j--,k--)                   //РџРµСЂРµСЃР»Р°Р»Рё РЅРµРёР·РјРµРЅСЏРµРјСѓСЋ С‡Р°СЃС‚СЊ С‡РёСЃР»Р° (n-РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№ + С‚РѕС‡РєР°)
      *(Ss + k) = *(CharDig + j);
-   for(i=1; i<=l-m; i++,j--,k--)                             //Пересылка оставшихся символов с вставкой пробела
+   for(i=1; i<=l-m; i++,j--,k--)                             //РџРµСЂРµСЃС‹Р»РєР° РѕСЃС‚Р°РІС€РёС…СЃСЏ СЃРёРјРІРѕР»РѕРІ СЃ РІСЃС‚Р°РІРєРѕР№ РїСЂРѕР±РµР»Р°
    {  if(k < 0) break;
       *(Ss + k) = *(CharDig + j);
       if(i % 3 == 0) k--;
    }
-   if(Ss[k+1] == '-' && Ss[k+2] == ' ')                      //Проверяем, чтобы знак числа не оторвался от первой цифры
+   if(Ss[k+1] == '-' && Ss[k+2] == ' ')                      //РџСЂРѕРІРµСЂСЏРµРј, С‡С‚РѕР±С‹ Р·РЅР°Рє С‡РёСЃР»Р° РЅРµ РѕС‚РѕСЂРІР°Р»СЃСЏ РѕС‚ РїРµСЂРІРѕР№ С†РёС„СЂС‹
    {  Ss[k+1] = ' '; Ss[k+2] = '-'; }
    return Ss;
 }
 
 //------------------------------------------------------------------------------
-
-char *FileSize_Txt(DWORDLONG Size)                           //Размер файла в текст
+
+char *FileSize_Txt(DWORDLONG Size)                           //Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ С‚РµРєСЃС‚
 {
    char dd[48], *Adr;
 
    sprintf(dd, "%16.0f", double(Size));
-   Adr = Char_Dig_p(dd, 22);                                  //Преобразование символьного числа в разрядку
+   Adr = Char_Dig_p(dd, 22);                                  //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
    return Adr;
 }
 
 //------------------------------------------------------------------------------
 
-void CenterDlg(HWND hDlg, int yPoz)                          //Центрирование окна диалога в главном окне
+void CenterDlg(HWND hDlg, int yPoz)                          //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РґРёР°Р»РѕРіР° РІ РіР»Р°РІРЅРѕРј РѕРєРЅРµ
 {
    RECT RectD, RectW;
    GetWindowRect(MainWin, &RectW);
    GetWindowRect(hDlg, &RectD);
-   int xCent = (RectW.right + RectW.left) / 2;               //Центр главного окна
-   int yCent = (RectW.bottom + RectW.top) / 2;               //Центр главного окна
+   int xCent = (RectW.right + RectW.left) / 2;               //Р¦РµРЅС‚СЂ РіР»Р°РІРЅРѕРіРѕ РѕРєРЅР°
+   int yCent = (RectW.bottom + RectW.top) / 2;               //Р¦РµРЅС‚СЂ РіР»Р°РІРЅРѕРіРѕ РѕРєРЅР°
    int xDlg =  xCent - (RectD.right - RectD.left) / 2;
    int yDlg =  yCent - (RectD.bottom - RectD.top) / 2;
    SetWindowPos(hDlg, HWND_TOP, xDlg, yDlg + yPoz, 0, 0, SWP_NOSIZE);
 }
 
 //------------------------------------------------------------------------------
-
-void Out_NameDlg(HWND hDlg, int ID_T, char *inText, char *ShortTxt, char **ATxt) //Усечение имени
+
+void Out_NameDlg(HWND hDlg, int ID_T, char *inText, char *ShortTxt, char **ATxt) //РЈСЃРµС‡РµРЅРёРµ РёРјРµРЅРё
 {
-   static char *StartTxt = "w:\\...";                        //Довесок к усеченному тексту (не менять static)
-   SIZE SizeTxt;                                             //Размер изображения текста
-   RECT WRect;                                               //Структура с координатами окна
+   static char *StartTxt = "w:\\...";                        //Р”РѕРІРµСЃРѕРє Рє СѓСЃРµС‡РµРЅРЅРѕРјСѓ С‚РµРєСЃС‚Сѓ (РЅРµ РјРµРЅСЏС‚СЊ static)
+   SIZE SizeTxt;                                             //Р Р°Р·РјРµСЂ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ С‚РµРєСЃС‚Р°
+   RECT WRect;                                               //РЎС‚СЂСѓРєС‚СѓСЂР° СЃ РєРѕРѕСЂРґРёРЅР°С‚Р°РјРё РѕРєРЅР°
    if(*inText == 0)
    {  *ShortTxt = 0;
       *ATxt = ShortTxt;
       return;
    }
-   lstrcpy(ShortTxt+6, inText);                              //Tекст для вывода
-   *StartTxt = *inText;                                      //Переслали букву диска
-   HWND hWnd = GetDlgItem(hDlg, ID_T);                       //Идентификатор окна для текста
-   HDC hDC = GetDC(hWnd);                                    //Контекст окна для текста
-   GetClientRect(hWnd, &WRect);                              //Получили размеры окна
-//Переодически строка становится больше окна. Возможно надо выбирать эмперический коэффициент из величины текста
+   lstrcpy(ShortTxt+6, inText);                              //TРµРєСЃС‚ РґР»СЏ РІС‹РІРѕРґР°
+   *StartTxt = *inText;                                      //РџРµСЂРµСЃР»Р°Р»Рё Р±СѓРєРІСѓ РґРёСЃРєР°
+   HWND hWnd = GetDlgItem(hDlg, ID_T);                       //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕРєРЅР° РґР»СЏ С‚РµРєСЃС‚Р°
+   HDC hDC = GetDC(hWnd);                                    //РљРѕРЅС‚РµРєСЃС‚ РѕРєРЅР° РґР»СЏ С‚РµРєСЃС‚Р°
+   GetClientRect(hWnd, &WRect);                              //РџРѕР»СѓС‡РёР»Рё СЂР°Р·РјРµСЂС‹ РѕРєРЅР°
+//РџРµСЂРµРѕРґРёС‡РµСЃРєРё СЃС‚СЂРѕРєР° СЃС‚Р°РЅРѕРІРёС‚СЃСЏ Р±РѕР»СЊС€Рµ РѕРєРЅР°. Р’РѕР·РјРѕР¶РЅРѕ РЅР°РґРѕ РІС‹Р±РёСЂР°С‚СЊ СЌРјРїРµСЂРёС‡РµСЃРєРёР№ РєРѕСЌС„С„РёС†РёРµРЅС‚ РёР· РІРµР»РёС‡РёРЅС‹ С‚РµРєСЃС‚Р°
 // int LogSize = MulDiv(WRect.right-10, GetDeviceCaps(hDC, LOGPIXELSX), 72);
-   int LogSize = int(1.25 * (WRect.right+1));                //Эмпирический коэффициент соотношения размеров окна и размеров текта
-   *ATxt = ShortTxt+6;                                       //Адрес начала текста
-   int Len = lstrlen(*ATxt);                                 //Число символов в тексте
+   int LogSize = int(1.25 * (WRect.right+1));                //Р­РјРїРёСЂРёС‡РµСЃРєРёР№ РєРѕСЌС„С„РёС†РёРµРЅС‚ СЃРѕРѕС‚РЅРѕС€РµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР° Рё СЂР°Р·РјРµСЂРѕРІ С‚РµРєС‚Р°
+   *ATxt = ShortTxt+6;                                       //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° С‚РµРєСЃС‚Р°
+   int Len = lstrlen(*ATxt);                                 //Р§РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ С‚РµРєСЃС‚Рµ
    GetTextExtentPoint32(hDC, *ATxt, Len, &SizeTxt);
-   if(SizeTxt.cx > LogSize)                                  //Весь текст не поместится в окно
-   {  GetTextExtentPoint32(hDC, StartTxt, 6, &SizeTxt);      //Размер довеска текста
-      LogSize -= SizeTxt.cx;                                 //Уменьшили размер окна на величину довеска
-      for(;Len>0; *(*ATxt)++,Len--)                          //Пока не вычислим длину хвоста имени
+   if(SizeTxt.cx > LogSize)                                  //Р’РµСЃСЊ С‚РµРєСЃС‚ РЅРµ РїРѕРјРµСЃС‚РёС‚СЃСЏ РІ РѕРєРЅРѕ
+   {  GetTextExtentPoint32(hDC, StartTxt, 6, &SizeTxt);      //Р Р°Р·РјРµСЂ РґРѕРІРµСЃРєР° С‚РµРєСЃС‚Р°
+      LogSize -= SizeTxt.cx;                                 //РЈРјРµРЅСЊС€РёР»Рё СЂР°Р·РјРµСЂ РѕРєРЅР° РЅР° РІРµР»РёС‡РёРЅСѓ РґРѕРІРµСЃРєР°
+      for(;Len>0; *(*ATxt)++,Len--)                          //РџРѕРєР° РЅРµ РІС‹С‡РёСЃР»РёРј РґР»РёРЅСѓ С…РІРѕСЃС‚Р° РёРјРµРЅРё
       {  GetTextExtentPoint32(hDC, *ATxt, Len, &SizeTxt);
-         if(SizeTxt.cx < LogSize) break;                     //Если остаток текста поместится в окно
+         if(SizeTxt.cx < LogSize) break;                     //Р•СЃР»Рё РѕСЃС‚Р°С‚РѕРє С‚РµРєСЃС‚Р° РїРѕРјРµСЃС‚РёС‚СЃСЏ РІ РѕРєРЅРѕ
       }
-      if(*ATxt > ShortTxt+6)                                 //Произошло отсечение имени
-      {  *ATxt -= 6;                                         //Место для довеска
-         CopyMemory(*ATxt, StartTxt, 6);                     //Переслали довесок
+      if(*ATxt > ShortTxt+6)                                 //РџСЂРѕРёР·РѕС€Р»Рѕ РѕС‚СЃРµС‡РµРЅРёРµ РёРјРµРЅРё
+      {  *ATxt -= 6;                                         //РњРµСЃС‚Рѕ РґР»СЏ РґРѕРІРµСЃРєР°
+         CopyMemory(*ATxt, StartTxt, 6);                     //РџРµСЂРµСЃР»Р°Р»Рё РґРѕРІРµСЃРѕРє
       }
    }
-   ReleaseDC(hWnd, hDC);                                     //Освободили контекст
+   ReleaseDC(hWnd, hDC);                                     //РћСЃРІРѕР±РѕРґРёР»Рё РєРѕРЅС‚РµРєСЃС‚
 }
 
 //------------------------------------------------------------------------------
 
-void OutNameDlg(HWND hDlg, int ID_T, char *inText)           //Усечение имени
+void OutNameDlg(HWND hDlg, int ID_T, char *inText)           //РЈСЃРµС‡РµРЅРёРµ РёРјРµРЅРё
 {
    char ShortTxt[260+6];
    char *ATxt;
-   Out_NameDlg(hDlg, ID_T, inText, ShortTxt, &ATxt);         //Усечение имени
+   Out_NameDlg(hDlg, ID_T, inText, ShortTxt, &ATxt);         //РЈСЃРµС‡РµРЅРёРµ РёРјРµРЅРё
    SendDlgItemMessage(hDlg, ID_T, WM_SETTEXT, 0, LPARAM(ATxt));
 }
 
 //------------------------------------------------------------------------------
 
-void UnicodeToAnsi(WCHAR *inUNI, char *outANSI, int maxN)    //Преобразование Unicode в символы
+void UnicodeToAnsi(WCHAR *inUNI, char *outANSI, int maxN)    //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Unicode РІ СЃРёРјРІРѕР»С‹
 {
    char strANSI[256];
-   for(int i=0; i<maxN; i++) SWAP16((WORD *)(inUNI + i));    //В каталоге байты переставлены
-// WideCharToMultiByte(CP_ACP, 0, inUNI, -1, outANSI, 100, NULL, NULL);  //Непосредственный адрес не работает
+   for(int i=0; i<maxN; i++) SWAP16((WORD *)(inUNI + i));    //Р’ РєР°С‚Р°Р»РѕРіРµ Р±Р°Р№С‚С‹ РїРµСЂРµСЃС‚Р°РІР»РµРЅС‹
+// WideCharToMultiByte(CP_ACP, 0, inUNI, -1, outANSI, 100, NULL, NULL);  //РќРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅС‹Р№ Р°РґСЂРµСЃ РЅРµ СЂР°Р±РѕС‚Р°РµС‚
 // WideCharToMultiByte(CP_ACP, 0, inUNI, -1, strANSI, 100, NULL, NULL);
    WideCharToMultiByte(CP_ACP, 0, inUNI, maxN, strANSI, 100, NULL, NULL);
    for(int i=0; i<maxN; i++)
@@ -193,7 +193,7 @@ static BOOL CALLBACK Dlg_Wait(HWND hDlg, UINT Message, WPARAM wParam, LPARAM lPa
 {
    switch(Message)
    {  case WM_INITDIALOG:
-             CenterDlg(hDlg, -90);                           //Центрирование окна диалога в главном окне
+             CenterDlg(hDlg, -90);                           //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РґРёР°Р»РѕРіР° РІ РіР»Р°РІРЅРѕРј РѕРєРЅРµ
              SetDlgItemText(hDlg, IDC_STATICTEXT1, (Lan+57)->msg);
              SetDlgItemText(hDlg, IDC_STATICTEXT2, (Lan+58)->msg);
              SetDlgItemText(hDlg, IDC_STATICTEXT3, (Lan+59)->msg);
@@ -213,14 +213,14 @@ static BOOL CALLBACK Dlg_Wait(HWND hDlg, UINT Message, WPARAM wParam, LPARAM lPa
 
 //------------------------------------------------------------------------------
 
-void Open_Wait_Found_HDD(void)                               //Окошко со словами подождите
+void Open_Wait_Found_HDD(void)                               //РћРєРѕС€РєРѕ СЃРѕ СЃР»РѕРІР°РјРё РїРѕРґРѕР¶РґРёС‚Рµ
 {
    hWaitDlg = CreateDialog(MainInst, MAKEINTRESOURCE(IDD_WAIT), MainWin, Dlg_Wait);
 }
 
 //------------------------------------------------------------------------------
 
-void Close_Wait_Found_HDD(void)                              //Окошко со словами подождите
+void Close_Wait_Found_HDD(void)                              //РћРєРѕС€РєРѕ СЃРѕ СЃР»РѕРІР°РјРё РїРѕРґРѕР¶РґРёС‚Рµ
 {
    if(hWaitDlg != NULL) EndDialog(hWaitDlg, 0);
    hWaitDlg = NULL;
@@ -228,22 +228,22 @@ void Close_Wait_Found_HDD(void)                              //Окошко со словами
 
 //------------------------------------------------------------------------------
 
-int Ctrl_Adm(void)                                           //Проверка наличия прав администратора
+int Ctrl_Adm(void)                                           //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїСЂР°РІ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°
 {
 #if !defined EMULATOR_HDD
    HANDLE hToken;
    LUID TakeOwnershipValue;
    TOKEN_PRIVILEGES tkp;
    if(!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
-      return Error2((Lan+26)->msg, "(code -10)");            //return Error2("Ошибка при проверке уровня доступа", "(code -10)");
+      return Error2((Lan+26)->msg, "(code -10)");            //return Error2("РћС€РёР±РєР° РїСЂРё РїСЂРѕРІРµСЂРєРµ СѓСЂРѕРІРЅСЏ РґРѕСЃС‚СѓРїР°", "(code -10)");
    if(!LookupPrivilegeValue((LPSTR)NULL, SE_TAKE_OWNERSHIP_NAME, &TakeOwnershipValue))
-      return Error2((Lan+26)->msg, "(code -11)");            //return Error2("Ошибка при проверке уровня доступа", "(code -11)");
+      return Error2((Lan+26)->msg, "(code -11)");            //return Error2("РћС€РёР±РєР° РїСЂРё РїСЂРѕРІРµСЂРєРµ СѓСЂРѕРІРЅСЏ РґРѕСЃС‚СѓРїР°", "(code -11)");
    tkp.PrivilegeCount = 1;
    tkp.Privileges[0].Luid = TakeOwnershipValue;
    tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
    AdjustTokenPrivileges(hToken, FALSE, &tkp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL);
    if(GetLastError() != ERROR_SUCCESS)
-      return Error1((Lan+25)->msg);                          //return Error1("Данная программа не работает если у текущего пользователя нет прав администратора.");
+      return Error1((Lan+25)->msg);                          //return Error1("Р”Р°РЅРЅР°СЏ РїСЂРѕРіСЂР°РјРјР° РЅРµ СЂР°Р±РѕС‚Р°РµС‚ РµСЃР»Рё Сѓ С‚РµРєСѓС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РЅРµС‚ РїСЂР°РІ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°.");
 #endif
    return 0;
 }
@@ -256,13 +256,13 @@ static BOOL CALLBACK AboutDlg(HWND hDlg, UINT Message, WPARAM wParam, LPARAM lPa
    char NumVer[260];
    switch(Message)
    {  case WM_INITDIALOG:
-               CenterDlg(hDlg, 0);                           //Центрирование окна диалога в главном окне
-               if(Conf.nLanguage == 0)                       //Признак языка по умолчанию 0-русский,1-другой
-               {  SetWindowText(hDlg, "О программе");        //Вывели новый заголовок
-                  SetDlgItemText(hDlg, IDC_STATICTEXT1, "Программа копирования файлов с HDD извлеченного из рекордера LG");
-                  SetDlgItemText(hDlg, IDC_STATICTEXT2, "Автор Кудряшов В. ( Val238 ),  г. Москва");
-                  SetDlgItemText(hDlg, IDC_STATICTEXT6, "Версия");
-                  SetDlgItemText(hDlg, IDCANCEL, "Закрыть");
+               CenterDlg(hDlg, 0);                           //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РґРёР°Р»РѕРіР° РІ РіР»Р°РІРЅРѕРј РѕРєРЅРµ
+               if(Conf.nLanguage == 0)                       //РџСЂРёР·РЅР°Рє СЏР·С‹РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 0-СЂСѓСЃСЃРєРёР№,1-РґСЂСѓРіРѕР№
+               {  SetWindowText(hDlg, "Рћ РїСЂРѕРіСЂР°РјРјРµ");        //Р’С‹РІРµР»Рё РЅРѕРІС‹Р№ Р·Р°РіРѕР»РѕРІРѕРє
+                  SetDlgItemText(hDlg, IDC_STATICTEXT1, "РџСЂРѕРіСЂР°РјРјР° РєРѕРїРёСЂРѕРІР°РЅРёСЏ С„Р°Р№Р»РѕРІ СЃ HDD РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ РёР· СЂРµРєРѕСЂРґРµСЂР° LG");
+                  SetDlgItemText(hDlg, IDC_STATICTEXT2, "РђРІС‚РѕСЂ РљСѓРґСЂСЏС€РѕРІ Р’. ( Val238 ),  Рі. РњРѕСЃРєРІР°");
+                  SetDlgItemText(hDlg, IDC_STATICTEXT6, "Р’РµСЂСЃРёСЏ");
+                  SetDlgItemText(hDlg, IDCANCEL, "Р—Р°РєСЂС‹С‚СЊ");
                }
                wsprintf(NumVer, "%s    ( %s )", NVER_TXT, __DATE__);
                SetDlgItemText(hDlg, IDC_STATICTEXT7, NumVer);
@@ -287,16 +287,16 @@ void About(void)
 //------------------------------------------------------------------------------
 
 #if defined OUT_TEST
-void AddToSpecSpis_VerWin(void)                              //Запись в дамп версии Windows
+void AddToSpecSpis_VerWin(void)                              //Р—Р°РїРёСЃСЊ РІ РґР°РјРї РІРµСЂСЃРёРё Windows
 {
    HKEY hKey;
    char key[260], Ss[300];
    DWORD nb = sizeof(key);
-   DWORD Type = REG_SZ;                                      //Тип - нуль терминированная строка
+   DWORD Type = REG_SZ;                                      //РўРёРї - РЅСѓР»СЊ С‚РµСЂРјРёРЅРёСЂРѕРІР°РЅРЅР°СЏ СЃС‚СЂРѕРєР°
    int n;
    
    if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-                   0, KEY_READ, &hKey) != ERROR_SUCCESS)     //Ключ не найден
+                   0, KEY_READ, &hKey) != ERROR_SUCCESS)     //РљР»СЋС‡ РЅРµ РЅР°Р№РґРµРЅ
    {  Add_SpecSpis("Windows ???");
       return;
    }

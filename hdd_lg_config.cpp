@@ -6,183 +6,183 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ config_io =======================================
-int  WriteConfig(void);                                      //Запись файла конфигурации
-int  LoadConfig(void);                                       //Загрузка конфигурации
-void NewConfig(void);                                        //Изменение конфигурации
+int  WriteConfig(void);                                      //Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+int  LoadConfig(void);                                       //Р—Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+void NewConfig(void);                                        //РР·РјРµРЅРµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
      LANG *Lan;
-     CONF Conf;                                              //Параметры
-     char *msgLan;                                           //Все собщения для другого языка
+     CONF Conf;                                              //РџР°СЂР°РјРµС‚СЂС‹
+     char *msgLan;                                           //Р’СЃРµ СЃРѕР±С‰РµРЅРёСЏ РґР»СЏ РґСЂСѓРіРѕРіРѕ СЏР·С‹РєР°
 
-static char NameF_Lan[260];                                  //Имя файла языка если оно задано
-static char *AdrEnd;                                         //Адрес конца файла языка в памяти
-static int prLanDef;                                         //Признак языка по умолчанию 0-русский,1-другой
+static char NameF_Lan[260];                                  //РРјСЏ С„Р°Р№Р»Р° СЏР·С‹РєР° РµСЃР»Рё РѕРЅРѕ Р·Р°РґР°РЅРѕ
+static char *AdrEnd;                                         //РђРґСЂРµСЃ РєРѕРЅС†Р° С„Р°Р№Р»Р° СЏР·С‹РєР° РІ РїР°РјСЏС‚Рё
+static int prLanDef;                                         //РџСЂРёР·РЅР°Рє СЏР·С‹РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 0-СЂСѓСЃСЃРєРёР№,1-РґСЂСѓРіРѕР№
 
 //------------------------------------------------------------------------------
 
-static int Write_Config(HANDLE *hFile)                       //Запись файла конфигурации
+static int Write_Config(HANDLE *hFile)                       //Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 {
    DWORD nb;
 
    char NameF[260];
    char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return -1;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
-   fnmerge(NameF, Driv, Dir, Name, ".conf");                 //Получили имя файла
+   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Р Р°Р·Р»РѕР¶РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
+   fnmerge(NameF, Driv, Dir, Name, ".conf");                 //РџРѕР»СѓС‡РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
    *hFile = CreateFile(NameF, GENERIC_WRITE, 0, NULL,
                        CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
    if(*hFile == INVALID_HANDLE_VALUE)
-     return ErrorSys2(NameF, (Lan+82)->msg);                 //return ErrorSys2(NameF, "Ошибка при открытии файла для записи.");
+     return ErrorSys2(NameF, (Lan+82)->msg);                 //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р° РґР»СЏ Р·Р°РїРёСЃРё.");
    if(WriteFile(*hFile, &Conf, sizeof(CONF), &nb, NULL) == FALSE || nb != sizeof(CONF))
-     return ErrorSys2(NameF, (Lan+83)->msg);                 //return ErrorSys2(NameF, "Ошибка при записи файла.");
-   if(Conf.nLanguage != 2) return 0;                         //0-русский, 1-английский, 2-внешний файл
-   DWORD Size = lstrlen(NameF_Lan) + 1;                      //Размер имени файла
+     return ErrorSys2(NameF, (Lan+83)->msg);                 //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё С„Р°Р№Р»Р°.");
+   if(Conf.nLanguage != 2) return 0;                         //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
+   DWORD Size = lstrlen(NameF_Lan) + 1;                      //Р Р°Р·РјРµСЂ РёРјРµРЅРё С„Р°Р№Р»Р°
    if(WriteFile(*hFile, &NameF_Lan, Size, &nb, NULL) == FALSE || nb != Size)
-     return ErrorSys2(NameF, (Lan+83)->msg);                 //return ErrorSys2(NameF, "Ошибка при записи файла.");
+     return ErrorSys2(NameF, (Lan+83)->msg);                 //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё С„Р°Р№Р»Р°.");
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int WriteConfig(void)                                        //Запись файла конфигурации
+int WriteConfig(void)                                        //Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 {
    HANDLE hFile;
-   int ret = Write_Config(&hFile);                           //Запись файла конфигурации
+   int ret = Write_Config(&hFile);                           //Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
    CloseFile(&hFile);
    return ret;
 }
 
 //------------------------------------------------------------------------------
 
-static int SaveConfig(HWND hDlg)                             //Сохранение файла конфигурации
+static int SaveConfig(HWND hDlg)                             //РЎРѕС…СЂР°РЅРµРЅРёРµ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 {
-   lstrcpy(Conf.IdentStr, IDENT_STR);                        //Идентификатор файла
+   lstrcpy(Conf.IdentStr, IDENT_STR);                        //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С„Р°Р№Р»Р°
    for(DWORD i=0; i<sizeof(Conf.rez); i++) *(Conf.rez + i) = 0;
-   int IndV = SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_GETCURSEL, 0, 0L); //Индекс в окне списка
-   if(IndV != LB_ERR)                                        //Ничего не выбрано
+   int IndV = SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_GETCURSEL, 0, 0L); //РРЅРґРµРєСЃ РІ РѕРєРЅРµ СЃРїРёСЃРєР°
+   if(IndV != LB_ERR)                                        //РќРёС‡РµРіРѕ РЅРµ РІС‹Р±СЂР°РЅРѕ
    {  if(IndV >= 2)
-      {  SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_GETTEXT, IndV, (LPARAM)NameF_Lan);  //Взяли текст имени из списка
-         Conf.nLanguage = 2;                                 //0-русский, 1-английский, 2-внешний файл
+      {  SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_GETTEXT, IndV, (LPARAM)NameF_Lan);  //Р’Р·СЏР»Рё С‚РµРєСЃС‚ РёРјРµРЅРё РёР· СЃРїРёСЃРєР°
+         Conf.nLanguage = 2;                                 //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
       }
       else
-      {  Conf.nLanguage = BYTE(IndV);                        //0-русский, 1-английский, 2-внешний файл
-         *NameF_Lan = 0;                                     //Имя файла языка если оно задано
+      {  Conf.nLanguage = BYTE(IndV);                        //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
+         *NameF_Lan = 0;                                     //РРјСЏ С„Р°Р№Р»Р° СЏР·С‹РєР° РµСЃР»Рё РѕРЅРѕ Р·Р°РґР°РЅРѕ
       }
    }
-   return WriteConfig();                                     //Запись файла конфигурации
+   return WriteConfig();                                     //Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 }
 
 //------------------------------------------------------------------------------
 
-static void Lan_Default(void)                                //Установка языка по умолчанию
+static void Lan_Default(void)                                //РЈСЃС‚Р°РЅРѕРІРєР° СЏР·С‹РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 {
    MyFreeMem(&(void*)msgLan);
-   if(prLanDef == 0)                                         //Признак языка по умолчанию 0-русский,1-другой
-   {  Lan = Lan_RU;                                          //Загрузили русскую страницу
-      Conf.nLanguage = 0;                                    //0-русский, 1-английский, 2-внешний файл
+   if(prLanDef == 0)                                         //РџСЂРёР·РЅР°Рє СЏР·С‹РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 0-СЂСѓСЃСЃРєРёР№,1-РґСЂСѓРіРѕР№
+   {  Lan = Lan_RU;                                          //Р—Р°РіСЂСѓР·РёР»Рё СЂСѓСЃСЃРєСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ
+      Conf.nLanguage = 0;                                    //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
    }
    else
-   {  Lan = Lan_EN;                                          //Загрузили английскую страницу
-      Conf.nLanguage = 1;                                    //0-русский, 1-английский, 2-внешний файл
+   {  Lan = Lan_EN;                                          //Р—Р°РіСЂСѓР·РёР»Рё Р°РЅРіР»РёР№СЃРєСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ
+      Conf.nLanguage = 1;                                    //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
    }
-   *NameF_Lan = 0;                                           //Имя файла языка если оно задано
+   *NameF_Lan = 0;                                           //РРјСЏ С„Р°Р№Р»Р° СЏР·С‹РєР° РµСЃР»Рё РѕРЅРѕ Р·Р°РґР°РЅРѕ
 }
 
 //------------------------------------------------------------------------------
 
-static void ConfigDefault(void)                              //Установка конфигурации по умолчанию
+static void ConfigDefault(void)                              //РЈСЃС‚Р°РЅРѕРІРєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 {
    ZeroMemory(&Conf, sizeof(Conf));
-   Lan_Default();                                            //Установка языка по умолчанию
+   Lan_Default();                                            //РЈСЃС‚Р°РЅРѕРІРєР° СЏР·С‹РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 }
 
 //------------------------------------------------------------------------------
 
-static int ReadConfig(char *NameF, HANDLE *hFile)            //Загрузка конфигурации
+static int ReadConfig(char *NameF, HANDLE *hFile)            //Р—Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 {
    DWORD nb;
 
    *hFile = CreateFile(NameF, GENERIC_READ, FILE_SHARE_READ, NULL,
                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
    if(*hFile == INVALID_HANDLE_VALUE)
-      return ErrorSys2(NameF, (Lan+84)->msg);                //return ErrorSys2(NameF, "Ошибка при открытии файла для чтения.");
+      return ErrorSys2(NameF, (Lan+84)->msg);                //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р° РґР»СЏ С‡С‚РµРЅРёСЏ.");
    DWORD FSize = GetFileSize(*hFile, NULL);
    if(FSize == 0xFFFFFFFF)
-      return ErrorSys2(NameF, (Lan+85)->msg);                //return ErrorSys2(NameF, "Ошибка при запросе размера файла.");
+      return ErrorSys2(NameF, (Lan+85)->msg);                //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ СЂР°Р·РјРµСЂР° С„Р°Р№Р»Р°.");
    if(FSize < sizeof(CONF))
-      return Error2(NameF, (Lan+86)->msg);                   //return Error2(NameF, "Недопустимо малый размер файла.");
+      return Error2(NameF, (Lan+86)->msg);                   //return Error2(NameF, "РќРµРґРѕРїСѓСЃС‚РёРјРѕ РјР°Р»С‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р°.");
    if(ReadFile(*hFile, &Conf, sizeof(CONF), &nb, NULL) == FALSE || nb != sizeof(CONF))
-      return ErrorSys2(NameF, (Lan+87)->msg);                //return ErrorSys2(NameF, "Ошибка при чтении файла.");
-   if(lstrcmp(Conf.IdentStr, IDENT_STR) != 0)                //Идентификатор файла
-   {  ConfigDefault();                                       //Установка конфигурации по умолчанию
-      return Error2(NameF, (Lan+88)->msg);                   //return Error2(NameF, "Неверный идентификатор файла.");
+      return ErrorSys2(NameF, (Lan+87)->msg);                //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё С„Р°Р№Р»Р°.");
+   if(lstrcmp(Conf.IdentStr, IDENT_STR) != 0)                //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С„Р°Р№Р»Р°
+   {  ConfigDefault();                                       //РЈСЃС‚Р°РЅРѕРІРєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+      return Error2(NameF, (Lan+88)->msg);                   //return Error2(NameF, "РќРµРІРµСЂРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С„Р°Р№Р»Р°.");
    }
    *NameF_Lan = 0;
-   if(Conf.nLanguage != 2)  return 0;                        //0-русский, 1-английский, 2-внешний файл
+   if(Conf.nLanguage != 2)  return 0;                        //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
    DWORD Size = FSize - sizeof(CONF);
    if(ReadFile(*hFile, &NameF_Lan, Size, &nb, NULL) == FALSE || nb != Size)
-      return ErrorSys2(NameF, (Lan+87)->msg);                //return ErrorSys2(NameF, "Ошибка при чтении файла.");
+      return ErrorSys2(NameF, (Lan+87)->msg);                //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё С„Р°Р№Р»Р°.");
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int ReadLanFile(char *NameF, HANDLE *hFile)           //Чтение файла языка
+static int ReadLanFile(char *NameF, HANDLE *hFile)           //Р§С‚РµРЅРёРµ С„Р°Р№Р»Р° СЏР·С‹РєР°
 {
    DWORD nb;
 
    *hFile = CreateFile(NameF, GENERIC_READ, FILE_SHARE_READ, NULL,
                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
    if(*hFile == INVALID_HANDLE_VALUE)
-      return ErrorSys2(NameF, (Lan+84)->msg);                //return ErrorSys2(NameF, "Ошибка при открытии файла для чтения.");
+      return ErrorSys2(NameF, (Lan+84)->msg);                //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р° РґР»СЏ С‡С‚РµРЅРёСЏ.");
    DWORD FSize = GetFileSize(*hFile, NULL);
    if(FSize == 0xFFFFFFFF)
-      return ErrorSys2(NameF, (Lan+85)->msg);                //return ErrorSys2(NameF, "Ошибка при запросе размера файла.");
+      return ErrorSys2(NameF, (Lan+85)->msg);                //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ СЂР°Р·РјРµСЂР° С„Р°Р№Р»Р°.");
    if(FSize < 120)
-      return Error2(NameF, (Lan+86)->msg);                   //return Error2(NameF, "Недопустимо малый размер файла.");
+      return Error2(NameF, (Lan+86)->msg);                   //return Error2(NameF, "РќРµРґРѕРїСѓСЃС‚РёРјРѕ РјР°Р»С‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р°.");
    MyFreeMem(&(void*)msgLan);
-   msgLan = (char *)MyAllocMem(FSize+1);                     //Память под один кластер
+   msgLan = (char *)MyAllocMem(FSize+1);                     //РџР°РјСЏС‚СЊ РїРѕРґ РѕРґРёРЅ РєР»Р°СЃС‚РµСЂ
    if(msgLan == NULL)  return -1;
    if(ReadFile(*hFile, msgLan, FSize, &nb, NULL) == FALSE || nb != FSize)
-      return ErrorSys2(NameF, (Lan+87)->msg);                //return ErrorSys2(NameF, "Ошибка при чтении файла.");
-   AdrEnd = msgLan + FSize;                                  //Адрес конца файла языка в памяти
-   *AdrEnd = '\n';                                           //На всякий случай, вдруг забыли
+      return ErrorSys2(NameF, (Lan+87)->msg);                //return ErrorSys2(NameF, "РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё С„Р°Р№Р»Р°.");
+   AdrEnd = msgLan + FSize;                                  //РђРґСЂРµСЃ РєРѕРЅС†Р° С„Р°Р№Р»Р° СЏР·С‹РєР° РІ РїР°РјСЏС‚Рё
+   *AdrEnd = '\n';                                           //РќР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№, РІРґСЂСѓРі Р·Р°Р±С‹Р»Рё
    AdrEnd++;
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int SetNewLan(void)                                   //Установка нового языка
+static int SetNewLan(void)                                   //РЈСЃС‚Р°РЅРѕРІРєР° РЅРѕРІРѕРіРѕ СЏР·С‹РєР°
 {
-   char *Adr;                                                //Текущий адрес начала строки
-   char *NewAdr = msgLan - 1;                                //Адрес конца строки (равен началу файла - 1 для работы первого оператора цикла)
-   LANG *LanD = (prLanDef == 0) ? Lan_RU : Lan_EN;           //Признак языка по умолчанию 0-русский,1-другой
-   for(int i=0; i<numStrLan; i++)                            //Скопировали все сообщения в полном объеме
+   char *Adr;                                                //РўРµРєСѓС‰РёР№ Р°РґСЂРµСЃ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+   char *NewAdr = msgLan - 1;                                //РђРґСЂРµСЃ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё (СЂР°РІРµРЅ РЅР°С‡Р°Р»Сѓ С„Р°Р№Р»Р° - 1 РґР»СЏ СЂР°Р±РѕС‚С‹ РїРµСЂРІРѕРіРѕ РѕРїРµСЂР°С‚РѕСЂР° С†РёРєР»Р°)
+   LANG *LanD = (prLanDef == 0) ? Lan_RU : Lan_EN;           //РџСЂРёР·РЅР°Рє СЏР·С‹РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 0-СЂСѓСЃСЃРєРёР№,1-РґСЂСѓРіРѕР№
+   for(int i=0; i<numStrLan; i++)                            //РЎРєРѕРїРёСЂРѕРІР°Р»Рё РІСЃРµ СЃРѕРѕР±С‰РµРЅРёСЏ РІ РїРѕР»РЅРѕРј РѕР±СЉРµРјРµ
      *(Lan_Any + i) = *(LanD + i);
-   for(;;)                                                   //Заменяем мои сообщения на сообщения из языкового файла
+   for(;;)                                                   //Р—Р°РјРµРЅСЏРµРј РјРѕРё СЃРѕРѕР±С‰РµРЅРёСЏ РЅР° СЃРѕРѕР±С‰РµРЅРёСЏ РёР· СЏР·С‹РєРѕРІРѕРіРѕ С„Р°Р№Р»Р°
    {  Adr = NewAdr + 1;
-      NewAdr = strchr(Adr, '\n');                            //Нашли конец строки
-      if(NewAdr > AdrEnd) break;                             //Данные кончились
-      if(NewAdr == NULL)  break;                             //Больше нет ни одной полной строки
-      *NewAdr = 0;                                           //Ограничили строку
-      if(*Adr == 0) continue;                                //Пустая строка
-      if(*Adr == '/' && *(Adr+1) == '/') continue;           //Строка комментария
-      int ind_m = int(atof(Adr));                            //Номер строки языка
-      if(ind_m < 0 || ind_m > numStrLan)                     //Номер строки вне допустимого диапазона
-      {   Error3(NameF_Lan, Adr, (Lan+89)->msg);             //Error3(NameF_Lan, Adr, "Недопустимый индекс строки.");
+      NewAdr = strchr(Adr, '\n');                            //РќР°С€Р»Рё РєРѕРЅРµС† СЃС‚СЂРѕРєРё
+      if(NewAdr > AdrEnd) break;                             //Р”Р°РЅРЅС‹Рµ РєРѕРЅС‡РёР»РёСЃСЊ
+      if(NewAdr == NULL)  break;                             //Р‘РѕР»СЊС€Рµ РЅРµС‚ РЅРё РѕРґРЅРѕР№ РїРѕР»РЅРѕР№ СЃС‚СЂРѕРєРё
+      *NewAdr = 0;                                           //РћРіСЂР°РЅРёС‡РёР»Рё СЃС‚СЂРѕРєСѓ
+      if(*Adr == 0) continue;                                //РџСѓСЃС‚Р°СЏ СЃС‚СЂРѕРєР°
+      if(*Adr == '/' && *(Adr+1) == '/') continue;           //РЎС‚СЂРѕРєР° РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
+      int ind_m = int(atof(Adr));                            //РќРѕРјРµСЂ СЃС‚СЂРѕРєРё СЏР·С‹РєР°
+      if(ind_m < 0 || ind_m > numStrLan)                     //РќРѕРјРµСЂ СЃС‚СЂРѕРєРё РІРЅРµ РґРѕРїСѓСЃС‚РёРјРѕРіРѕ РґРёР°РїР°Р·РѕРЅР°
+      {   Error3(NameF_Lan, Adr, (Lan+89)->msg);             //Error3(NameF_Lan, Adr, "РќРµРґРѕРїСѓСЃС‚РёРјС‹Р№ РёРЅРґРµРєСЃ СЃС‚СЂРѕРєРё.");
           continue;
       }
-      int ik1 = -1, ik2 = -1;                                //Индексы первой и второй кавычек
-      for(int i=0; i<NewAdr-Adr; i++)                        //По всей строке ищем пару кавычек
+      int ik1 = -1, ik2 = -1;                                //РРЅРґРµРєСЃС‹ РїРµСЂРІРѕР№ Рё РІС‚РѕСЂРѕР№ РєР°РІС‹С‡РµРє
+      for(int i=0; i<NewAdr-Adr; i++)                        //РџРѕ РІСЃРµР№ СЃС‚СЂРѕРєРµ РёС‰РµРј РїР°СЂСѓ РєР°РІС‹С‡РµРє
         if(*(Adr+i) == '"')
-          if(ik1 == -1) ik1 = i;                             //Нашли первую кавычку
-          else ik2 = i;                                      //Нашли вторую кавычку
+          if(ik1 == -1) ik1 = i;                             //РќР°С€Р»Рё РїРµСЂРІСѓСЋ РєР°РІС‹С‡РєСѓ
+          else ik2 = i;                                      //РќР°С€Р»Рё РІС‚РѕСЂСѓСЋ РєР°РІС‹С‡РєСѓ
       if(ik1 == -1 || ik2 == -1)
-      {   Error3(NameF_Lan, Adr, (Lan+90)->msg);             //Error3(NameF_Lan, Adr, "Не найден текст ограниченный кавычками.");
+      {   Error3(NameF_Lan, Adr, (Lan+90)->msg);             //Error3(NameF_Lan, Adr, "РќРµ РЅР°Р№РґРµРЅ С‚РµРєСЃС‚ РѕРіСЂР°РЅРёС‡РµРЅРЅС‹Р№ РєР°РІС‹С‡РєР°РјРё.");
           continue;
       }
-      (Lan_Any + ind_m)->msg = Adr + ik1 + 1;                //Начало текста первый символ после первой кавычки
-      *(Adr + ik2) = 0;                                      //Заменили вторую кавычку на признак конца строки
+      (Lan_Any + ind_m)->msg = Adr + ik1 + 1;                //РќР°С‡Р°Р»Рѕ С‚РµРєСЃС‚Р° РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» РїРѕСЃР»Рµ РїРµСЂРІРѕР№ РєР°РІС‹С‡РєРё
+      *(Adr + ik2) = 0;                                      //Р—Р°РјРµРЅРёР»Рё РІС‚РѕСЂСѓСЋ РєР°РІС‹С‡РєСѓ РЅР° РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° СЃС‚СЂРѕРєРё
    }
    Lan = Lan_Any;
    return 0;
@@ -190,68 +190,68 @@ static int SetNewLan(void)                                   //Установка нового 
 
 //------------------------------------------------------------------------------
 
-static int LoadLanFile(void)                                 //Загрузка файла языка
+static int LoadLanFile(void)                                 //Р—Р°РіСЂСѓР·РєР° С„Р°Р№Р»Р° СЏР·С‹РєР°
 {
    HANDLE hFile;
    char NameF[260];
    char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return -1;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
-   fnmerge(NameF, Driv, Dir, NameF_Lan, "");                 //Получили имя файла
-   int ret = ReadLanFile(NameF, &hFile);                     //Чтение файла языка
+   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Р Р°Р·Р»РѕР¶РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
+   fnmerge(NameF, Driv, Dir, NameF_Lan, "");                 //РџРѕР»СѓС‡РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
+   int ret = ReadLanFile(NameF, &hFile);                     //Р§С‚РµРЅРёРµ С„Р°Р№Р»Р° СЏР·С‹РєР°
    CloseFile(&hFile);
    if(ret < 0) return -1;
-   ret = SetNewLan();                                        //Установка нового языка
+   ret = SetNewLan();                                        //РЈСЃС‚Р°РЅРѕРІРєР° РЅРѕРІРѕРіРѕ СЏР·С‹РєР°
    return ret;
 }
 
 //------------------------------------------------------------------------------
 
-static int SetNewLanguage(void)                              //Загрузка и установка файла языка
+static int SetNewLanguage(void)                              //Р—Р°РіСЂСѓР·РєР° Рё СѓСЃС‚Р°РЅРѕРІРєР° С„Р°Р№Р»Р° СЏР·С‹РєР°
 {
-   if(Conf.nLanguage == 0)                                   //0-русский, 1-английский, 2-внешний файл
-   {  Lan = Lan_RU;  return 0;  }                            //Загрузили русскую страницу
-   if(Conf.nLanguage == 1)                                   //0-русский, 1-английский, 2-внешний файл
-   {  Lan = Lan_EN;  return 0;  }                            //Загрузили английскую страницу
-   if(LoadLanFile() == 0) return 0;                          //Загрузка файла языка
-   Lan_Default();                                            //Установка языка по умолчанию
+   if(Conf.nLanguage == 0)                                   //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
+   {  Lan = Lan_RU;  return 0;  }                            //Р—Р°РіСЂСѓР·РёР»Рё СЂСѓСЃСЃРєСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ
+   if(Conf.nLanguage == 1)                                   //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
+   {  Lan = Lan_EN;  return 0;  }                            //Р—Р°РіСЂСѓР·РёР»Рё Р°РЅРіР»РёР№СЃРєСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ
+   if(LoadLanFile() == 0) return 0;                          //Р—Р°РіСЂСѓР·РєР° С„Р°Р№Р»Р° СЏР·С‹РєР°
+   Lan_Default();                                            //РЈСЃС‚Р°РЅРѕРІРєР° СЏР·С‹РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int LoadConfig(void)                                        //Загрузка конфигурации
+int LoadConfig(void)                                        //Р—Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 {
    char NameF[260];
    char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return -1;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
-   fnmerge(NameF, Driv, Dir, Name, ".conf");                 //Получили имя файла
+   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Р Р°Р·Р»РѕР¶РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
+   fnmerge(NameF, Driv, Dir, Name, ".conf");                 //РџРѕР»СѓС‡РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
 
    char LanDef[5];
    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ILANGUAGE, LanDef, 5);
    if(lstrcmp(LanDef, "0419") == 0)
-   {  prLanDef = 0; Lan = Lan_RU; }                          //Признак языка по умолчанию 0-русский,1-другой
+   {  prLanDef = 0; Lan = Lan_RU; }                          //РџСЂРёР·РЅР°Рє СЏР·С‹РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 0-СЂСѓСЃСЃРєРёР№,1-РґСЂСѓРіРѕР№
    else
-   {  prLanDef = 1; Lan = Lan_EN; }                          //Признак языка по умолчанию 0-русский,1-другой
+   {  prLanDef = 1; Lan = Lan_EN; }                          //РџСЂРёР·РЅР°Рє СЏР·С‹РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 0-СЂСѓСЃСЃРєРёР№,1-РґСЂСѓРіРѕР№
    msgLan = NULL;
-   if(CtrlFileYesNo(NameF) == 0)                             //Проверка наличия файла (0-файла нет)
-   {  ConfigDefault();                                       //Установка конфигурации по умолчанию
+   if(CtrlFileYesNo(NameF) == 0)                             //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р° (0-С„Р°Р№Р»Р° РЅРµС‚)
+   {  ConfigDefault();                                       //РЈСЃС‚Р°РЅРѕРІРєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
       return 0;
    }
    HANDLE hFile;
-   int ret = ReadConfig(NameF, &hFile);                      //Загрузка конфигурации
+   int ret = ReadConfig(NameF, &hFile);                      //Р—Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
    CloseFile(&hFile);
-   if(ret == 0) return SetNewLanguage();                     //Загрузка и установка файла языка
-   ConfigDefault();                                          //Установка конфигурации по умолчанию
+   if(ret == 0) return SetNewLanguage();                     //Р—Р°РіСЂСѓР·РєР° Рё СѓСЃС‚Р°РЅРѕРІРєР° С„Р°Р№Р»Р° СЏР·С‹РєР°
+   ConfigDefault();                                          //РЈСЃС‚Р°РЅРѕРІРєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static void Init_Dlg_Name(HWND hDlg)                         //Наименования в зависимости от языка
+static void Init_Dlg_Name(HWND hDlg)                         //РќР°РёРјРµРЅРѕРІР°РЅРёСЏ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЏР·С‹РєР°
 {
-   SetWindowText(hDlg, (Lan+5)->msg);                        //Вывели новый заголовок
+   SetWindowText(hDlg, (Lan+5)->msg);                        //Р’С‹РІРµР»Рё РЅРѕРІС‹Р№ Р·Р°РіРѕР»РѕРІРѕРє
    SetDlgItemText(hDlg, IDC_GROUPBOX2, (Lan+69)->msg);
    SetDlgItemText(hDlg, IDC_CHECKBOX1, (Lan+70)->msg);
    SetDlgItemText(hDlg, IDC_CHECKBOX2, (Lan+71)->msg);
@@ -288,13 +288,13 @@ static void Init_Dlg_Name(HWND hDlg)                         //Наименования в за
    SetDlgItemText(hDlg, IDC_RADIOBUTTON16, (Lan+132)->msg);
    SetDlgItemText(hDlg, IDC_RADIOBUTTON17, (Lan+133)->msg);
    SetDlgItemText(hDlg, IDC_RADIOBUTTON18, (Lan+134)->msg);
-#if defined WRITE_YES                                        //Режим записи разрешен
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
    SetDlgItemText(hDlg, IDC_GROUPBOX10, (Lan+165)->msg);
    SetDlgItemText(hDlg, IDC_CHECKBOX8, (Lan+166)->msg);
-   if(pr_tRec == 1)                                          //Признак рекордера 0 или 1 (старейшая серия)
+   if(pr_tRec == 1)                                          //РџСЂРёР·РЅР°Рє СЂРµРєРѕСЂРґРµСЂР° 0 РёР»Рё 1 (СЃС‚Р°СЂРµР№С€Р°СЏ СЃРµСЂРёСЏ)
    {  ShowWindow(GetDlgItem(hDlg, IDC_GROUPBOX10), SW_HIDE);
       ShowWindow(GetDlgItem(hDlg, IDC_CHECKBOX8), SW_HIDE);
-      Conf.WriteYes = 0;                                     //Для старой серии никакой записи
+      Conf.WriteYes = 0;                                     //Р”Р»СЏ СЃС‚Р°СЂРѕР№ СЃРµСЂРёРё РЅРёРєР°РєРѕР№ Р·Р°РїРёСЃРё
    }
 #else
    ShowWindow(GetDlgItem(hDlg, IDC_GROUPBOX10), SW_HIDE);
@@ -304,7 +304,7 @@ static void Init_Dlg_Name(HWND hDlg)                         //Наименования в за
 
 //------------------------------------------------------------------------------
 
-static void Init_Dlg_ParForConfig(HWND hDlg)                 //Параметры в зависимости от конфигурации
+static void Init_Dlg_ParForConfig(HWND hDlg)                 //РџР°СЂР°РјРµС‚СЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 {
    if(Conf.altName == 0)
    {  EnableWindow(GetDlgItem(hDlg, IDC_CHECKBOX1), FALSE);
@@ -350,70 +350,70 @@ static void Init_Dlg_ParForConfig(HWND hDlg)                 //Параметры в завис
 
 //------------------------------------------------------------------------------
 
-static void Init_Dlg_Par(HWND hDlg)                          //Параметры в зависимости от конфигурации
+static void Init_Dlg_Par(HWND hDlg)                          //РџР°СЂР°РјРµС‚СЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 {
    int State;
    SendDlgItemMessage(hDlg, IDC_RADIOBUTTON1+Conf.PrSort, BM_SETCHECK, 1, 0L);
    SendDlgItemMessage(hDlg, IDC_RADIOBUTTON3+Conf.altName, BM_SETCHECK, 1, 0L);
    SendDlgItemMessage(hDlg, IDC_RADIOBUTTON5+Conf.typeRec, BM_SETCHECK, 1, 0L);
    SendDlgItemMessage(hDlg, IDC_RADIOBUTTON7+Conf.typeSize, BM_SETCHECK, 1, 0L);
-   SendDlgItemMessage(hDlg, IDC_RADIOBUTTON11+Conf.typeTime, BM_SETCHECK, 1, 0L);//0-показывать время начала записи, 1-время создания файла
-   SendDlgItemMessage(hDlg, IDC_RADIOBUTTON13+Conf.poz_Ql, BM_SETCHECK, 1, 0L);  //Качество записи: 0-в колонке, 1-в имени, 2-не показывать
-   SendDlgItemMessage(hDlg, IDC_RADIOBUTTON16+Conf.poz_In, BM_SETCHECK, 1, 0L);  //Источник записи: 0-в колонке, 1-в имени, 2-не показывать
+   SendDlgItemMessage(hDlg, IDC_RADIOBUTTON11+Conf.typeTime, BM_SETCHECK, 1, 0L);//0-РїРѕРєР°Р·С‹РІР°С‚СЊ РІСЂРµРјСЏ РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРё, 1-РІСЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р°
+   SendDlgItemMessage(hDlg, IDC_RADIOBUTTON13+Conf.poz_Ql, BM_SETCHECK, 1, 0L);  //РљР°С‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+   SendDlgItemMessage(hDlg, IDC_RADIOBUTTON16+Conf.poz_In, BM_SETCHECK, 1, 0L);  //РСЃС‚РѕС‡РЅРёРє Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
 
-   State = (Conf.ViewVRO == 0) ? BST_CHECKED : BST_UNCHECKED;      //0-показыват расширение *.vro, 1-не показывать
+   State = (Conf.ViewVRO == 0) ? BST_CHECKED : BST_UNCHECKED;      //0-РїРѕРєР°Р·С‹РІР°С‚ СЂР°СЃС€РёСЂРµРЅРёРµ *.vro, 1-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
    SendDlgItemMessage(hDlg, IDC_CHECKBOX6, BM_SETCHECK, State, 0L);
-   State = (Conf.ViewPart == 0) ? BST_CHECKED : BST_UNCHECKED;      //0-показыват расширение *.vro, 1-не показывать
+   State = (Conf.ViewPart == 0) ? BST_CHECKED : BST_UNCHECKED;      //0-РїРѕРєР°Р·С‹РІР°С‚ СЂР°СЃС€РёСЂРµРЅРёРµ *.vro, 1-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
    SendDlgItemMessage(hDlg, IDC_CHECKBOX7, BM_SETCHECK, State, 0L);
-   State = (Conf.ViewIDX == 0) ? BST_CHECKED : BST_UNCHECKED;      //0-не показыват файлы *.idx, 1-показывать
+   State = (Conf.ViewIDX == 0) ? BST_CHECKED : BST_UNCHECKED;      //0-РЅРµ РїРѕРєР°Р·С‹РІР°С‚ С„Р°Р№Р»С‹ *.idx, 1-РїРѕРєР°Р·С‹РІР°С‚СЊ
    SendDlgItemMessage(hDlg, IDC_CHECKBOX1, BM_SETCHECK, State, 0L);
-   State = (Conf.Ren_STR == 0) ? BST_CHECKED : BST_UNCHECKED;      //0-переименовывоть *.str в *.vro
+   State = (Conf.Ren_STR == 0) ? BST_CHECKED : BST_UNCHECKED;      //0-РїРµСЂРµРёРјРµРЅРѕРІС‹РІРѕС‚СЊ *.str РІ *.vro
    SendDlgItemMessage(hDlg, IDC_CHECKBOX2, BM_SETCHECK, State, 0L);
-   State = (Conf.SwapNPart == 0) ? BST_CHECKED : BST_UNCHECKED;    //0-переставлять номер части в конец имени
+   State = (Conf.SwapNPart == 0) ? BST_CHECKED : BST_UNCHECKED;    //0-РїРµСЂРµСЃС‚Р°РІР»СЏС‚СЊ РЅРѕРјРµСЂ С‡Р°СЃС‚Рё РІ РєРѕРЅРµС† РёРјРµРЅРё
    SendDlgItemMessage(hDlg, IDC_CHECKBOX3, BM_SETCHECK, State, 0L);
-   State = (Conf.ChangeNul == 0) ? BST_CHECKED : BST_UNCHECKED;    //0-заменять символ '0' на '_'
+   State = (Conf.ChangeNul == 0) ? BST_CHECKED : BST_UNCHECKED;    //0-Р·Р°РјРµРЅСЏС‚СЊ СЃРёРјРІРѕР» '0' РЅР° '_'
    SendDlgItemMessage(hDlg, IDC_CHECKBOX4, BM_SETCHECK, State, 0L);
-   State = (Conf.NoViewOnePart == 0) ? BST_CHECKED : BST_UNCHECKED;//0-не показыватьномер для одной части
+   State = (Conf.NoViewOnePart == 0) ? BST_CHECKED : BST_UNCHECKED;//0-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊРЅРѕРјРµСЂ РґР»СЏ РѕРґРЅРѕР№ С‡Р°СЃС‚Рё
    SendDlgItemMessage(hDlg, IDC_CHECKBOX5, BM_SETCHECK, State, 0L);
-   State = (Conf.WriteYes == 1) ? BST_CHECKED : BST_UNCHECKED;     //1-функции записи включены
+   State = (Conf.WriteYes == 1) ? BST_CHECKED : BST_UNCHECKED;     //1-С„СѓРЅРєС†РёРё Р·Р°РїРёСЃРё РІРєР»СЋС‡РµРЅС‹
    SendDlgItemMessage(hDlg, IDC_CHECKBOX8, BM_SETCHECK, State, 0L);
-   Init_Dlg_ParForConfig(hDlg);                                    //Параметры в зависимости от конфигурации
+   Init_Dlg_ParForConfig(hDlg);                                    //РџР°СЂР°РјРµС‚СЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 }
 
 //------------------------------------------------------------------------------
 
-static void Create_SpisLangF(HWND hDlg)                      //Создание списка языковых файлов
+static void Create_SpisLangF(HWND hDlg)                      //РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° СЏР·С‹РєРѕРІС‹С… С„Р°Р№Р»РѕРІ
 {
    HANDLE File;
    WIN32_FIND_DATA Data;
    char NameF[260];
    char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
-   fnmerge(NameF, Driv, Dir, "*", ".lng");                   //Получили имя файла
-   if((File = FindFirstFile(NameF, &Data)) == INVALID_HANDLE_VALUE)  return; //Файл не найден
-   for(;;)                                                   //Список языковых файлов
+   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Р Р°Р·Р»РѕР¶РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
+   fnmerge(NameF, Driv, Dir, "*", ".lng");                   //РџРѕР»СѓС‡РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
+   if((File = FindFirstFile(NameF, &Data)) == INVALID_HANDLE_VALUE)  return; //Р¤Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ
+   for(;;)                                                   //РЎРїРёСЃРѕРє СЏР·С‹РєРѕРІС‹С… С„Р°Р№Р»РѕРІ
    {  SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_ADDSTRING, 0, (LPARAM)Data.cFileName);
       if(FindNextFile(File, &Data) == 0)
-          if(GetLastError() == ERROR_NO_MORE_FILES) break;   //Больше нет файлов с расширением *.lng
+          if(GetLastError() == ERROR_NO_MORE_FILES) break;   //Р‘РѕР»СЊС€Рµ РЅРµС‚ С„Р°Р№Р»РѕРІ СЃ СЂР°СЃС€РёСЂРµРЅРёРµРј *.lng
    }
    FindClose(File);
 }
 
 //------------------------------------------------------------------------------
 
-static void Init_SpisLang(HWND hDlg)                         //Создание списка языков
+static void Init_SpisLang(HWND hDlg)                         //РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° СЏР·С‹РєРѕРІ
 {
-   SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_ADDSTRING, 0, (LPARAM)"Русский (Russian)");
+   SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_ADDSTRING, 0, (LPARAM)"Р СѓСЃСЃРєРёР№ (Russian)");
    SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_ADDSTRING, 0, (LPARAM)"English");
-   Create_SpisLangF(hDlg);                                   //Создание списка языковых файлов
-   if(Conf.nLanguage != 2)                                   //0-русский, 1-английский, 2-внешний файл
+   Create_SpisLangF(hDlg);                                   //РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° СЏР·С‹РєРѕРІС‹С… С„Р°Р№Р»РѕРІ
+   if(Conf.nLanguage != 2)                                   //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
      SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_SETCURSEL, Conf.nLanguage, 0L);
    else
    {  int IndV = SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_FINDSTRING, -1, (LPARAM)NameF_Lan);
-      if(IndV == LB_ERR)                                     //Ничего не выбрано
-         Error2((Lan+81)->msg, "(code -44)");                //Error2("Неопознанная ошибка работы со списком", "(code -44)");
-      SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_SETCURSEL, IndV, 0L);    //Курсор на номер в списке
+      if(IndV == LB_ERR)                                     //РќРёС‡РµРіРѕ РЅРµ РІС‹Р±СЂР°РЅРѕ
+         Error2((Lan+81)->msg, "(code -44)");                //Error2("РќРµРѕРїРѕР·РЅР°РЅРЅР°СЏ РѕС€РёР±РєР° СЂР°Р±РѕС‚С‹ СЃРѕ СЃРїРёСЃРєРѕРј", "(code -44)");
+      SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_SETCURSEL, IndV, 0L);    //РљСѓСЂСЃРѕСЂ РЅР° РЅРѕРјРµСЂ РІ СЃРїРёСЃРєРµ
    }
 }
 
@@ -426,54 +426,54 @@ static BOOL CALLBACK Dlg_NewConf(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
    {
       case WM_INITDIALOG:
              CenterDlg(hDlg, 0);
-             Init_Dlg_Name(hDlg);                            //Наименования в зависимости от языка
-             Init_Dlg_Par(hDlg);                             //Параметры в зависимости от конфигурации
-             Init_SpisLang(hDlg);                            //Создание списка языков
+             Init_Dlg_Name(hDlg);                            //РќР°РёРјРµРЅРѕРІР°РЅРёСЏ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЏР·С‹РєР°
+             Init_Dlg_Par(hDlg);                             //РџР°СЂР°РјРµС‚СЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+             Init_SpisLang(hDlg);                            //РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° СЏР·С‹РєРѕРІ
              return TRUE;
       case WM_COMMAND:
            switch(LOWORD(wParam))
-           {   case IDOK:     if(SaveConfig(hDlg) < 0) break;//Сохранение файла конфигурации
-                              SetNewLanguage();              //Загрузка и установка файла языка
+           {   case IDOK:     if(SaveConfig(hDlg) < 0) break;//РЎРѕС…СЂР°РЅРµРЅРёРµ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+                              SetNewLanguage();              //Р—Р°РіСЂСѓР·РєР° Рё СѓСЃС‚Р°РЅРѕРІРєР° С„Р°Р№Р»Р° СЏР·С‹РєР°
                               EndDialog(hDlg, IDOK);
                               return TRUE;
                case IDCANCEL: EndDialog(hDlg, IDCANCEL);
                               return TRUE;
-               case IDC_RADIOBUTTON1: Conf.PrSort = 0; break;//0-сортировка по имени, 1-без сотировки
-               case IDC_RADIOBUTTON2: Conf.PrSort = 1; break;//0-сортировка по имени, 1-без сотировки
+               case IDC_RADIOBUTTON1: Conf.PrSort = 0; break;//0-СЃРѕСЂС‚РёСЂРѕРІРєР° РїРѕ РёРјРµРЅРё, 1-Р±РµР· СЃРѕС‚РёСЂРѕРІРєРё
+               case IDC_RADIOBUTTON2: Conf.PrSort = 1; break;//0-СЃРѕСЂС‚РёСЂРѕРІРєР° РїРѕ РёРјРµРЅРё, 1-Р±РµР· СЃРѕС‚РёСЂРѕРІРєРё
                case IDC_RADIOBUTTON3: Conf.altName = 0;
-                                   Init_Dlg_ParForConfig(hDlg); //Параметры в зависимости от конфигурации
+                                   Init_Dlg_ParForConfig(hDlg); //РџР°СЂР°РјРµС‚СЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
                                    break;
                case IDC_RADIOBUTTON4: Conf.altName = 1;
-                                   Init_Dlg_ParForConfig(hDlg); //Параметры в зависимости от конфигурации
+                                   Init_Dlg_ParForConfig(hDlg); //РџР°СЂР°РјРµС‚СЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
                                    break;
-               case IDC_RADIOBUTTON5:  Conf.typeRec  = 0; break;//0-старые серии, 1-новая серия RH2000
-               case IDC_RADIOBUTTON6:  Conf.typeRec  = 1; break;//0-старые серии, 1-новая серия RH2000
-               case IDC_RADIOBUTTON7:  Conf.typeSize = 0; break;//0-байты, 1-Кбайты, 2-Мбайты, 3-ГБайты
-               case IDC_RADIOBUTTON8:  Conf.typeSize = 1; break;//0-байты, 1-Кбайты, 2-Мбайты, 3-ГБайты
-               case IDC_RADIOBUTTON9:  Conf.typeSize = 2; break;//0-байты, 1-Кбайты, 2-Мбайты, 3-ГБайты
-               case IDC_RADIOBUTTON10: Conf.typeSize = 3; break;//0-байты, 1-Кбайты, 2-Мбайты, 3-ГБайты
-               case IDC_RADIOBUTTON11: Conf.typeTime = 0; break;//0-показывать время начала записи, 1-время создания файла
-               case IDC_RADIOBUTTON12: Conf.typeTime = 1; break;//0-показывать время начала записи, 1-время создания файла
-               case IDC_RADIOBUTTON13: Conf.poz_Ql = 0;   break;//Качество записи: 0-в колонке, 1-в имени, 2-не показывать
-               case IDC_RADIOBUTTON14: Conf.poz_Ql = 1;   break;//Качество записи: 0-в колонке, 1-в имени, 2-не показывать
-               case IDC_RADIOBUTTON15: Conf.poz_Ql = 2;   break;//Качество записи: 0-в колонке, 1-в имени, 2-не показывать
-               case IDC_RADIOBUTTON16: Conf.poz_In = 0;   break;//Источник записи: 0-в колонке, 1-в имени, 2-не показывать
-               case IDC_RADIOBUTTON17: Conf.poz_In = 1;   break;//Источник записи: 0-в колонке, 1-в имени, 2-не показывать
-               case IDC_RADIOBUTTON18: Conf.poz_In = 2;   break;//Источник записи: 0-в колонке, 1-в имени, 2-не показывать
-               case IDC_CHECKBOX1: Conf.ViewIDX       = (Conf.ViewIDX == 0)       ? BYTE(1) : BYTE(0);//0-не показыват файлы *.idx, 1-показывать
+               case IDC_RADIOBUTTON5:  Conf.typeRec  = 0; break;//0-СЃС‚Р°СЂС‹Рµ СЃРµСЂРёРё, 1-РЅРѕРІР°СЏ СЃРµСЂРёСЏ RH2000
+               case IDC_RADIOBUTTON6:  Conf.typeRec  = 1; break;//0-СЃС‚Р°СЂС‹Рµ СЃРµСЂРёРё, 1-РЅРѕРІР°СЏ СЃРµСЂРёСЏ RH2000
+               case IDC_RADIOBUTTON7:  Conf.typeSize = 0; break;//0-Р±Р°Р№С‚С‹, 1-РљР±Р°Р№С‚С‹, 2-РњР±Р°Р№С‚С‹, 3-Р“Р‘Р°Р№С‚С‹
+               case IDC_RADIOBUTTON8:  Conf.typeSize = 1; break;//0-Р±Р°Р№С‚С‹, 1-РљР±Р°Р№С‚С‹, 2-РњР±Р°Р№С‚С‹, 3-Р“Р‘Р°Р№С‚С‹
+               case IDC_RADIOBUTTON9:  Conf.typeSize = 2; break;//0-Р±Р°Р№С‚С‹, 1-РљР±Р°Р№С‚С‹, 2-РњР±Р°Р№С‚С‹, 3-Р“Р‘Р°Р№С‚С‹
+               case IDC_RADIOBUTTON10: Conf.typeSize = 3; break;//0-Р±Р°Р№С‚С‹, 1-РљР±Р°Р№С‚С‹, 2-РњР±Р°Р№С‚С‹, 3-Р“Р‘Р°Р№С‚С‹
+               case IDC_RADIOBUTTON11: Conf.typeTime = 0; break;//0-РїРѕРєР°Р·С‹РІР°С‚СЊ РІСЂРµРјСЏ РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРё, 1-РІСЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р°
+               case IDC_RADIOBUTTON12: Conf.typeTime = 1; break;//0-РїРѕРєР°Р·С‹РІР°С‚СЊ РІСЂРµРјСЏ РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРё, 1-РІСЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р°
+               case IDC_RADIOBUTTON13: Conf.poz_Ql = 0;   break;//РљР°С‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+               case IDC_RADIOBUTTON14: Conf.poz_Ql = 1;   break;//РљР°С‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+               case IDC_RADIOBUTTON15: Conf.poz_Ql = 2;   break;//РљР°С‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+               case IDC_RADIOBUTTON16: Conf.poz_In = 0;   break;//РСЃС‚РѕС‡РЅРёРє Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+               case IDC_RADIOBUTTON17: Conf.poz_In = 1;   break;//РСЃС‚РѕС‡РЅРёРє Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+               case IDC_RADIOBUTTON18: Conf.poz_In = 2;   break;//РСЃС‚РѕС‡РЅРёРє Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+               case IDC_CHECKBOX1: Conf.ViewIDX       = (Conf.ViewIDX == 0)       ? BYTE(1) : BYTE(0);//0-РЅРµ РїРѕРєР°Р·С‹РІР°С‚ С„Р°Р№Р»С‹ *.idx, 1-РїРѕРєР°Р·С‹РІР°С‚СЊ
                                    break;
-               case IDC_CHECKBOX2: Conf.Ren_STR       = (Conf.Ren_STR == 0)       ? BYTE(1) : BYTE(0);//0-переименовывоть *.str в *.vro
+               case IDC_CHECKBOX2: Conf.Ren_STR       = (Conf.Ren_STR == 0)       ? BYTE(1) : BYTE(0);//0-РїРµСЂРµРёРјРµРЅРѕРІС‹РІРѕС‚СЊ *.str РІ *.vro
                                    break;
-               case IDC_CHECKBOX3: Conf.SwapNPart     = (Conf.SwapNPart == 0)     ? BYTE(1) : BYTE(0);//0-переставлять номер части в конец имени
-                                   Init_Dlg_ParForConfig(hDlg);                                       //Параметры в зависимости от конфигурации
+               case IDC_CHECKBOX3: Conf.SwapNPart     = (Conf.SwapNPart == 0)     ? BYTE(1) : BYTE(0);//0-РїРµСЂРµСЃС‚Р°РІР»СЏС‚СЊ РЅРѕРјРµСЂ С‡Р°СЃС‚Рё РІ РєРѕРЅРµС† РёРјРµРЅРё
+                                   Init_Dlg_ParForConfig(hDlg);                                       //РџР°СЂР°РјРµС‚СЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
                                    break;
-               case IDC_CHECKBOX4: Conf.ChangeNul     = (Conf.ChangeNul == 0)     ? BYTE(1) : BYTE(0);//0-заменять символ '0' на '_'
+               case IDC_CHECKBOX4: Conf.ChangeNul     = (Conf.ChangeNul == 0)     ? BYTE(1) : BYTE(0);//0-Р·Р°РјРµРЅСЏС‚СЊ СЃРёРјРІРѕР» '0' РЅР° '_'
                                    break;
-               case IDC_CHECKBOX5: Conf.NoViewOnePart = (Conf.NoViewOnePart == 0) ? BYTE(1) : BYTE(0);//0-не показыватьномер для одной части
+               case IDC_CHECKBOX5: Conf.NoViewOnePart = (Conf.NoViewOnePart == 0) ? BYTE(1) : BYTE(0);//0-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊРЅРѕРјРµСЂ РґР»СЏ РѕРґРЅРѕР№ С‡Р°СЃС‚Рё
                                    break;
-               case IDC_CHECKBOX6: Conf.ViewVRO  = (Conf.ViewVRO == 0)  ? BYTE(1) : BYTE(0);//0-показывать расширение *.vro, 1- не показывать
+               case IDC_CHECKBOX6: Conf.ViewVRO  = (Conf.ViewVRO == 0)  ? BYTE(1) : BYTE(0);//0-РїРѕРєР°Р·С‹РІР°С‚СЊ СЂР°СЃС€РёСЂРµРЅРёРµ *.vro, 1- РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
                                    break;
-               case IDC_CHECKBOX7: Conf.ViewPart  = (Conf.ViewPart == 0)  ? BYTE(1) : BYTE(0);//0-показывать Title в виде папки
+               case IDC_CHECKBOX7: Conf.ViewPart  = (Conf.ViewPart == 0)  ? BYTE(1) : BYTE(0);//0-РїРѕРєР°Р·С‹РІР°С‚СЊ Title РІ РІРёРґРµ РїР°РїРєРё
                                    break;
                case IDC_CHECKBOX8: if(Conf.WriteYes == 0)
                                       if(MsgYesNo5((Lan+167)->msg, (Lan+168)->msg, (Lan+169)->msg,
@@ -481,7 +481,7 @@ static BOOL CALLBACK Dlg_NewConf(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
                                    {   SendDlgItemMessage(hDlg, IDC_CHECKBOX8, BM_SETCHECK, BST_UNCHECKED, 0L);
                                        break;
                                    }
-                                   Conf.WriteYes  = (Conf.WriteYes == 0)  ? BYTE(1) : BYTE(0);//0-показывать Title в виде папки
+                                   Conf.WriteYes  = (Conf.WriteYes == 0)  ? BYTE(1) : BYTE(0);//0-РїРѕРєР°Р·С‹РІР°С‚СЊ Title РІ РІРёРґРµ РїР°РїРєРё
                                    break;
            }
            break;
@@ -491,55 +491,55 @@ static BOOL CALLBACK Dlg_NewConf(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 
 //------------------------------------------------------------------------------
 
-void NewConfig(void)                                         //Изменение конфигурации
+void NewConfig(void)                                         //РР·РјРµРЅРµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 {
-   CONF oldConf = Conf;                                      //Сохранили предыдущее состояние
-   char oldNameF_Lan[260];                                   //Имя файла языка если оно задано
-   lstrcpy(oldNameF_Lan, NameF_Lan);                         //Сохранили предыдущее состояние
+   CONF oldConf = Conf;                                      //РЎРѕС…СЂР°РЅРёР»Рё РїСЂРµРґС‹РґСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
+   char oldNameF_Lan[260];                                   //РРјСЏ С„Р°Р№Р»Р° СЏР·С‹РєР° РµСЃР»Рё РѕРЅРѕ Р·Р°РґР°РЅРѕ
+   lstrcpy(oldNameF_Lan, NameF_Lan);                         //РЎРѕС…СЂР°РЅРёР»Рё РїСЂРµРґС‹РґСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
    if(DialogBox(MainInst, MAKEINTRESOURCE(IDD_DLG_CONFIG), MainWin, Dlg_NewConf) == IDCANCEL)
-   {  Conf = oldConf;                                        //Восстановили предыдущее состояние
-      lstrcpy(NameF_Lan, oldNameF_Lan);                      //Восстановили предыдущее состояние
+   {  Conf = oldConf;                                        //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё РїСЂРµРґС‹РґСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
+      lstrcpy(NameF_Lan, oldNameF_Lan);                      //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё РїСЂРµРґС‹РґСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
       return;
    }
-#if defined WRITE_YES                                        //Режим записи разрешен
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
    if(Conf.WriteYes != oldConf.WriteYes)
-      Message1((Lan+172)->msg);                              //"Изменения с функцией записи вступят в силу после перезапуска программы."
+      Message1((Lan+172)->msg);                              //"РР·РјРµРЅРµРЅРёСЏ СЃ С„СѓРЅРєС†РёРµР№ Р·Р°РїРёСЃРё РІСЃС‚СѓРїСЏС‚ РІ СЃРёР»Сѓ РїРѕСЃР»Рµ РїРµСЂРµР·Р°РїСѓСЃРєР° РїСЂРѕРіСЂР°РјРјС‹."
 #endif
-   if(Conf.nLanguage != oldConf.nLanguage ||                 //0-русский, 1-английский, 2-внешний файл
+   if(Conf.nLanguage != oldConf.nLanguage ||                 //0-СЂСѓСЃСЃРєРёР№, 1-Р°РЅРіР»РёР№СЃРєРёР№, 2-РІРЅРµС€РЅРёР№ С„Р°Р№Р»
       (Conf.nLanguage == 2 && lstrcmp(NameF_Lan, oldNameF_Lan) != 0))
-   {  SetWindowText(hCopy,  (Lan+4)->msg);                   //Новая надпись на кнопке
-      SetWindowText(hConf,  (Lan+5)->msg);                   //Новая надпись на кнопке
-      SetWindowText(hClose, (Lan+6)->msg);                   //Новая надпись на кнопке
-      SetWindowText(hClear, (Lan+123)->msg);                 //Новая надпись на кнопке
-      SetWindowText(hToTxt, (Lan+146)->msg);                 //Новая надпись на кнопке
-#if defined WRITE_YES                                        //Режим записи разрешен
-      SetWindowText(hWriteFi, (Lan+177)->msg);               //Новая надпись на кнопке
-      SetWindowText(hWriteFo, (Lan+178)->msg);               //Новая надпись на кнопке
-      SetWindowText(hNew_Fo,  (Lan+179)->msg);               //Новая надпись на кнопке
-      SetWindowText(hRenFi,   (Lan+163)->msg);               //"Переименовать"
-      SetWindowText(hDelFi,   (Lan+187)->msg);               //"Удалить"
+   {  SetWindowText(hCopy,  (Lan+4)->msg);                   //РќРѕРІР°СЏ РЅР°РґРїРёСЃСЊ РЅР° РєРЅРѕРїРєРµ
+      SetWindowText(hConf,  (Lan+5)->msg);                   //РќРѕРІР°СЏ РЅР°РґРїРёСЃСЊ РЅР° РєРЅРѕРїРєРµ
+      SetWindowText(hClose, (Lan+6)->msg);                   //РќРѕРІР°СЏ РЅР°РґРїРёСЃСЊ РЅР° РєРЅРѕРїРєРµ
+      SetWindowText(hClear, (Lan+123)->msg);                 //РќРѕРІР°СЏ РЅР°РґРїРёСЃСЊ РЅР° РєРЅРѕРїРєРµ
+      SetWindowText(hToTxt, (Lan+146)->msg);                 //РќРѕРІР°СЏ РЅР°РґРїРёСЃСЊ РЅР° РєРЅРѕРїРєРµ
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
+      SetWindowText(hWriteFi, (Lan+177)->msg);               //РќРѕРІР°СЏ РЅР°РґРїРёСЃСЊ РЅР° РєРЅРѕРїРєРµ
+      SetWindowText(hWriteFo, (Lan+178)->msg);               //РќРѕРІР°СЏ РЅР°РґРїРёСЃСЊ РЅР° РєРЅРѕРїРєРµ
+      SetWindowText(hNew_Fo,  (Lan+179)->msg);               //РќРѕРІР°СЏ РЅР°РґРїРёСЃСЊ РЅР° РєРЅРѕРїРєРµ
+      SetWindowText(hRenFi,   (Lan+163)->msg);               //"РџРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ"
+      SetWindowText(hDelFi,   (Lan+187)->msg);               //"РЈРґР°Р»РёС‚СЊ"
 #endif
-      ViewSize();                                            //Показа дискового пространства
+      ViewSize();                                            //РџРѕРєР°Р·Р° РґРёСЃРєРѕРІРѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР°
    }
-   if(prHDD_LG_Yes != 0) return;                             //Признак, присутствия HDD: 0-есть, 1-не найден
-   if(Conf.typeRec != oldConf.typeRec ||                     //0-старые серии, 1-новая серия RH2000
-      Conf.altName != oldConf.altName)                       //0-информативное имя, 1-истинное имя
-      Update_MME_DB();                                       //Пересоздание массива информативных имен
-   if(Conf.PrSort !=        oldConf.PrSort    ||             //0-сортировка по имени, 1-без сотировки
-      Conf.ViewIDX !=       oldConf.ViewIDX   ||             //0-не показыват файлы *.idx, 1-показывать
-      Conf.Ren_STR !=       oldConf.Ren_STR   ||             //0-переименовывоть *.str в *.vro
-      Conf.SwapNPart !=     oldConf.SwapNPart ||             //0-переставлять номер части в конец имени
-      Conf.ChangeNul !=     oldConf.ChangeNul ||             //0-заменять символ '0' на '_'
-      Conf.NoViewOnePart != oldConf.NoViewOnePart ||         //0-не показыватьномер для одной части
-      Conf.altName != oldConf.altName ||                     //0-информативное имя, 1-истинное имя
-      Conf.typeRec != oldConf.typeRec ||                     //0-старые серии, 1-новая серия RH2000
-      Conf.typeSize != oldConf.typeSize ||                   //0-байты, 1-Кбайты, 2-Мбайты, 3-ГБайты
-      Conf.ViewVRO != oldConf.ViewVRO ||                     //0-показыват расширение *.vro, 1-не показывать
-      Conf.ViewPart != oldConf.ViewPart ||                   //0-показыват папкой отредактированные Title
-      Conf.typeTime != oldConf.typeTime ||                   //0-показывать время начала записи, 1-время создания файла
-      Conf.poz_Ql != oldConf.poz_Ql ||                       //Источник записи: 0-в колонке, 1-в имени, 2-не показывать
-      Conf.poz_In != oldConf.poz_In)                         //Источник записи: 0-в колонке, 1-в имени, 2-не показывать
-      Update_Tree();                                         //Пересоздание дерева файлов и папок при изменении настроек
+   if(prHDD_LG_Yes != 0) return;                             //РџСЂРёР·РЅР°Рє, РїСЂРёСЃСѓС‚СЃС‚РІРёСЏ HDD: 0-РµСЃС‚СЊ, 1-РЅРµ РЅР°Р№РґРµРЅ
+   if(Conf.typeRec != oldConf.typeRec ||                     //0-СЃС‚Р°СЂС‹Рµ СЃРµСЂРёРё, 1-РЅРѕРІР°СЏ СЃРµСЂРёСЏ RH2000
+      Conf.altName != oldConf.altName)                       //0-РёРЅС„РѕСЂРјР°С‚РёРІРЅРѕРµ РёРјСЏ, 1-РёСЃС‚РёРЅРЅРѕРµ РёРјСЏ
+      Update_MME_DB();                                       //РџРµСЂРµСЃРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР° РёРЅС„РѕСЂРјР°С‚РёРІРЅС‹С… РёРјРµРЅ
+   if(Conf.PrSort !=        oldConf.PrSort    ||             //0-СЃРѕСЂС‚РёСЂРѕРІРєР° РїРѕ РёРјРµРЅРё, 1-Р±РµР· СЃРѕС‚РёСЂРѕРІРєРё
+      Conf.ViewIDX !=       oldConf.ViewIDX   ||             //0-РЅРµ РїРѕРєР°Р·С‹РІР°С‚ С„Р°Р№Р»С‹ *.idx, 1-РїРѕРєР°Р·С‹РІР°С‚СЊ
+      Conf.Ren_STR !=       oldConf.Ren_STR   ||             //0-РїРµСЂРµРёРјРµРЅРѕРІС‹РІРѕС‚СЊ *.str РІ *.vro
+      Conf.SwapNPart !=     oldConf.SwapNPart ||             //0-РїРµСЂРµСЃС‚Р°РІР»СЏС‚СЊ РЅРѕРјРµСЂ С‡Р°СЃС‚Рё РІ РєРѕРЅРµС† РёРјРµРЅРё
+      Conf.ChangeNul !=     oldConf.ChangeNul ||             //0-Р·Р°РјРµРЅСЏС‚СЊ СЃРёРјРІРѕР» '0' РЅР° '_'
+      Conf.NoViewOnePart != oldConf.NoViewOnePart ||         //0-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊРЅРѕРјРµСЂ РґР»СЏ РѕРґРЅРѕР№ С‡Р°СЃС‚Рё
+      Conf.altName != oldConf.altName ||                     //0-РёРЅС„РѕСЂРјР°С‚РёРІРЅРѕРµ РёРјСЏ, 1-РёСЃС‚РёРЅРЅРѕРµ РёРјСЏ
+      Conf.typeRec != oldConf.typeRec ||                     //0-СЃС‚Р°СЂС‹Рµ СЃРµСЂРёРё, 1-РЅРѕРІР°СЏ СЃРµСЂРёСЏ RH2000
+      Conf.typeSize != oldConf.typeSize ||                   //0-Р±Р°Р№С‚С‹, 1-РљР±Р°Р№С‚С‹, 2-РњР±Р°Р№С‚С‹, 3-Р“Р‘Р°Р№С‚С‹
+      Conf.ViewVRO != oldConf.ViewVRO ||                     //0-РїРѕРєР°Р·С‹РІР°С‚ СЂР°СЃС€РёСЂРµРЅРёРµ *.vro, 1-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+      Conf.ViewPart != oldConf.ViewPart ||                   //0-РїРѕРєР°Р·С‹РІР°С‚ РїР°РїРєРѕР№ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅС‹Рµ Title
+      Conf.typeTime != oldConf.typeTime ||                   //0-РїРѕРєР°Р·С‹РІР°С‚СЊ РІСЂРµРјСЏ РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРё, 1-РІСЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р°
+      Conf.poz_Ql != oldConf.poz_Ql ||                       //РСЃС‚РѕС‡РЅРёРє Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+      Conf.poz_In != oldConf.poz_In)                         //РСЃС‚РѕС‡РЅРёРє Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+      Update_Tree();                                         //РџРµСЂРµСЃРѕР·РґР°РЅРёРµ РґРµСЂРµРІР° С„Р°Р№Р»РѕРІ Рё РїР°РїРѕРє РїСЂРё РёР·РјРµРЅРµРЅРёРё РЅР°СЃС‚СЂРѕРµРє
 }
 
 #endif

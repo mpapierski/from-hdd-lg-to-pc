@@ -16,72 +16,72 @@ static DWORD inSizeIdx;
 
 //------------------------------------------------------------------------------
 
-static int OpenInFile(char *NameF, HANDLE *inFile)                           //Открытие файла
+static int OpenInFile(char *NameF, HANDLE *inFile)                           //РћС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 {
-   *inFile = CreateFile(NameF,                                //Адрес строки с именем файла
-                       GENERIC_READ,                         //Способ доступа к файлу
-                       FILE_SHARE_READ,                      //Посторонний процес может только читать файл
-                       NULL,                                 //Адрес структуры с параметрами защиты ядра
-                       OPEN_EXISTING,                        //Тип открытия файла
-                       FILE_ATTRIBUTE_NORMAL,                //Атрибуты файла
-                       NULL);                                //Используется для временных файлов
+   *inFile = CreateFile(NameF,                                //РђРґСЂРµСЃ СЃС‚СЂРѕРєРё СЃ РёРјРµРЅРµРј С„Р°Р№Р»Р°
+                       GENERIC_READ,                         //РЎРїРѕСЃРѕР± РґРѕСЃС‚СѓРїР° Рє С„Р°Р№Р»Сѓ
+                       FILE_SHARE_READ,                      //РџРѕСЃС‚РѕСЂРѕРЅРЅРёР№ РїСЂРѕС†РµСЃ РјРѕР¶РµС‚ С‚РѕР»СЊРєРѕ С‡РёС‚Р°С‚СЊ С„Р°Р№Р»
+                       NULL,                                 //РђРґСЂРµСЃ СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё Р·Р°С‰РёС‚С‹ СЏРґСЂР°
+                       OPEN_EXISTING,                        //РўРёРї РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°
+                       FILE_ATTRIBUTE_NORMAL,                //РђС‚СЂРёР±СѓС‚С‹ С„Р°Р№Р»Р°
+                       NULL);                                //РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РІСЂРµРјРµРЅРЅС‹С… С„Р°Р№Р»РѕРІ
    if(*inFile == INVALID_HANDLE_VALUE)
-     return ErrorSys2("Ошибка при открытии файла", NameF);
+     return ErrorSys2("РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р°", NameF);
    inSizeIdx = GetFileSize(*inFile, NULL);
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int GetName_InFile(char *NameF)                       //Ввод имени обрабатываемого файла
+static int GetName_InFile(char *NameF)                       //Р’РІРѕРґ РёРјРµРЅРё РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјРѕРіРѕ С„Р°Р№Р»Р°
 {
    OPENFILENAME ofn;
-   char DirName[260];                                        //Начальный путь для поиска файлов
-   char FileTitle[256];                                      //Заголовок окна
-   char Filter[256];                                         //Фильтры поиска
+   char DirName[260];                                        //РќР°С‡Р°Р»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+   char FileTitle[256];                                      //Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
+   char Filter[256];                                         //Р¤РёР»СЊС‚СЂС‹ РїРѕРёСЃРєР°
    char NameFile[260];
 
-   strcpy(NameFile, NameF);                                  //Начальный путь для поиска файлов
-   *DirName = 0;                                             //На случай если имени небыло
-   if(*NameFile != 0)                                        //Имя уже было
+   strcpy(NameFile, NameF);                                  //РќР°С‡Р°Р»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+   *DirName = 0;                                             //РќР° СЃР»СѓС‡Р°Р№ РµСЃР»Рё РёРјРµРЅРё РЅРµР±С‹Р»Рѕ
+   if(*NameFile != 0)                                        //РРјСЏ СѓР¶Рµ Р±С‹Р»Рѕ
    {  char *A;
-      lstrcpy(DirName, NameFile);                            //Начальный путь для поиска файлов
-      //Наверно логично создать полное имя
-      A = strrchr(DirName, '\\');                            //Нашли последний разделитель
+      lstrcpy(DirName, NameFile);                            //РќР°С‡Р°Р»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+      //РќР°РІРµСЂРЅРѕ Р»РѕРіРёС‡РЅРѕ СЃРѕР·РґР°С‚СЊ РїРѕР»РЅРѕРµ РёРјСЏ
+      A = strrchr(DirName, '\\');                            //РќР°С€Р»Рё РїРѕСЃР»РµРґРЅРёР№ СЂР°Р·РґРµР»РёС‚РµР»СЊ
       if(A != NULL) *A = 0;
-      else *DirName = 0;                                     //Нет имени файла
+      else *DirName = 0;                                     //РќРµС‚ РёРјРµРЅРё С„Р°Р№Р»Р°
    }
    *NameFile = 0;
-   lstrcpy(Filter, "Файлы idx|*.idx|Все файлы (*.*)|*.*|");
-   for(int i=0; Filter[i]!=0; i++)                           //Заменили разделитель 0
+   lstrcpy(Filter, "Р¤Р°Р№Р»С‹ idx|*.idx|Р’СЃРµ С„Р°Р№Р»С‹ (*.*)|*.*|");
+   for(int i=0; Filter[i]!=0; i++)                           //Р—Р°РјРµРЅРёР»Рё СЂР°Р·РґРµР»РёС‚РµР»СЊ 0
      if(Filter[i] == '|') Filter[i] = 0;
-   ZeroMemory(&ofn, sizeof(OPENFILENAME));                   //Заполнили нулями
-   ofn.lStructSize = sizeof(OPENFILENAME);                   //Длина структуры
-   ofn.hwndOwner = MainWin;                                  //Владелец диалога
-   ofn.hInstance = MainInst;                                 //Идентификатор программы владеющая диалогом
-   ofn.lpstrFilter = Filter;                                 //Типы просматриваемых файлов
-// ofn.lpstrCustomFilter                                     //Специальные фильтры
-// ofn.nMaxCustFilter                                        //Длина специального фильтра
-   ofn.nFilterIndex = 1;                                     //Индекс для работы с фильтрами
-   ofn.lpstrFile = NameFile;                                 //Имя файла в случае успеха
-   ofn.nMaxFile = sizeof(NameFile);                          //Длина поля имени файла
-   ofn.lpstrFileTitle = FileTitle;                           //Маршрут и имя файла в случае успеха
-   ofn.nMaxFileTitle = sizeof(FileTitle);                    //Длина поля
-   ofn.lpstrInitialDir = DirName;                            //Начальный каталог файлов
-   ofn.lpstrTitle = "Укажите имя файла дампа";
+   ZeroMemory(&ofn, sizeof(OPENFILENAME));                   //Р—Р°РїРѕР»РЅРёР»Рё РЅСѓР»СЏРјРё
+   ofn.lStructSize = sizeof(OPENFILENAME);                   //Р”Р»РёРЅР° СЃС‚СЂСѓРєС‚СѓСЂС‹
+   ofn.hwndOwner = MainWin;                                  //Р’Р»Р°РґРµР»РµС† РґРёР°Р»РѕРіР°
+   ofn.hInstance = MainInst;                                 //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРѕРіСЂР°РјРјС‹ РІР»Р°РґРµСЋС‰Р°СЏ РґРёР°Р»РѕРіРѕРј
+   ofn.lpstrFilter = Filter;                                 //РўРёРїС‹ РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРјС‹С… С„Р°Р№Р»РѕРІ
+// ofn.lpstrCustomFilter                                     //РЎРїРµС†РёР°Р»СЊРЅС‹Рµ С„РёР»СЊС‚СЂС‹
+// ofn.nMaxCustFilter                                        //Р”Р»РёРЅР° СЃРїРµС†РёР°Р»СЊРЅРѕРіРѕ С„РёР»СЊС‚СЂР°
+   ofn.nFilterIndex = 1;                                     //РРЅРґРµРєСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„РёР»СЊС‚СЂР°РјРё
+   ofn.lpstrFile = NameFile;                                 //РРјСЏ С„Р°Р№Р»Р° РІ СЃР»СѓС‡Р°Рµ СѓСЃРїРµС…Р°
+   ofn.nMaxFile = sizeof(NameFile);                          //Р”Р»РёРЅР° РїРѕР»СЏ РёРјРµРЅРё С„Р°Р№Р»Р°
+   ofn.lpstrFileTitle = FileTitle;                           //РњР°СЂС€СЂСѓС‚ Рё РёРјСЏ С„Р°Р№Р»Р° РІ СЃР»СѓС‡Р°Рµ СѓСЃРїРµС…Р°
+   ofn.nMaxFileTitle = sizeof(FileTitle);                    //Р”Р»РёРЅР° РїРѕР»СЏ
+   ofn.lpstrInitialDir = DirName;                            //РќР°С‡Р°Р»СЊРЅС‹Р№ РєР°С‚Р°Р»РѕРі С„Р°Р№Р»РѕРІ
+   ofn.lpstrTitle = "РЈРєР°Р¶РёС‚Рµ РёРјСЏ С„Р°Р№Р»Р° РґР°РјРїР°";
    ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-// ofn.Flags |= OFN_ENABLESIZING;                            //Можно менять размер окна диалога
-// ofn.nFileOffset;                                          //Смещение в внутри lpstrFile
-// ofn.nFileExtension;                                       //Смещение в внутри lpstrFile
-   ofn.lpstrDefExt = "idx";                                  //Расширение по умолчанию
-// ofn.lCustData;                                            //Для функции обработчиков
-//   ofn.lpfnHook = ModDlg.fnHook;                           //Функция обработки дополнительного диалога
-//   ofn.lpTemplateName = ModDlg.DopDlgName;                 //Дополнительный диалог который суммируется с основным
-//   if(NumWinNT != 0)                                       //0-Система Win95/98 или номер NT
-//     ofn.FlagsEx = OFN_EX_NOPLACESBAR;                     //Убирает иконку слева
+// ofn.Flags |= OFN_ENABLESIZING;                            //РњРѕР¶РЅРѕ РјРµРЅСЏС‚СЊ СЂР°Р·РјРµСЂ РѕРєРЅР° РґРёР°Р»РѕРіР°
+// ofn.nFileOffset;                                          //РЎРјРµС‰РµРЅРёРµ РІ РІРЅСѓС‚СЂРё lpstrFile
+// ofn.nFileExtension;                                       //РЎРјРµС‰РµРЅРёРµ РІ РІРЅСѓС‚СЂРё lpstrFile
+   ofn.lpstrDefExt = "idx";                                  //Р Р°СЃС€РёСЂРµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+// ofn.lCustData;                                            //Р”Р»СЏ С„СѓРЅРєС†РёРё РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
+//   ofn.lpfnHook = ModDlg.fnHook;                           //Р¤СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РґРёР°Р»РѕРіР°
+//   ofn.lpTemplateName = ModDlg.DopDlgName;                 //Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РґРёР°Р»РѕРі РєРѕС‚РѕСЂС‹Р№ СЃСѓРјРјРёСЂСѓРµС‚СЃСЏ СЃ РѕСЃРЅРѕРІРЅС‹Рј
+//   if(NumWinNT != 0)                                       //0-РЎРёСЃС‚РµРјР° Win95/98 РёР»Рё РЅРѕРјРµСЂ NT
+//     ofn.FlagsEx = OFN_EX_NOPLACESBAR;                     //РЈР±РёСЂР°РµС‚ РёРєРѕРЅРєСѓ СЃР»РµРІР°
    if(GetOpenFileName(&ofn) == FALSE) return -1;
    if(*NameFile == 0) return -1;
-   strcpy(NameF, NameFile);                                  //Переслали имя файла
+   strcpy(NameF, NameFile);                                  //РџРµСЂРµСЃР»Р°Р»Рё РёРјСЏ С„Р°Р№Р»Р°
    return 0;
 }
 
@@ -92,13 +92,13 @@ int Read_File_idx(void)
    HANDLE inFile;
    char Name_F_IDX[260];
    DWORD nb;
-   if(GetName_InFile(Name_F_IDX) < 0) return -1;              //Ввод имени обрабатываемого файла
-   if(OpenInFile(Name_F_IDX, &inFile) < 0) return -1;         //Открытие входного файла
+   if(GetName_InFile(Name_F_IDX) < 0) return -1;              //Р’РІРѕРґ РёРјРµРЅРё РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјРѕРіРѕ С„Р°Р№Р»Р°
+   if(OpenInFile(Name_F_IDX, &inFile) < 0) return -1;         //РћС‚РєСЂС‹С‚РёРµ РІС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
    inBufIdx = (FILE_IDX *)MyAllocMem(inSizeIdx);
    if(inBufIdx == NULL) return -1;
    if(ReadFile(inFile, inBufIdx, inSizeIdx, &nb, NULL) == FALSE || nb != inSizeIdx)
-      return ErrorSys2("Ошибка при чтении исходного файла", Name_F_IDX);
-   CloseFile(&inFile);                                       //Закрыли входной файл
+      return ErrorSys2("РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°", Name_F_IDX);
+   CloseFile(&inFile);                                       //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
 
    char Ss[1024], *as;
    FILE_IDX *aIn = inBufIdx;
@@ -109,7 +109,7 @@ int Read_File_idx(void)
           as += sprintf(as, " %08X", aIn->A[j]);
        }
        *as = 0;
-       Add_Spis(Ss);                                             //Добавление строки в список
+       Add_Spis(Ss);                                             //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
    }
    return 0;
 }

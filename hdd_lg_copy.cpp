@@ -6,82 +6,82 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_copy =====================================
-int  CopyFiles(void);                                        //Выполнение копирования
-     DWORD num_Sel;                                          //Число выбранных имен при групповом выборе
-     LONGLONG size_Sel;                                      //Суммарный размер выбранных файлов
-     DWORD indF;                                             //Индекс копируемого файла
+int  CopyFiles(void);                                        //Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+     DWORD num_Sel;                                          //Р§РёСЃР»Рѕ РІС‹Р±СЂР°РЅРЅС‹С… РёРјРµРЅ РїСЂРё РіСЂСѓРїРїРѕРІРѕРј РІС‹Р±РѕСЂРµ
+     LONGLONG size_Sel;                                      //РЎСѓРјРјР°СЂРЅС‹Р№ СЂР°Р·РјРµСЂ РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ
+     DWORD indF;                                             //РРЅРґРµРєСЃ РєРѕРїРёСЂСѓРµРјРѕРіРѕ С„Р°Р№Р»Р°
 
 static HANDLE outFile;
-static DWORD numAllInCl;                                     //Суммарное число кластеров во всех копируемых файлах
-static DWORD numAllFi;                                       //Число копируемых файлов
-static DWORD num_T_Fi;                                       //Номер текущего копируемого файла
-static DWORD BytesPerClaster;                                //Число байт в кластере
-static DWORDLONG numAllOutCl;                                //Суммарный число выходных кластеров
+static DWORD numAllInCl;                                     //РЎСѓРјРјР°СЂРЅРѕРµ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІРѕ РІСЃРµС… РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»Р°С…
+static DWORD numAllFi;                                       //Р§РёСЃР»Рѕ РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»РѕРІ
+static DWORD num_T_Fi;                                       //РќРѕРјРµСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРїРёСЂСѓРµРјРѕРіРѕ С„Р°Р№Р»Р°
+static DWORD BytesPerClaster;                                //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ РєР»Р°СЃС‚РµСЂРµ
+static DWORDLONG numAllOutCl;                                //РЎСѓРјРјР°СЂРЅС‹Р№ С‡РёСЃР»Рѕ РІС‹С…РѕРґРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
 
 //------------------------------------------------------------------------------
 
-static int Ctrl_OutName(char *outNameF)                      //Проверка, что длина имени менее предельной
+static int Ctrl_OutName(char *outNameF)                      //РџСЂРѕРІРµСЂРєР°, С‡С‚Рѕ РґР»РёРЅР° РёРјРµРЅРё РјРµРЅРµРµ РїСЂРµРґРµР»СЊРЅРѕР№
 {
 // char Driv[MAXDRIVE+3], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT+3];
 // fnmerge(outNameF, Driv, Dir, Name, Ext);
    int l = lstrlen(outNameF);
-   if(l > 255)  //if(l > 259)                                //Боремся с предельно длинными именвми
-     return Error3(outNameF, "", (Lan+95)->msg);             //return Error3(outNameF, "", "Число символов в полном имени файла превышает предел для  Windows.");
+   if(l > 255)  //if(l > 259)                                //Р‘РѕСЂРµРјСЃСЏ СЃ РїСЂРµРґРµР»СЊРЅРѕ РґР»РёРЅРЅС‹РјРё РёРјРµРЅРІРјРё
+     return Error3(outNameF, "", (Lan+95)->msg);             //return Error3(outNameF, "", "Р§РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ РїРѕР»РЅРѕРј РёРјРµРЅРё С„Р°Р№Р»Р° РїСЂРµРІС‹С€Р°РµС‚ РїСЂРµРґРµР» РґР»СЏ  Windows.");
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-//11static int Copy_One_File(PAR_FILE *pf, char *msg, char *fName) //Копирование одного файла
-static int Copy_One_File(PAR_FILE *pf, char *msg)            //Копирование одного файла
+//11static int Copy_One_File(PAR_FILE *pf, char *msg, char *fName) //РљРѕРїРёСЂРѕРІР°РЅРёРµ РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+static int Copy_One_File(PAR_FILE *pf, char *msg)            //РљРѕРїРёСЂРѕРІР°РЅРёРµ РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 {
-   BYTE buff[sCl_B];                                         //Память под один кластер
+   BYTE buff[sCl_B];                                         //РџР°РјСЏС‚СЊ РїРѕРґ РѕРґРёРЅ РєР»Р°СЃС‚РµСЂ
    DWORD nb;
-#if !defined EMULATOR_HDD_AND_COPY                           //НЕТ Режима эмулятора с эмуляцией копирования
-   ZeroMemory(buff, sCl_B);                                  //Очистка буфера чтения
+#if !defined EMULATOR_HDD_AND_COPY                           //РќР•Рў Р РµР¶РёРјР° СЌРјСѓР»СЏС‚РѕСЂР° СЃ СЌРјСѓР»СЏС†РёРµР№ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+   ZeroMemory(buff, sCl_B);                                  //РћС‡РёСЃС‚РєР° Р±СѓС„РµСЂР° С‡С‚РµРЅРёСЏ
 #endif
-   DWORD wSizeB = sCl_B;                                     //Число записываемых байт равно числу байт в кластере
-   DWORD nCl = pf->ClSt;                                     //Текущий номер кластера равен первому кластеру файла
-   LONGLONG SizeToEnd = pf->SizeF;                           //Число байт которые осталось записать
-   DWORD numCl = DWORD((pf->SizeF + sCl_B - 1) / sCl_B);     //Число кластеров необходимое для размещения файла данного размера
+   DWORD wSizeB = sCl_B;                                     //Р§РёСЃР»Рѕ Р·Р°РїРёСЃС‹РІР°РµРјС‹С… Р±Р°Р№С‚ СЂР°РІРЅРѕ С‡РёСЃР»Сѓ Р±Р°Р№С‚ РІ РєР»Р°СЃС‚РµСЂРµ
+   DWORD nCl = pf->ClSt;                                     //РўРµРєСѓС‰РёР№ РЅРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° СЂР°РІРµРЅ РїРµСЂРІРѕРјСѓ РєР»Р°СЃС‚РµСЂСѓ С„Р°Р№Р»Р°
+   LONGLONG SizeToEnd = pf->SizeF;                           //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РєРѕС‚РѕСЂС‹Рµ РѕСЃС‚Р°Р»РѕСЃСЊ Р·Р°РїРёСЃР°С‚СЊ
+   DWORD numCl = DWORD((pf->SizeF + sCl_B - 1) / sCl_B);     //Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РЅРµРѕР±С…РѕРґРёРјРѕРµ РґР»СЏ СЂР°Р·РјРµС‰РµРЅРёСЏ С„Р°Р№Р»Р° РґР°РЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР°
    if(numCl > 0)
       InitProgressBar(numCl, msg);
-   for(DWORD i=0; i<numCl; i++)                              //По числу кластеров
-   {  if(nCl == 0x0FFFFFFF)                                  //Признак конца цепочки
-        return Error1((Lan+12)->msg);                        //return Error1("Неожиданно найден признак конца цепочки FAT.");
-      if(*(FAT1 + nCl) == 0)                                 //Ненормальная ситуация
-        return Error1((Lan+11)->msg);                        //return Error1("Обнаружено несоответствие значения FAT и ссылки на кластер файла.");
+   for(DWORD i=0; i<numCl; i++)                              //РџРѕ С‡РёСЃР»Сѓ РєР»Р°СЃС‚РµСЂРѕРІ
+   {  if(nCl == 0x0FFFFFFF)                                  //РџСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё
+        return Error1((Lan+12)->msg);                        //return Error1("РќРµРѕР¶РёРґР°РЅРЅРѕ РЅР°Р№РґРµРЅ РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё FAT.");
+      if(*(FAT1 + nCl) == 0)                                 //РќРµРЅРѕСЂРјР°Р»СЊРЅР°СЏ СЃРёС‚СѓР°С†РёСЏ
+        return Error1((Lan+11)->msg);                        //return Error1("РћР±РЅР°СЂСѓР¶РµРЅРѕ РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ Р·РЅР°С‡РµРЅРёСЏ FAT Рё СЃСЃС‹Р»РєРё РЅР° РєР»Р°СЃС‚РµСЂ С„Р°Р№Р»Р°.");
       if(wSizeB > SizeToEnd)
-//11     wSizeB = DWORD(((SizeToEnd + 511) / 512) * 512);    //Размер остатка записи меньше размера кластера  ?? Почему сектор
-         wSizeB = DWORD(SizeToEnd);                          //Размер остатка записи меньше размера кластера
-#if !defined EMULATOR_HDD_AND_COPY                           //НЕТ Режима эмулятора с эмуляцией копирования
-      DWORD nSector = Start_SecDir1 + (nCl - 1) * sClSec;    //Сектор начала текущего кластера
-      if(ReadClast1_P(nSector, buff) < 0) return -1;         //Чтение очeредного кластера
+//11     wSizeB = DWORD(((SizeToEnd + 511) / 512) * 512);    //Р Р°Р·РјРµСЂ РѕСЃС‚Р°С‚РєР° Р·Р°РїРёСЃРё РјРµРЅСЊС€Рµ СЂР°Р·РјРµСЂР° РєР»Р°СЃС‚РµСЂР°  ?? РџРѕС‡РµРјСѓ СЃРµРєС‚РѕСЂ
+         wSizeB = DWORD(SizeToEnd);                          //Р Р°Р·РјРµСЂ РѕСЃС‚Р°С‚РєР° Р·Р°РїРёСЃРё РјРµРЅСЊС€Рµ СЂР°Р·РјРµСЂР° РєР»Р°СЃС‚РµСЂР°
+#if !defined EMULATOR_HDD_AND_COPY                           //РќР•Рў Р РµР¶РёРјР° СЌРјСѓР»СЏС‚РѕСЂР° СЃ СЌРјСѓР»СЏС†РёРµР№ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+      DWORD nSector = Start_SecDir1 + (nCl - 1) * sClSec;    //РЎРµРєС‚РѕСЂ РЅР°С‡Р°Р»Р° С‚РµРєСѓС‰РµРіРѕ РєР»Р°СЃС‚РµСЂР°
+      if(ReadClast1_P(nSector, buff) < 0) return -1;         //Р§С‚РµРЅРёРµ РѕС‡eСЂРµРґРЅРѕРіРѕ РєР»Р°СЃС‚РµСЂР°
 #endif
       if(WriteFile(outFile, buff, wSizeB, &nb, NULL) == false || nb != wSizeB)
-        return ErrorSys1((Lan+83)->msg);                     //return ErrorSys1("Ошибка при записи выходного файла.");
-      SizeToEnd -= wSizeB;                                   //Число байт которые осталось записать
-      nCl = *(FAT1 + nCl);                                   //Номер следующего кластера
+        return ErrorSys1((Lan+83)->msg);                     //return ErrorSys1("РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°.");
+      SizeToEnd -= wSizeB;                                   //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РєРѕС‚РѕСЂС‹Рµ РѕСЃС‚Р°Р»РѕСЃСЊ Р·Р°РїРёСЃР°С‚СЊ
+      nCl = *(FAT1 + nCl);                                   //РќРѕРјРµСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ РєР»Р°СЃС‚РµСЂР°
       if(nCl > maxZapFAT1 && nCl != 0x0FFFFFFF)
-        return Error1((Lan+13)->msg);                        //"Номер кластера превышает допустимое значение."
+        return Error1((Lan+13)->msg);                        //"РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РїСЂРµРІС‹С€Р°РµС‚ РґРѕРїСѓСЃС‚РёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ."
       if(SizeToEnd == 0 && nCl != 0x0FFFFFFF)
-        Error1((Lan+29)->msg);                               //return Error2("Выходной файл заданного размера записан,", "а признак конца цепочки FAT не найден.");
-      if(ProgressBar(wSizeB) < 0) return -1;                 //Оператор нажал кнопку Прервать
+        Error1((Lan+29)->msg);                               //return Error2("Р’С‹С…РѕРґРЅРѕР№ С„Р°Р№Р» Р·Р°РґР°РЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР° Р·Р°РїРёСЃР°РЅ,", "Р° РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё FAT РЅРµ РЅР°Р№РґРµРЅ.");
+      if(ProgressBar(wSizeB) < 0) return -1;                 //РћРїРµСЂР°С‚РѕСЂ РЅР°Р¶Р°Р» РєРЅРѕРїРєСѓ РџСЂРµСЂРІР°С‚СЊ
    }
-   CloseFile(&outFile);                                      //Закрыли выходной файл
+   CloseFile(&outFile);                                      //Р—Р°РєСЂС‹Р»Рё РІС‹С…РѕРґРЅРѕР№ С„Р°Р№Р»
 /*11
-   if((pf->SizeF % sCl_B) != 0)                              //Размер файла не является кратным размеру кластера
+   if((pf->SizeF % sCl_B) != 0)                              //Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РЅРµ СЏРІР»СЏРµС‚СЃСЏ РєСЂР°С‚РЅС‹Рј СЂР°Р·РјРµСЂСѓ РєР»Р°СЃС‚РµСЂР°
  {
-   int n = 0;                                                //Счетчик для ожидания освобождения файла
-   if(Open_FileR(fName, &outFile, &n) < 0)                   //Открытие выходного файла
+   int n = 0;                                                //РЎС‡РµС‚С‡РёРє РґР»СЏ РѕР¶РёРґР°РЅРёСЏ РѕСЃРІРѕР±РѕР¶РґРµРЅРёСЏ С„Р°Р№Р»Р°
+   if(Open_FileR(fName, &outFile, &n) < 0)                   //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
       return -1;
    LARGE_INTEGER TPoz;
    TPoz.QuadPart = pf->SizeF;
    TPoz.u.LowPart = SetFilePointer(outFile, TPoz.u.LowPart, &TPoz.u.HighPart, FILE_BEGIN);
    if(TPoz.u.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR)
-      return ErrorSys1((Lan+83)->msg);                       //"Ошибка при позиционировании по диску."
+      return ErrorSys1((Lan+83)->msg);                       //"РћС€РёР±РєР° РїСЂРё РїРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёРё РїРѕ РґРёСЃРєСѓ."
     if(SetEndOfFile(outFile) == false)
-      return ErrorSys1((Lan+83)->msg);                     //return ErrorSys1("Ошибка при записи выходного файла.");
+      return ErrorSys1((Lan+83)->msg);                     //return ErrorSys1("РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°.");
  }
 */
    FILETIME fTime, flTime;
@@ -94,56 +94,56 @@ static int Copy_One_File(PAR_FILE *pf, char *msg)            //Копирование одног
    sysTime.wMinute = pf->Min;
    sysTime.wSecond = pf->Sec;
    sysTime.wMilliseconds = 0;
-   SystemTimeToFileTime(&sysTime, &flTime);                  //Преобразовали время
+   SystemTimeToFileTime(&sysTime, &flTime);                  //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РІСЂРµРјСЏ
    LocalFileTimeToFileTime(&flTime, &fTime);
-   SetFileTime(outFile, &fTime, &fTime, &fTime);             //Дата файла
+   SetFileTime(outFile, &fTime, &fTime, &fTime);             //Р”Р°С‚Р° С„Р°Р№Р»Р°
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Copy_File1(DWORD ind)                             //Копирование выбранного файла на диск ПК
+static int Copy_File1(DWORD ind)                             //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р° РЅР° РґРёСЃРє РџРљ
 {
    char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
    char outNameF1[260], NameFF[260];
 
    fnsplit(outNameF1, Driv, Dir, Name, Ext);
    lstrcpy(NameFF, (aTree+ind)->NameF);
-   Ctrl_Name_Ch(NameFF);                                     //Проверка имени на недопустимые символы
+   Ctrl_Name_Ch(NameFF);                                     //РџСЂРѕРІРµСЂРєР° РёРјРµРЅРё РЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹
    fnmerge(outNameF1, Driv, Dir, NameFF, "");
-   indF = ind;                                               //Индекс копируемого файла
-   if(OpenOutFileName_New(outNameF1, (aTree+ind)->pf.SizeF, &outFile) < 0) return -1; //Открытие выходного файла
-   UpdateWindow(MainWin);                                    //Восстановили окно после диалога выбора файла
+   indF = ind;                                               //РРЅРґРµРєСЃ РєРѕРїРёСЂСѓРµРјРѕРіРѕ С„Р°Р№Р»Р°
+   if(OpenOutFileName_New(outNameF1, (aTree+ind)->pf.SizeF, &outFile) < 0) return -1; //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+   UpdateWindow(MainWin);                                    //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё РѕРєРЅРѕ РїРѕСЃР»Рµ РґРёР°Р»РѕРіР° РІС‹Р±РѕСЂР° С„Р°Р№Р»Р°
    InitProgressBar = InitProgressBar1;
    ProgressBar = ProgressBar1;
    Close_ProgressBar = Close_ProgressBar1;
-//11   int ret = Copy_One_File(&((aTree+ind)->pf), (Lan+24)->msg, outNameF1);//int ret = Copy_One_File((Tree+ind)->pf.SizeF, (Tree+ind)->pf.ClSt,  "Копирование файла");
-   int ret = Copy_One_File(&((aTree+ind)->pf), (Lan+24)->msg);               //int ret = Copy_One_File((Tree+ind)->pf.SizeF, (Tree+ind)->pf.ClSt,  "Копирование файла");
+//11   int ret = Copy_One_File(&((aTree+ind)->pf), (Lan+24)->msg, outNameF1);//int ret = Copy_One_File((Tree+ind)->pf.SizeF, (Tree+ind)->pf.ClSt,  "РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р°");
+   int ret = Copy_One_File(&((aTree+ind)->pf), (Lan+24)->msg);               //int ret = Copy_One_File((Tree+ind)->pf.SizeF, (Tree+ind)->pf.ClSt,  "РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р°");
    Close_ProgressBar();
-   CloseFile(&outFile);                                      //Закрыли входной файл
+   CloseFile(&outFile);                                      //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
    if(ret < 0) DeleteFile(outNameF1);
    return ret;
 }
 
 //------------------------------------------------------------------------------
 
-static int Copy_Folder_(HTREEITEM hitem, char *Name_Dir, char *NameFo)//Копирование выбранной папки на диск ПК
+static int Copy_Folder_(HTREEITEM hitem, char *Name_Dir, char *NameFo)//РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕР№ РїР°РїРєРё РЅР° РґРёСЃРє РџРљ
 {
-   HTREEITEM ind = TreeView_GetChild(hwndTree, hitem);       //Вошли во внутренний уровень дерева
+   HTREEITEM ind = TreeView_GetChild(hwndTree, hitem);       //Р’РѕС€Р»Рё РІРѕ РІРЅСѓС‚СЂРµРЅРЅРёР№ СѓСЂРѕРІРµРЅСЊ РґРµСЂРµРІР°
    if(ind == NULL) return 0;
-   char nName_Dir[512];                                      //Суммарный путь
+   char nName_Dir[512];                                      //РЎСѓРјРјР°СЂРЅС‹Р№ РїСѓС‚СЊ
    lstrcpy(nName_Dir, Name_Dir);
    lstrcat(nName_Dir, "\\");
-   Ctrl_Name_Ch(NameFo);                                     //Проверка имени на недопустимые символы и замена недопустимых символов
+   Ctrl_Name_Ch(NameFo);                                     //РџСЂРѕРІРµСЂРєР° РёРјРµРЅРё РЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹ Рё Р·Р°РјРµРЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
    lstrcat(nName_Dir, NameFo);
 // int l = lstrlen(nName_Dir);
-// if((l+45) >= 256)                                         //Длина имени файла до 45 знаков
-//   if(MsgYesNo4(nName_Dir, "Длина пути к указанной папке близка к предельной.",
-//                           "Возможны ошибки.", "Продолжать ?") == 'N') return -1;
-   if(CtrlFileYesNo(nName_Dir) == 0)                         //Каталога первого копируемого уровня нет
+// if((l+45) >= 256)                                         //Р”Р»РёРЅР° РёРјРµРЅРё С„Р°Р№Р»Р° РґРѕ 45 Р·РЅР°РєРѕРІ
+//   if(MsgYesNo4(nName_Dir, "Р”Р»РёРЅР° РїСѓС‚Рё Рє СѓРєР°Р·Р°РЅРЅРѕР№ РїР°РїРєРµ Р±Р»РёР·РєР° Рє РїСЂРµРґРµР»СЊРЅРѕР№.",
+//                           "Р’РѕР·РјРѕР¶РЅС‹ РѕС€РёР±РєРё.", "РџСЂРѕРґРѕР»Р¶Р°С‚СЊ ?") == 'N') return -1;
+   if(CtrlFileYesNo(nName_Dir) == 0)                         //РљР°С‚Р°Р»РѕРіР° РїРµСЂРІРѕРіРѕ РєРѕРїРёСЂСѓРµРјРѕРіРѕ СѓСЂРѕРІРЅСЏ РЅРµС‚
       if(CreateDirectory(nName_Dir, NULL) == FALSE)
-        return Error2(nName_Dir, (Lan+93)->msg);             //return Error2(nName_Dir, "Системная ошибка при создании папки.");
-   for(;;)                                                   //Просмотр всего дерева от текущей папки
+        return Error2(nName_Dir, (Lan+93)->msg);             //return Error2(nName_Dir, "РЎРёСЃС‚РµРјРЅР°СЏ РѕС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё РїР°РїРєРё.");
+   for(;;)                                                   //РџСЂРѕСЃРјРѕС‚СЂ РІСЃРµРіРѕ РґРµСЂРµРІР° РѕС‚ С‚РµРєСѓС‰РµР№ РїР°РїРєРё
    {  TV_ITEM item;
       char Msg[100];
       item.mask = TVIF_TEXT | TVIF_PARAM;
@@ -151,54 +151,54 @@ static int Copy_Folder_(HTREEITEM hitem, char *Name_Dir, char *NameFo)//Копирова
       item.pszText = Msg;
       item.cchTextMax = 100;
       if(TreeView_GetItem(hwndTree, &item) == FALSE)
-        return Error1((Lan+33)->msg);                        //return Error1("Ошибка при запросе информации об элементе дерева.");
-      if((aTree + item.lParam)->pf.type == 48 ||             //Очередное имя это папка
-         (aTree + item.lParam)->pf.type == 47)               //Данное имя это специальная папка
-      {   if(Copy_Folder_(ind, nName_Dir, (aTree + item.lParam)->NameF) < 0) return -1; }//Копирование файлов одной папки
-      else                                                   //Очередное имя это файл
+        return Error1((Lan+33)->msg);                        //return Error1("РћС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ РёРЅС„РѕСЂРјР°С†РёРё РѕР± СЌР»РµРјРµРЅС‚Рµ РґРµСЂРµРІР°.");
+      if((aTree + item.lParam)->pf.type == 48 ||             //РћС‡РµСЂРµРґРЅРѕРµ РёРјСЏ СЌС‚Рѕ РїР°РїРєР°
+         (aTree + item.lParam)->pf.type == 47)               //Р”Р°РЅРЅРѕРµ РёРјСЏ СЌС‚Рѕ СЃРїРµС†РёР°Р»СЊРЅР°СЏ РїР°РїРєР°
+      {   if(Copy_Folder_(ind, nName_Dir, (aTree + item.lParam)->NameF) < 0) return -1; }//РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»РѕРІ РѕРґРЅРѕР№ РїР°РїРєРё
+      else                                                   //РћС‡РµСЂРµРґРЅРѕРµ РёРјСЏ СЌС‚Рѕ С„Р°Р№Р»
       {  char outNameF[260], Ss[300], NameFF[260];
          lstrcpy(outNameF, nName_Dir);
          lstrcat(outNameF, "\\");
          lstrcpy(NameFF, (aTree + item.lParam)->NameF);
-         Ctrl_Name_Ch(NameFF);                               //Проверка имени на недопустимые символы и замена недопустимых символов
+         Ctrl_Name_Ch(NameFF);                               //РџСЂРѕРІРµСЂРєР° РёРјРµРЅРё РЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹ Рё Р·Р°РјРµРЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
          lstrcat(outNameF, NameFF);
-         if(Ctrl_OutName(outNameF) < 0) return  -1;          //Проверка, что длина имени менее предельной
-         indF = item.lParam;                                 //Индекс копируемого файла
-         int ret = OpenOutFileName_Yes(outNameF, (aTree + item.lParam)->pf.SizeF, &outFile);//Открытие выходного файла
+         if(Ctrl_OutName(outNameF) < 0) return  -1;          //РџСЂРѕРІРµСЂРєР°, С‡С‚Рѕ РґР»РёРЅР° РёРјРµРЅРё РјРµРЅРµРµ РїСЂРµРґРµР»СЊРЅРѕР№
+         indF = item.lParam;                                 //РРЅРґРµРєСЃ РєРѕРїРёСЂСѓРµРјРѕРіРѕ С„Р°Р№Р»Р°
+         int ret = OpenOutFileName_Yes(outNameF, (aTree + item.lParam)->pf.SizeF, &outFile);//РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
          if(ret == -1) return -1;
          num_T_Fi++;
          sprintf(Ss, "%s:   %d  ( %d )", (Lan+24)->msg, num_T_Fi, numAllFi);
-         if(ret == -2)                                       //Нажата кнопка "Пропустить"
-         {  ScipProgressBar2((aTree+item.lParam)->pf.SizeF); //Отработка прогресса для пропускаемых файлов
+         if(ret == -2)                                       //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° "РџСЂРѕРїСѓСЃС‚РёС‚СЊ"
+         {  ScipProgressBar2((aTree+item.lParam)->pf.SizeF); //РћС‚СЂР°Р±РѕС‚РєР° РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… С„Р°Р№Р»РѕРІ
             ret = 0;
          }
          else
-//11       ret = Copy_One_File(&((aTree+item.lParam)->pf), Ss, outNameF);//ret = Copy_One_File(&((Tree+item.lParam)->pf), "Копирование файла");
-           ret = Copy_One_File(&((aTree+item.lParam)->pf), Ss);          //ret = Copy_One_File(&((Tree+item.lParam)->pf), "Копирование файла");
+//11       ret = Copy_One_File(&((aTree+item.lParam)->pf), Ss, outNameF);//ret = Copy_One_File(&((Tree+item.lParam)->pf), "РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р°");
+           ret = Copy_One_File(&((aTree+item.lParam)->pf), Ss);          //ret = Copy_One_File(&((Tree+item.lParam)->pf), "РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р°");
          Close_ProgressBar();
-         CloseFile(&outFile);                                //Закрыли входной файл
+         CloseFile(&outFile);                                //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
          if(ret < 0)
          {  DeleteFile(outNameF);  return -1;  }
       }
-      ind = TreeView_GetNextSibling(hwndTree, ind);          //Следующая запись на том же уровне дерева
-      if(ind == NULL) break;                                 //Больше записей данного уровня нет
+      ind = TreeView_GetNextSibling(hwndTree, ind);          //РЎР»РµРґСѓСЋС‰Р°СЏ Р·Р°РїРёСЃСЊ РЅР° С‚РѕРј Р¶Рµ СѓСЂРѕРІРЅРµ РґРµСЂРµРІР°
+      if(ind == NULL) break;                                 //Р‘РѕР»СЊС€Рµ Р·Р°РїРёСЃРµР№ РґР°РЅРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ РЅРµС‚
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Calc_Folder_(HTREEITEM hitem, char *Name_Dir, char *NameFo, int pr)//Вычисления для копирование выбранной папки на диск ПК
+static int Calc_Folder_(HTREEITEM hitem, char *Name_Dir, char *NameFo, int pr)//Р’С‹С‡РёСЃР»РµРЅРёСЏ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕР№ РїР°РїРєРё РЅР° РґРёСЃРє РџРљ
 {
-   HTREEITEM ind = TreeView_GetChild(hwndTree, hitem);       //Вошли во внутренний уровень дерева
+   HTREEITEM ind = TreeView_GetChild(hwndTree, hitem);       //Р’РѕС€Р»Рё РІРѕ РІРЅСѓС‚СЂРµРЅРЅРёР№ СѓСЂРѕРІРµРЅСЊ РґРµСЂРµРІР°
    if(ind == NULL)
-     if(pr == 0) return Error1((Lan+92)->msg);               //if(pr == 0) return Error1("В указанной папке нет файлов для копирования.");
-     else return 0;                                          //Для вложенных пустых папок ничего не делаем
-   char nName_Dir[512];                                      //Суммарный путь
+     if(pr == 0) return Error1((Lan+92)->msg);               //if(pr == 0) return Error1("Р’ СѓРєР°Р·Р°РЅРЅРѕР№ РїР°РїРєРµ РЅРµС‚ С„Р°Р№Р»РѕРІ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёСЏ.");
+     else return 0;                                          //Р”Р»СЏ РІР»РѕР¶РµРЅРЅС‹С… РїСѓСЃС‚С‹С… РїР°РїРѕРє РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµРј
+   char nName_Dir[512];                                      //РЎСѓРјРјР°СЂРЅС‹Р№ РїСѓС‚СЊ
    lstrcpy(nName_Dir, Name_Dir);
    lstrcat(nName_Dir, "\\");
    lstrcat(nName_Dir, NameFo);
-   for(;;)                                                   //Просмотр всего дерева от текущей папки
+   for(;;)                                                   //РџСЂРѕСЃРјРѕС‚СЂ РІСЃРµРіРѕ РґРµСЂРµРІР° РѕС‚ С‚РµРєСѓС‰РµР№ РїР°РїРєРё
    {  TV_ITEM item;
       char Msg[100];
       item.mask = TVIF_TEXT | TVIF_PARAM;
@@ -206,29 +206,29 @@ static int Calc_Folder_(HTREEITEM hitem, char *Name_Dir, char *NameFo, int pr)//
       item.pszText = Msg;
       item.cchTextMax = 100;
       if(TreeView_GetItem(hwndTree, &item) == FALSE)
-         return Error1((Lan+33)->msg);                       //return Error1("Ошибка при запросе информации об элементе дерева.");
-      if((aTree + item.lParam)->pf.type == 48 ||             //Очередное имя это папка
-         (aTree + item.lParam)->pf.type == 47)               //Данное имя это специальная папка
-      {  if(Calc_Folder_(ind, nName_Dir, (aTree + item.lParam)->NameF, ++pr) < 0) return -1; }//Вычисления для копирование выбранной папки на диск ПК
-      else                                                   //Очередное имя это файл
-      {  numAllInCl += DWORD(((aTree + item.lParam)->pf.SizeF + sCl_B - 1) / sCl_B);  //Суммарное число кластеров во всех копируемых файлах
-         numAllOutCl += ((aTree + item.lParam)->pf.SizeF + BytesPerClaster - 1) / BytesPerClaster; //Суммарный число выходных кластеров
-         numAllFi++;                                         //Число копируемых файлах
+         return Error1((Lan+33)->msg);                       //return Error1("РћС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ РёРЅС„РѕСЂРјР°С†РёРё РѕР± СЌР»РµРјРµРЅС‚Рµ РґРµСЂРµРІР°.");
+      if((aTree + item.lParam)->pf.type == 48 ||             //РћС‡РµСЂРµРґРЅРѕРµ РёРјСЏ СЌС‚Рѕ РїР°РїРєР°
+         (aTree + item.lParam)->pf.type == 47)               //Р”Р°РЅРЅРѕРµ РёРјСЏ СЌС‚Рѕ СЃРїРµС†РёР°Р»СЊРЅР°СЏ РїР°РїРєР°
+      {  if(Calc_Folder_(ind, nName_Dir, (aTree + item.lParam)->NameF, ++pr) < 0) return -1; }//Р’С‹С‡РёСЃР»РµРЅРёСЏ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕР№ РїР°РїРєРё РЅР° РґРёСЃРє РџРљ
+      else                                                   //РћС‡РµСЂРµРґРЅРѕРµ РёРјСЏ СЌС‚Рѕ С„Р°Р№Р»
+      {  numAllInCl += DWORD(((aTree + item.lParam)->pf.SizeF + sCl_B - 1) / sCl_B);  //РЎСѓРјРјР°СЂРЅРѕРµ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІРѕ РІСЃРµС… РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»Р°С…
+         numAllOutCl += ((aTree + item.lParam)->pf.SizeF + BytesPerClaster - 1) / BytesPerClaster; //РЎСѓРјРјР°СЂРЅС‹Р№ С‡РёСЃР»Рѕ РІС‹С…РѕРґРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+         numAllFi++;                                         //Р§РёСЃР»Рѕ РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»Р°С…
       }
-      ind = TreeView_GetNextSibling(hwndTree, ind);          //Следующая запись на том же уровне дерева
-      if(ind == NULL) break;                                 //Больше записей данного уровня нет
+      ind = TreeView_GetNextSibling(hwndTree, ind);          //РЎР»РµРґСѓСЋС‰Р°СЏ Р·Р°РїРёСЃСЊ РЅР° С‚РѕРј Р¶Рµ СѓСЂРѕРІРЅРµ РґРµСЂРµРІР°
+      if(ind == NULL) break;                                 //Р‘РѕР»СЊС€Рµ Р·Р°РїРёСЃРµР№ РґР°РЅРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ РЅРµС‚
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Copy_Folder(HTREEITEM hitem, char *NameFo)        //Копирование выбранной папки на диск ПК
+static int Copy_Folder(HTREEITEM hitem, char *NameFo)        //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕР№ РїР°РїРєРё РЅР° РґРёСЃРє РџРљ
 {
    char Name_Dir[260];
-   if(Get_Name_Dir((Lan+94)->msg, Name_Dir, 0) < 0) return -1;//Запрос имени папки //if(Get_Name_Dir("Укажите диск или папку для записи", Name_Dir) < 0) return -1; //Запрос имени папки
-   UpdateWindow(MainWin);                                    //Восстановили окно после диалога выбора файла
-   InitProgressBar = InitProgressBar1_2;                     //Функция прогресса для одного файла из группы
+   if(Get_Name_Dir((Lan+94)->msg, Name_Dir, 0) < 0) return -1;//Р—Р°РїСЂРѕСЃ РёРјРµРЅРё РїР°РїРєРё //if(Get_Name_Dir("РЈРєР°Р¶РёС‚Рµ РґРёСЃРє РёР»Рё РїР°РїРєСѓ РґР»СЏ Р·Р°РїРёСЃРё", Name_Dir) < 0) return -1; //Р—Р°РїСЂРѕСЃ РёРјРµРЅРё РїР°РїРєРё
+   UpdateWindow(MainWin);                                    //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё РѕРєРЅРѕ РїРѕСЃР»Рµ РґРёР°Р»РѕРіР° РІС‹Р±РѕСЂР° С„Р°Р№Р»Р°
+   InitProgressBar = InitProgressBar1_2;                     //Р¤СѓРЅРєС†РёСЏ РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р° РёР· РіСЂСѓРїРїС‹
    ProgressBar = ProgressBar2;
    Close_ProgressBar = Close_ProgressBar1_2;
 
@@ -239,96 +239,96 @@ static int Copy_Folder(HTREEITEM hitem, char *NameFo)        //Копирование выбра
    DWORD SectorsPerCluster, BytesPerSector, NumberOfFreeClusters, TotalNumberOfClusters;
    if(GetDiskFreeSpace(Path, &SectorsPerCluster, &BytesPerSector,
                     &NumberOfFreeClusters, &TotalNumberOfClusters) == 0)
-      return ErrorSys1((Lan+46)->msg);                       //return ErrorSys1("Системная ошибка при запросе емкости диска.");
-   BytesPerClaster = SectorsPerCluster * BytesPerSector;     //Число байт в кластере
-   numAllInCl = 0;                                           //Суммарное число кластеров во всех копируемых файлах
-   numAllFi = 0;                                             //Число копируемых файлов
-   num_T_Fi = 0;                                             //Номер текущего копируемого файла
-   numAllOutCl = 0;                                          //Суммарный число выходных кластеров
+      return ErrorSys1((Lan+46)->msg);                       //return ErrorSys1("РЎРёСЃС‚РµРјРЅР°СЏ РѕС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ РµРјРєРѕСЃС‚Рё РґРёСЃРєР°.");
+   BytesPerClaster = SectorsPerCluster * BytesPerSector;     //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ РєР»Р°СЃС‚РµСЂРµ
+   numAllInCl = 0;                                           //РЎСѓРјРјР°СЂРЅРѕРµ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІРѕ РІСЃРµС… РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»Р°С…
+   numAllFi = 0;                                             //Р§РёСЃР»Рѕ РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»РѕРІ
+   num_T_Fi = 0;                                             //РќРѕРјРµСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРїРёСЂСѓРµРјРѕРіРѕ С„Р°Р№Р»Р°
+   numAllOutCl = 0;                                          //РЎСѓРјРјР°СЂРЅС‹Р№ С‡РёСЃР»Рѕ РІС‹С…РѕРґРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
    int l = lstrlen(Name_Dir) - 1;
-   if(*(Name_Dir + l) == '\\') *(Name_Dir + l) = 0;          //Для имени диска косая всегда есть
-   if(Calc_Folder_(hitem, Name_Dir, NameFo, 0) < 0) return -1;//Вычисления для копирование выбранной папки на диск ПК
+   if(*(Name_Dir + l) == '\\') *(Name_Dir + l) = 0;          //Р”Р»СЏ РёРјРµРЅРё РґРёСЃРєР° РєРѕСЃР°СЏ РІСЃРµРіРґР° РµСЃС‚СЊ
+   if(Calc_Folder_(hitem, Name_Dir, NameFo, 0) < 0) return -1;//Р’С‹С‡РёСЃР»РµРЅРёСЏ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕР№ РїР°РїРєРё РЅР° РґРёСЃРє РџРљ
    DWORDLONG allSize = numAllOutCl * BytesPerClaster;
-   int ret = DiskFreeSpaceEx_F(Name_Dir, allSize);           //Проверка свободного места
+   int ret = DiskFreeSpaceEx_F(Name_Dir, allSize);           //РџСЂРѕРІРµСЂРєР° СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
    if(ret < 0) return -1;
-   if(ret == 1) return Copy_Folder(hitem, NameFo);           //Копирование выбранной папки на диск ПК (повторный запуск для запроса нового пути)
+   if(ret == 1) return Copy_Folder(hitem, NameFo);           //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕР№ РїР°РїРєРё РЅР° РґРёСЃРє РџРљ (РїРѕРІС‚РѕСЂРЅС‹Р№ Р·Р°РїСѓСЃРє РґР»СЏ Р·Р°РїСЂРѕСЃР° РЅРѕРІРѕРіРѕ РїСѓС‚Рё)
    sprintf(Ss, "%s:  %s", (Lan+91)->msg, NameFo);
-   InitProgressBar2_2(numAllInCl, Ss);                       //Функция прогресса для нескольких файлов
-   ret = Copy_Folder_(hitem, Name_Dir, NameFo);              //Копирование выбранной папки на диск ПК
+   InitProgressBar2_2(numAllInCl, Ss);                       //Р¤СѓРЅРєС†РёСЏ РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РЅРµСЃРєРѕР»СЊРєРёС… С„Р°Р№Р»РѕРІ
+   ret = Copy_Folder_(hitem, Name_Dir, NameFo);              //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕР№ РїР°РїРєРё РЅР° РґРёСЃРє РџРљ
    Close_ProgressBar2_2();
    return ret;
 }
 
 //------------------------------------------------------------------------------
 
-static int Copy_AllFiles(char *Name_Dir)                     //Копирование выбранных файлов на диск ПК
+static int Copy_AllFiles(char *Name_Dir)                     //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє РџРљ
 {
    char outNameF[512], Ss[300], NameFF[260];
-   for(int i=0; i<numEl_Tree; i++)                           //По числу элементров в дереве имен
-   {  if((aTree + i)->prSel == 0) continue;                  //Данный файл не выбран
-      if((aTree + i)->pf.type == 47) continue;               //Данное имя это специальная папка
+   for(int i=0; i<numEl_Tree; i++)                           //РџРѕ С‡РёСЃР»Сѓ СЌР»РµРјРµРЅС‚СЂРѕРІ РІ РґРµСЂРµРІРµ РёРјРµРЅ
+   {  if((aTree + i)->prSel == 0) continue;                  //Р”Р°РЅРЅС‹Р№ С„Р°Р№Р» РЅРµ РІС‹Р±СЂР°РЅ
+      if((aTree + i)->pf.type == 47) continue;               //Р”Р°РЅРЅРѕРµ РёРјСЏ СЌС‚Рѕ СЃРїРµС†РёР°Р»СЊРЅР°СЏ РїР°РїРєР°
       lstrcpy(outNameF, Name_Dir);
       lstrcat(outNameF, "\\");
-      if((aTree + i)->indFolder != 0)                        //Ссылка на имя папки
+      if((aTree + i)->indFolder != 0)                        //РЎСЃС‹Р»РєР° РЅР° РёРјСЏ РїР°РїРєРё
       {  lstrcpy(NameFF, (aTree + (aTree + i)->indFolder)->NameF);
-         Ctrl_Name_Ch(NameFF);                               //Проверка имени на недопустимые символы и замена недопустимых символов
+         Ctrl_Name_Ch(NameFF);                               //РџСЂРѕРІРµСЂРєР° РёРјРµРЅРё РЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹ Рё Р·Р°РјРµРЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
          lstrcat(outNameF, NameFF);
-         if(CtrlFileYesNo(outNameF) == 0)                    //Каталога первого копируемого уровня нет
+         if(CtrlFileYesNo(outNameF) == 0)                    //РљР°С‚Р°Р»РѕРіР° РїРµСЂРІРѕРіРѕ РєРѕРїРёСЂСѓРµРјРѕРіРѕ СѓСЂРѕРІРЅСЏ РЅРµС‚
            if(CreateDirectory(outNameF, NULL) == FALSE)
-              return Error2(outNameF, (Lan+93)->msg);        //return Error2(nName_Dir, "Системная ошибка при создании папки.");
+              return Error2(outNameF, (Lan+93)->msg);        //return Error2(nName_Dir, "РЎРёСЃС‚РµРјРЅР°СЏ РѕС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё РїР°РїРєРё.");
          lstrcat(outNameF, "\\");
       }
       lstrcpy(NameFF, (aTree + i)->NameF);
-      Ctrl_Name_Ch(NameFF);                                  //Проверка имени на недопустимые символы и замена недопустимых символов
+      Ctrl_Name_Ch(NameFF);                                  //РџСЂРѕРІРµСЂРєР° РёРјРµРЅРё РЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹ Рё Р·Р°РјРµРЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
       lstrcat(outNameF, NameFF);
-      if(Ctrl_OutName(outNameF) < 0) return -1;              //Проверка, что длина имени менее предельной
-      indF = i;                                              //Индекс копируемого файла
-      int ret = OpenOutFileName_Yes(outNameF, (aTree + i)->pf.SizeF, &outFile);//Открытие выходного файла
+      if(Ctrl_OutName(outNameF) < 0) return -1;              //РџСЂРѕРІРµСЂРєР°, С‡С‚Рѕ РґР»РёРЅР° РёРјРµРЅРё РјРµРЅРµРµ РїСЂРµРґРµР»СЊРЅРѕР№
+      indF = i;                                              //РРЅРґРµРєСЃ РєРѕРїРёСЂСѓРµРјРѕРіРѕ С„Р°Р№Р»Р°
+      int ret = OpenOutFileName_Yes(outNameF, (aTree + i)->pf.SizeF, &outFile);//РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
       if(ret == -1) return -1;
       num_T_Fi++;
-      sprintf(Ss, "%s:   %d  ( %d )", (Lan+24)->msg, num_T_Fi, numAllFi);//"Копирование файла"
-      if(ret == -2)                                          //Нажата кнопка "Пропустить"
-      {  ScipProgressBar2((aTree+i)->pf.SizeF);              //Отработка прогресса для пропускаемых файлов
+      sprintf(Ss, "%s:   %d  ( %d )", (Lan+24)->msg, num_T_Fi, numAllFi);//"РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р°"
+      if(ret == -2)                                          //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° "РџСЂРѕРїСѓСЃС‚РёС‚СЊ"
+      {  ScipProgressBar2((aTree+i)->pf.SizeF);              //РћС‚СЂР°Р±РѕС‚РєР° РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… С„Р°Р№Р»РѕРІ
          ret = 0;
       }
       else
 //11    ret = Copy_One_File(&((aTree+i)->pf), Ss, outNameF);
         ret = Copy_One_File(&((aTree+i)->pf), Ss);
       Close_ProgressBar();
-      CloseFile(&outFile);                                   //Закрыли входной файл
+      CloseFile(&outFile);                                   //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
       if(ret < 0)
       {  DeleteFile(outNameF);  return -1;  }
-      if((aTree + i)->indFolder != 0)                        //Ссылка на имя папки
-         if(--((aTree + (aTree + i)->indFolder)->numCopy) == 0)   //Уменьшили счетчик частей
+      if((aTree + i)->indFolder != 0)                        //РЎСЃС‹Р»РєР° РЅР° РёРјСЏ РїР°РїРєРё
+         if(--((aTree + (aTree + i)->indFolder)->numCopy) == 0)   //РЈРјРµРЅСЊС€РёР»Рё СЃС‡РµС‚С‡РёРє С‡Р°СЃС‚РµР№
            RemoveSelectionFromCopy((aTree + i)->indFolder);
-      RemoveSelectionFromCopy(i);                            //Снятие выделение файла в дереве при копировании
+      RemoveSelectionFromCopy(i);                            //РЎРЅСЏС‚РёРµ РІС‹РґРµР»РµРЅРёРµ С„Р°Р№Р»Р° РІ РґРµСЂРµРІРµ РїСЂРё РєРѕРїРёСЂРѕРІР°РЅРёРё
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Calc_SizeAllFile(void)                            //Вычисления для копирование выбранных файлов на диск ПК
+static int Calc_SizeAllFile(void)                            //Р’С‹С‡РёСЃР»РµРЅРёСЏ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє РџРљ
 {
-   for(int i=0; i<numEl_Tree; i++)                           //По числу элементров в дереве имен
-   {  if((aTree + i)->prSel == 0) continue;                  //Данный файл не выбран
-      if((aTree + i)->pf.type == 47) continue;               //Данное имя это специальная папка
-      numAllInCl += DWORD(((aTree + i)->pf.SizeF + sCl_B - 1) / sCl_B);  //Суммарное число кластеров во всех копируемых файлах
-      numAllOutCl += ((aTree + i)->pf.SizeF + BytesPerClaster - 1) / BytesPerClaster; //Суммарный число выходных кластеров
-      numAllFi++;                                            //Число копируемых файлах
+   for(int i=0; i<numEl_Tree; i++)                           //РџРѕ С‡РёСЃР»Сѓ СЌР»РµРјРµРЅС‚СЂРѕРІ РІ РґРµСЂРµРІРµ РёРјРµРЅ
+   {  if((aTree + i)->prSel == 0) continue;                  //Р”Р°РЅРЅС‹Р№ С„Р°Р№Р» РЅРµ РІС‹Р±СЂР°РЅ
+      if((aTree + i)->pf.type == 47) continue;               //Р”Р°РЅРЅРѕРµ РёРјСЏ СЌС‚Рѕ СЃРїРµС†РёР°Р»СЊРЅР°СЏ РїР°РїРєР°
+      numAllInCl += DWORD(((aTree + i)->pf.SizeF + sCl_B - 1) / sCl_B);  //РЎСѓРјРјР°СЂРЅРѕРµ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІРѕ РІСЃРµС… РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»Р°С…
+      numAllOutCl += ((aTree + i)->pf.SizeF + BytesPerClaster - 1) / BytesPerClaster; //РЎСѓРјРјР°СЂРЅС‹Р№ С‡РёСЃР»Рѕ РІС‹С…РѕРґРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+      numAllFi++;                                            //Р§РёСЃР»Рѕ РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»Р°С…
    }
-   if(numAllFi == num_Sel) return 0;                         //Число копируемых файлах
-   return Error1((Lan+81)->msg);                             //81, "Неопознанная ошибка работы со списком");
+   if(numAllFi == num_Sel) return 0;                         //Р§РёСЃР»Рѕ РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»Р°С…
+   return Error1((Lan+81)->msg);                             //81, "РќРµРѕРїРѕР·РЅР°РЅРЅР°СЏ РѕС€РёР±РєР° СЂР°Р±РѕС‚С‹ СЃРѕ СЃРїРёСЃРєРѕРј");
 }
 
 //------------------------------------------------------------------------------
 
-static int CopySelect(void)                                  //Копирование выбранных файлов
+static int CopySelect(void)                                  //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ
 {
    char Name_Dir[260];
-   if(Get_Name_Dir((Lan+94)->msg, Name_Dir, 0) < 0) return -1;//Запрос имени папки // if(Get_Name_Dir("Укажите диск или папку для записи", Name_Dir) < 0) return -1;  //Запрос имени папки
-   UpdateWindow(MainWin);                                    //Восстановили окно после диалога выбора файла
-   InitProgressBar = InitProgressBar1_2;                     //Функция прогресса для одного файла из группы
+   if(Get_Name_Dir((Lan+94)->msg, Name_Dir, 0) < 0) return -1;//Р—Р°РїСЂРѕСЃ РёРјРµРЅРё РїР°РїРєРё // if(Get_Name_Dir("РЈРєР°Р¶РёС‚Рµ РґРёСЃРє РёР»Рё РїР°РїРєСѓ РґР»СЏ Р·Р°РїРёСЃРё", Name_Dir) < 0) return -1;  //Р—Р°РїСЂРѕСЃ РёРјРµРЅРё РїР°РїРєРё
+   UpdateWindow(MainWin);                                    //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё РѕРєРЅРѕ РїРѕСЃР»Рµ РґРёР°Р»РѕРіР° РІС‹Р±РѕСЂР° С„Р°Р№Р»Р°
+   InitProgressBar = InitProgressBar1_2;                     //Р¤СѓРЅРєС†РёСЏ РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р° РёР· РіСЂСѓРїРїС‹
    ProgressBar = ProgressBar2;
    Close_ProgressBar = Close_ProgressBar1_2;
 
@@ -339,46 +339,46 @@ static int CopySelect(void)                                  //Копирование выбра
    DWORD SectorsPerCluster, BytesPerSector, NumberOfFreeClusters, TotalNumberOfClusters;
    if(GetDiskFreeSpace(Path, &SectorsPerCluster, &BytesPerSector,
                        &NumberOfFreeClusters, &TotalNumberOfClusters) == 0)
-      return ErrorSys1((Lan+46)->msg);                       //return ErrorSys1("Системная ошибка при запросе емкости диска.");
-   BytesPerClaster = SectorsPerCluster * BytesPerSector;     //Число байт в кластере
-   numAllInCl = 0;                                           //Суммарное число кластеров во всех копируемых файлах
-   numAllFi = 0;                                             //Число копируемых файлов
-   num_T_Fi = 0;                                             //Номер текущего копируемого файла
-   numAllOutCl = 0;                                          //Суммарный число выходных кластеров
+      return ErrorSys1((Lan+46)->msg);                       //return ErrorSys1("РЎРёСЃС‚РµРјРЅР°СЏ РѕС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ РµРјРєРѕСЃС‚Рё РґРёСЃРєР°.");
+   BytesPerClaster = SectorsPerCluster * BytesPerSector;     //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ РєР»Р°СЃС‚РµСЂРµ
+   numAllInCl = 0;                                           //РЎСѓРјРјР°СЂРЅРѕРµ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІРѕ РІСЃРµС… РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»Р°С…
+   numAllFi = 0;                                             //Р§РёСЃР»Рѕ РєРѕРїРёСЂСѓРµРјС‹С… С„Р°Р№Р»РѕРІ
+   num_T_Fi = 0;                                             //РќРѕРјРµСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРїРёСЂСѓРµРјРѕРіРѕ С„Р°Р№Р»Р°
+   numAllOutCl = 0;                                          //РЎСѓРјРјР°СЂРЅС‹Р№ С‡РёСЃР»Рѕ РІС‹С…РѕРґРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
    int l = lstrlen(Name_Dir) - 1;
-   if(*(Name_Dir + l) == '\\') *(Name_Dir + l) = 0;          //Для имени диска косая всегда есть
-   if(Calc_SizeAllFile() < 0) return -1;                     //Вычисления для копирование выбранных файлов на диск ПК
+   if(*(Name_Dir + l) == '\\') *(Name_Dir + l) = 0;          //Р”Р»СЏ РёРјРµРЅРё РґРёСЃРєР° РєРѕСЃР°СЏ РІСЃРµРіРґР° РµСЃС‚СЊ
+   if(Calc_SizeAllFile() < 0) return -1;                     //Р’С‹С‡РёСЃР»РµРЅРёСЏ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє РџРљ
    DWORDLONG allSize = numAllOutCl * BytesPerClaster;
-   int ret = DiskFreeSpaceEx_F(Name_Dir, allSize);           //Проверка свободного места
+   int ret = DiskFreeSpaceEx_F(Name_Dir, allSize);           //РџСЂРѕРІРµСЂРєР° СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
    if(ret < 0) return -1;
-   if(ret == 1) return CopySelect();                         //Копирование выбранной файлов на диск ПК (повторный запуск для запроса нового пути)
-   InitProgressBar2_2(numAllInCl, (Lan+122)->msg);           //Функция прогресса для нескольких файлов // if(Get_Name_Dir("Укажите диск или папку для записи", Name_Dir) < 0) return -1;  //Запрос имени папки
-   ret = Copy_AllFiles(Name_Dir);                            //Копирование выбранных файлов на диск ПК
+   if(ret == 1) return CopySelect();                         //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕР№ С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє РџРљ (РїРѕРІС‚РѕСЂРЅС‹Р№ Р·Р°РїСѓСЃРє РґР»СЏ Р·Р°РїСЂРѕСЃР° РЅРѕРІРѕРіРѕ РїСѓС‚Рё)
+   InitProgressBar2_2(numAllInCl, (Lan+122)->msg);           //Р¤СѓРЅРєС†РёСЏ РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РЅРµСЃРєРѕР»СЊРєРёС… С„Р°Р№Р»РѕРІ // if(Get_Name_Dir("РЈРєР°Р¶РёС‚Рµ РґРёСЃРє РёР»Рё РїР°РїРєСѓ РґР»СЏ Р·Р°РїРёСЃРё", Name_Dir) < 0) return -1;  //Р—Р°РїСЂРѕСЃ РёРјРµРЅРё РїР°РїРєРё
+   ret = Copy_AllFiles(Name_Dir);                            //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє РџРљ
    Close_ProgressBar2_2();
    return ret;
 }
 
 //------------------------------------------------------------------------------
 
-int  CopyFiles(void)                                         //Выполнение копирования
+int  CopyFiles(void)                                         //Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
 {
    TV_ITEM item;
    char Msg[256];
-   prCopy = 0;                                               //Признак действия при групповом копировании
-   if(num_Sel > 0) return CopySelect();                      //Число выбранных имен при групповом выборе
+   prCopy = 0;                                               //РџСЂРёР·РЅР°Рє РґРµР№СЃС‚РІРёСЏ РїСЂРё РіСЂСѓРїРїРѕРІРѕРј РєРѕРїРёСЂРѕРІР°РЅРёРё
+   if(num_Sel > 0) return CopySelect();                      //Р§РёСЃР»Рѕ РІС‹Р±СЂР°РЅРЅС‹С… РёРјРµРЅ РїСЂРё РіСЂСѓРїРїРѕРІРѕРј РІС‹Р±РѕСЂРµ
    HTREEITEM ind = TreeView_GetSelection(hwndTree);
    if(ind == NULL)
-     return Error1((Lan+32)->msg);                           //return Error1("Нет имени выбранного для копирования.");
+     return Error1((Lan+32)->msg);                           //return Error1("РќРµС‚ РёРјРµРЅРё РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёСЏ.");
    item.mask = TVIF_TEXT | TVIF_PARAM;
    item.hItem = ind;
    item.pszText = Msg;
    item.cchTextMax = 256;
-   if(TreeView_GetItem(hwndTree, &item) == FALSE)            //Взяли текущий элемент дерева
-      return Error1((Lan+33)->msg);                          //return Error1("Ошибка при запросе информации об элементе дерева.");
-   if((aTree + item.lParam)->pf.type == 48 ||                //Текущий выбор это папка
-      (aTree + item.lParam)->pf.type == 47)                  //Текущий выбор это папка многофайлового Title
-      return Copy_Folder(ind, (aTree + item.lParam)->NameF); //Копирование выбранной папки на диск ПК
-   return Copy_File1(item.lParam);                           //Копирование выбранного файла на диск ПК
+   if(TreeView_GetItem(hwndTree, &item) == FALSE)            //Р’Р·СЏР»Рё С‚РµРєСѓС‰РёР№ СЌР»РµРјРµРЅС‚ РґРµСЂРµРІР°
+      return Error1((Lan+33)->msg);                          //return Error1("РћС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ РёРЅС„РѕСЂРјР°С†РёРё РѕР± СЌР»РµРјРµРЅС‚Рµ РґРµСЂРµРІР°.");
+   if((aTree + item.lParam)->pf.type == 48 ||                //РўРµРєСѓС‰РёР№ РІС‹Р±РѕСЂ СЌС‚Рѕ РїР°РїРєР°
+      (aTree + item.lParam)->pf.type == 47)                  //РўРµРєСѓС‰РёР№ РІС‹Р±РѕСЂ СЌС‚Рѕ РїР°РїРєР° РјРЅРѕРіРѕС„Р°Р№Р»РѕРІРѕРіРѕ Title
+      return Copy_Folder(ind, (aTree + item.lParam)->NameF); //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕР№ РїР°РїРєРё РЅР° РґРёСЃРє РџРљ
+   return Copy_File1(item.lParam);                           //РљРѕРїРёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р° РЅР° РґРёСЃРє РџРљ
 }
 
 #endif

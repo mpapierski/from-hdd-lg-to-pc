@@ -5,19 +5,19 @@
 
 #include "from_hdd_lg_to_pc.h"
 
-#if defined WRITE_YES                                        //Режим записи разрешен
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
 
 //============================ hdd_lg_write_1 ==================================
-int  File_ToHDD(void);                                       //Запись файлов на диск LG
-int  New_Folder_ToHDD(void);                                 //Cоздание папок на диске LG
-int  Folder_ToHDD(void);                                     //Запись папок на диск LG
-     char *spisF;                                            //Память списка файлов
+int  File_ToHDD(void);                                       //Р—Р°РїРёСЃСЊ С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє LG
+int  New_Folder_ToHDD(void);                                 //CРѕР·РґР°РЅРёРµ РїР°РїРѕРє РЅР° РґРёСЃРєРµ LG
+int  Folder_ToHDD(void);                                     //Р—Р°РїРёСЃСЊ РїР°РїРѕРє РЅР° РґРёСЃРє LG
+     char *spisF;                                            //РџР°РјСЏС‚СЊ СЃРїРёСЃРєР° С„Р°Р№Р»РѕРІ
 
-static BYTE bufIO[sCl_B];                                    //Память под один кластер
-static int numF_Sp;                                          //Число имен в списке
-static DWORD all_nCl;                                        //Общее число кластеров в записи
-static int writeNewCl;                                       //Число записанных кластеров
-static DWORD *pozNameF;                                      //Таблица смещений к именам файла в списке
+static BYTE bufIO[sCl_B];                                    //РџР°РјСЏС‚СЊ РїРѕРґ РѕРґРёРЅ РєР»Р°СЃС‚РµСЂ
+static int numF_Sp;                                          //Р§РёСЃР»Рѕ РёРјРµРЅ РІ СЃРїРёСЃРєРµ
+static DWORD all_nCl;                                        //РћР±С‰РµРµ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІ Р·Р°РїРёСЃРё
+static int writeNewCl;                                       //Р§РёСЃР»Рѕ Р·Р°РїРёСЃР°РЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+static DWORD *pozNameF;                                      //РўР°Р±Р»РёС†Р° СЃРјРµС‰РµРЅРёР№ Рє РёРјРµРЅР°Рј С„Р°Р№Р»Р° РІ СЃРїРёСЃРєРµ
 
 //------------------------------------------------------------------------------
 
@@ -26,80 +26,80 @@ static int MaloMesta(DWORD nCl)
    char ss1[200], ss2[200];
    wsprintf(ss1, "     %s   %s %s.", (Lan+48)->msg, FileSize_Txt(DWORDLONG(maxZapFAT1 - 1 - writeCl) * sCl_B), (Lan+47)->msg);
    wsprintf(ss2, "     %s %s %s.", (Lan+49)->msg, FileSize_Txt(DWORDLONG(nCl) * sCl_B), (Lan+47)->msg);
-   return Error3((Lan+190)->msg, ss1, ss2);                  //"Запись невозможна, на HDD LG нет свободного места."},
+   return Error3((Lan+190)->msg, ss1, ss2);                  //"Р—Р°РїРёСЃСЊ РЅРµРІРѕР·РјРѕР¶РЅР°, РЅР° HDD LG РЅРµС‚ СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°."},
 }
 
 //------------------------------------------------------------------------------
 
-static int WriteFile_ToHDD(char *NameF, char *msg)           //Запись файла на HDD рекордера
+static int WriteFile_ToHDD(char *NameF, char *msg)           //Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
 {
    DWORD nb;
 
-   if(OpenInFilePC(NameF) < 0) return -1;                    //Открыли входной файл для чтения с компьютера
-   DWORD wSizeB = sCl_B;                                     //Число байт чтения равно числу байт в кластере
-   LONGLONG SizeToEnd = Size_inF.QuadPart;                   //Число байт которые осталось записать
-   DWORD numCl = DWORD((Size_inF.QuadPart + sCl_B - 1) / sCl_B);//Число кластеров необходимое для размещения файла данного размера
+   if(OpenInFilePC(NameF) < 0) return -1;                    //РћС‚РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ СЃ РєРѕРјРїСЊСЋС‚РµСЂР°
+   DWORD wSizeB = sCl_B;                                     //Р§РёСЃР»Рѕ Р±Р°Р№С‚ С‡С‚РµРЅРёСЏ СЂР°РІРЅРѕ С‡РёСЃР»Сѓ Р±Р°Р№С‚ РІ РєР»Р°СЃС‚РµСЂРµ
+   LONGLONG SizeToEnd = Size_inF.QuadPart;                   //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РєРѕС‚РѕСЂС‹Рµ РѕСЃС‚Р°Р»РѕСЃСЊ Р·Р°РїРёСЃР°С‚СЊ
+   DWORD numCl = DWORD((Size_inF.QuadPart + sCl_B - 1) / sCl_B);//Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РЅРµРѕР±С…РѕРґРёРјРѕРµ РґР»СЏ СЂР°Р·РјРµС‰РµРЅРёСЏ С„Р°Р№Р»Р° РґР°РЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР°
    if(numCl > maxZapFAT1 - 1 - writeCl)
-      return MaloMesta(numCl);                               //"Запись невозможна, на HDD LG нет свободного места."},
+      return MaloMesta(numCl);                               //"Р—Р°РїРёСЃСЊ РЅРµРІРѕР·РјРѕР¶РЅР°, РЅР° HDD LG РЅРµС‚ СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°."},
    if(numCl > 0)
       InitProgressBar(numCl, msg);
-   DWORD n, nCl = 1;                                         //Номер последнего записанного кластера
-   for(DWORD i=0; i<numCl; i++)                              //По числу кластеров
-   {  for(n=nCl+1; n<maxZapFAT1; n++)                        //Просмотр FAT для поиска первого свободного кластера
+   DWORD n, nCl = 1;                                         //РќРѕРјРµСЂ РїРѕСЃР»РµРґРЅРµРіРѕ Р·Р°РїРёСЃР°РЅРЅРѕРіРѕ РєР»Р°СЃС‚РµСЂР°
+   for(DWORD i=0; i<numCl; i++)                              //РџРѕ С‡РёСЃР»Сѓ РєР»Р°СЃС‚РµСЂРѕРІ
+   {  for(n=nCl+1; n<maxZapFAT1; n++)                        //РџСЂРѕСЃРјРѕС‚СЂ FAT РґР»СЏ РїРѕРёСЃРєР° РїРµСЂРІРѕРіРѕ СЃРІРѕР±РѕРґРЅРѕРіРѕ РєР»Р°СЃС‚РµСЂР°
         if(*(c_FAT1 + n) == 0) break;
       if(n >= maxZapFAT1)
-         return Error1((Lan+190)->msg);                      //"Запись невозможна, на HDD LG нет свободного места."},
+         return Error1((Lan+190)->msg);                      //"Р—Р°РїРёСЃСЊ РЅРµРІРѕР·РјРѕР¶РЅР°, РЅР° HDD LG РЅРµС‚ СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°."},
       if(wSizeB > SizeToEnd)
-      {  wSizeB = DWORD(SizeToEnd);                          //Размер остатка чтения меньше размера кластера
+      {  wSizeB = DWORD(SizeToEnd);                          //Р Р°Р·РјРµСЂ РѕСЃС‚Р°С‚РєР° С‡С‚РµРЅРёСЏ РјРµРЅСЊС€Рµ СЂР°Р·РјРµСЂР° РєР»Р°СЃС‚РµСЂР°
          ZeroMemory(bufIO, sCl_B);
       }
       if(ReadFile(inFile, bufIO, wSizeB, &nb, NULL) == false || nb != wSizeB)
-         return ErrorSys1((Lan+87)->msg);                    //"Ошибка при чтении файла."
-#if !defined EMULATOR_HDD                                    //НЕТ Режима эмулятора
-      if(WriteClast1P(n, bufIO) < 0) return -1;              //Запись кластера
+         return ErrorSys1((Lan+87)->msg);                    //"РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё С„Р°Р№Р»Р°."
+#if !defined EMULATOR_HDD                                    //РќР•Рў Р РµР¶РёРјР° СЌРјСѓР»СЏС‚РѕСЂР°
+      if(WriteClast1P(n, bufIO) < 0) return -1;              //Р—Р°РїРёСЃСЊ РєР»Р°СЃС‚РµСЂР°
 #endif
       if(nCl > 1)
-        *(c_FAT1 + nCl) = n;                                 //Ссылка на следубщий кластер в цепочке кластеров
-      else nCl_1 = n;                                        //Номер кластера начала файла
-      nCl = n;                                               //Последний записанный кластер
-      SizeToEnd -= wSizeB;                                   //Число байт которые осталось прочитать
-      if(ProgressBar(wSizeB) < 0) return -1;                 //Оператор нажал кнопку Прервать
+        *(c_FAT1 + nCl) = n;                                 //РЎСЃС‹Р»РєР° РЅР° СЃР»РµРґСѓР±С‰РёР№ РєР»Р°СЃС‚РµСЂ РІ С†РµРїРѕС‡РєРµ РєР»Р°СЃС‚РµСЂРѕРІ
+      else nCl_1 = n;                                        //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РЅР°С‡Р°Р»Р° С„Р°Р№Р»Р°
+      nCl = n;                                               //РџРѕСЃР»РµРґРЅРёР№ Р·Р°РїРёСЃР°РЅРЅС‹Р№ РєР»Р°СЃС‚РµСЂ
+      SizeToEnd -= wSizeB;                                   //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РєРѕС‚РѕСЂС‹Рµ РѕСЃС‚Р°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ
+      if(ProgressBar(wSizeB) < 0) return -1;                 //РћРїРµСЂР°С‚РѕСЂ РЅР°Р¶Р°Р» РєРЅРѕРїРєСѓ РџСЂРµСЂРІР°С‚СЊ
    }
-   *(c_FAT1 + nCl) = 0x0FFFFFFF;                             //Признак конца цепочки
+   *(c_FAT1 + nCl) = 0x0FFFFFFF;                             //РџСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё
    CloseFile(&inFile);
-   writeNewCl += numCl;                                      //Число записанных кластеров
-   return Change_Dir_For_File(NameF);                        //Изменение каталога (запись нового файла)
+   writeNewCl += numCl;                                      //Р§РёСЃР»Рѕ Р·Р°РїРёСЃР°РЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+   return Change_Dir_For_File(NameF);                        //РР·РјРµРЅРµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (Р·Р°РїРёСЃСЊ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°)
 }
 
 //------------------------------------------------------------------------------
 
-static int CopyOne_FileToHDD(char *NameF)                    //Запись единственного файла на HDD рекордера
+static int CopyOne_FileToHDD(char *NameF)                    //Р—Р°РїРёСЃСЊ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРіРѕ С„Р°Р№Р»Р° РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
 {
-   //Надо проверить, что такого имени в папке нет
-   c_FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                  //Память под FAT
+   //РќР°РґРѕ РїСЂРѕРІРµСЂРёС‚СЊ, С‡С‚Рѕ С‚Р°РєРѕРіРѕ РёРјРµРЅРё РІ РїР°РїРєРµ РЅРµС‚
+   c_FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                  //РџР°РјСЏС‚СЊ РїРѕРґ FAT
    if(c_FAT1 == NULL)  return -1;
-   CopyMemory(c_FAT1, FAT1, Size_FAT1);                      //Скопировали содержимое FAT1
-   if(Load_Dir() < 0) return -1;                             //Загрузка кластера каталога
-   if(WriteFile_ToHDD(NameF, (Lan+24)->msg) < 0) return -1;  //Запись файла на HDD рекордера
-#if !defined EMULATOR_HDD                                    //Режим эмулятора
-   if(Save_FAT1() < 0) return -1;                            //Сохранение обновленной FAT первого раздела
-   if(Save_Dir() < 0) return -1;                             //Сохранение кластера каталога
-   if(Change_Sec67(-writeNewCl) < 0) return -1;              //Внесение изменений в содержимое сектора 67
+   CopyMemory(c_FAT1, FAT1, Size_FAT1);                      //РЎРєРѕРїРёСЂРѕРІР°Р»Рё СЃРѕРґРµСЂР¶РёРјРѕРµ FAT1
+   if(Load_Dir() < 0) return -1;                             //Р—Р°РіСЂСѓР·РєР° РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+   if(WriteFile_ToHDD(NameF, (Lan+24)->msg) < 0) return -1;  //Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
+#if !defined EMULATOR_HDD                                    //Р РµР¶РёРј СЌРјСѓР»СЏС‚РѕСЂР°
+   if(Save_FAT1() < 0) return -1;                            //РЎРѕС…СЂР°РЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРЅРѕР№ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+   if(Save_Dir() < 0) return -1;                             //РЎРѕС…СЂР°РЅРµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+   if(Change_Sec67(-writeNewCl) < 0) return -1;              //Р’РЅРµСЃРµРЅРёРµ РёР·РјРµРЅРµРЅРёР№ РІ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРµРєС‚РѕСЂР° 67
 #endif
-   writeCl += writeNewCl;                                    //Число записанных кластеров
-   ViewSize();                                               //Показа дискового пространства
+   writeCl += writeNewCl;                                    //Р§РёСЃР»Рѕ Р·Р°РїРёСЃР°РЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+   ViewSize();                                               //РџРѕРєР°Р·Р° РґРёСЃРєРѕРІРѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР°
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int CopyOneFileToHDD(char *NameF)                     //Запись единственного файла на HDD рекордера
+static int CopyOneFileToHDD(char *NameF)                     //Р—Р°РїРёСЃСЊ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРіРѕ С„Р°Р№Р»Р° РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
 {
-   writeNewCl = 0;                                           //Число записанных кластеров
+   writeNewCl = 0;                                           //Р§РёСЃР»Рѕ Р·Р°РїРёСЃР°РЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
    InitProgressBar = InitProgressBar1;
    ProgressBar = ProgressBar1;
    Close_ProgressBar = Close_ProgressBar1;
-   int ret = CopyOne_FileToHDD(NameF);                       //Запись единственного файла на HDD рекордера
+   int ret = CopyOne_FileToHDD(NameF);                       //Р—Р°РїРёСЃСЊ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРіРѕ С„Р°Р№Р»Р° РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
    Close_ProgressBar();
    MyFreeMem(&(void*)c_FAT1);
    MyFreeMem(&(void*)spisF);
@@ -109,83 +109,83 @@ static int CopyOneFileToHDD(char *NameF)                     //Запись единственн
 
 //------------------------------------------------------------------------------
 
-static int Work_Spis(char *SpisF, int sm)                      //Разборка списка файлов
+static int Work_Spis(char *SpisF, int sm)                      //Р Р°Р·Р±РѕСЂРєР° СЃРїРёСЃРєР° С„Р°Р№Р»РѕРІ
 {
-   numF_Sp = 0;                                              //Число имен в списке
-   pozNameF[numF_Sp] = sm;                                   //Таблица смещений к именам файлов (смещение к имени первого файла)
-   for(;;)                                                   //По списку файлов
-   {  int L = lstrlen(SpisF + pozNameF[numF_Sp]);            //Число символов в имени файла
-      if(L == 0) break;                                      //Пустое имя это конец списка
+   numF_Sp = 0;                                              //Р§РёСЃР»Рѕ РёРјРµРЅ РІ СЃРїРёСЃРєРµ
+   pozNameF[numF_Sp] = sm;                                   //РўР°Р±Р»РёС†Р° СЃРјРµС‰РµРЅРёР№ Рє РёРјРµРЅР°Рј С„Р°Р№Р»РѕРІ (СЃРјРµС‰РµРЅРёРµ Рє РёРјРµРЅРё РїРµСЂРІРѕРіРѕ С„Р°Р№Р»Р°)
+   for(;;)                                                   //РџРѕ СЃРїРёСЃРєСѓ С„Р°Р№Р»РѕРІ
+   {  int L = lstrlen(SpisF + pozNameF[numF_Sp]);            //Р§РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ РёРјРµРЅРё С„Р°Р№Р»Р°
+      if(L == 0) break;                                      //РџСѓСЃС‚РѕРµ РёРјСЏ СЌС‚Рѕ РєРѕРЅРµС† СЃРїРёСЃРєР°
       numF_Sp++;
-      if(numF_Sp >= MAX_NAME_S)                              //Максимальное число файлов
-        return Error1((Lan+182)->msg);                       //"Число файлов для копирования превысило возможности программы.");
-      pozNameF[numF_Sp] = pozNameF[numF_Sp-1] + L + 1;       //Таблица смещений к именам файлов (смешение к имени очередного файла)
+      if(numF_Sp >= MAX_NAME_S)                              //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ С„Р°Р№Р»РѕРІ
+        return Error1((Lan+182)->msg);                       //"Р§РёСЃР»Рѕ С„Р°Р№Р»РѕРІ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёСЏ РїСЂРµРІС‹СЃРёР»Рѕ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РїСЂРѕРіСЂР°РјРјС‹.");
+      pozNameF[numF_Sp] = pozNameF[numF_Sp-1] + L + 1;       //РўР°Р±Р»РёС†Р° СЃРјРµС‰РµРЅРёР№ Рє РёРјРµРЅР°Рј С„Р°Р№Р»РѕРІ (СЃРјРµС€РµРЅРёРµ Рє РёРјРµРЅРё РѕС‡РµСЂРµРґРЅРѕРіРѕ С„Р°Р№Р»Р°)
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Mk_AllSize(char *SpisF)                           //Вычисление общего число кластеров записи
+static int Mk_AllSize(char *SpisF)                           //Р’С‹С‡РёСЃР»РµРЅРёРµ РѕР±С‰РµРіРѕ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ Р·Р°РїРёСЃРё
 {
    char NameF[260];
    all_nCl = 0;
-   for(int i=0; i<numF_Sp; i++)                              //По числу имен в списке
-   {  lstrcpy(NameF, SpisF);                                 //Переслали имя каталога
-      lstrcat(NameF, "\\");                                  //Добавили разделитель
-      lstrcat(NameF, SpisF + pozNameF[i]);                   //Добавили имя файла
-      int ret = OpenInFilePC(NameF);                         //Открыли входной файл для чтения с компьютера
+   for(int i=0; i<numF_Sp; i++)                              //РџРѕ С‡РёСЃР»Сѓ РёРјРµРЅ РІ СЃРїРёСЃРєРµ
+   {  lstrcpy(NameF, SpisF);                                 //РџРµСЂРµСЃР»Р°Р»Рё РёРјСЏ РєР°С‚Р°Р»РѕРіР°
+      lstrcat(NameF, "\\");                                  //Р”РѕР±Р°РІРёР»Рё СЂР°Р·РґРµР»РёС‚РµР»СЊ
+      lstrcat(NameF, SpisF + pozNameF[i]);                   //Р”РѕР±Р°РІРёР»Рё РёРјСЏ С„Р°Р№Р»Р°
+      int ret = OpenInFilePC(NameF);                         //РћС‚РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ СЃ РєРѕРјРїСЊСЋС‚РµСЂР°
       CloseFile(&inFile);
       if(ret < 0) return -1;
-      all_nCl += DWORD((Size_inF.QuadPart + sCl_B - 1) / sCl_B);//Число кластеров необходимое для размещения всех файлов
+      all_nCl += DWORD((Size_inF.QuadPart + sCl_B - 1) / sCl_B);//Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РЅРµРѕР±С…РѕРґРёРјРѕРµ РґР»СЏ СЂР°Р·РјРµС‰РµРЅРёСЏ РІСЃРµС… С„Р°Р№Р»РѕРІ
    }
    if(all_nCl > maxZapFAT1 - 1 - writeCl)
-      return MaloMesta(all_nCl);                             //"Запись невозможна, на HDD LG нет свободного места."},
+      return MaloMesta(all_nCl);                             //"Р—Р°РїРёСЃСЊ РЅРµРІРѕР·РјРѕР¶РЅР°, РЅР° HDD LG РЅРµС‚ СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°."},
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int CopyAll_FileToHDD(char *SpisF)                    //Запись списка файла на HDD рекордера
+static int CopyAll_FileToHDD(char *SpisF)                    //Р—Р°РїРёСЃСЊ СЃРїРёСЃРєР° С„Р°Р№Р»Р° РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
 {
    char NameF[260], Ss[100];
-   //Надо проверить, что такого имени в папке нет
-   InitProgressBar2_2(all_nCl, "");                          //Функция прогресса для нескольких файлов
-   c_FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                  //Память под FAT
+   //РќР°РґРѕ РїСЂРѕРІРµСЂРёС‚СЊ, С‡С‚Рѕ С‚Р°РєРѕРіРѕ РёРјРµРЅРё РІ РїР°РїРєРµ РЅРµС‚
+   InitProgressBar2_2(all_nCl, "");                          //Р¤СѓРЅРєС†РёСЏ РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РЅРµСЃРєРѕР»СЊРєРёС… С„Р°Р№Р»РѕРІ
+   c_FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                  //РџР°РјСЏС‚СЊ РїРѕРґ FAT
    if(c_FAT1 == NULL)  return -1;
-   CopyMemory(c_FAT1, FAT1, Size_FAT1);                      //Скопировали содержимое FAT1
-   if(Load_Dir() < 0) return -1;                             //Загрузка кластера каталога
-   for(int i=0; i<numF_Sp; i++)                              //По числу имен в списке
-   {  lstrcpy(NameF, SpisF);                                 //Переслали имя каталога
-      lstrcat(NameF, "\\");                                  //Добавили разделитель
-      lstrcat(NameF, SpisF + pozNameF[i]);                   //Добавили имя файла
+   CopyMemory(c_FAT1, FAT1, Size_FAT1);                      //РЎРєРѕРїРёСЂРѕРІР°Р»Рё СЃРѕРґРµСЂР¶РёРјРѕРµ FAT1
+   if(Load_Dir() < 0) return -1;                             //Р—Р°РіСЂСѓР·РєР° РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+   for(int i=0; i<numF_Sp; i++)                              //РџРѕ С‡РёСЃР»Сѓ РёРјРµРЅ РІ СЃРїРёСЃРєРµ
+   {  lstrcpy(NameF, SpisF);                                 //РџРµСЂРµСЃР»Р°Р»Рё РёРјСЏ РєР°С‚Р°Р»РѕРіР°
+      lstrcat(NameF, "\\");                                  //Р”РѕР±Р°РІРёР»Рё СЂР°Р·РґРµР»РёС‚РµР»СЊ
+      lstrcat(NameF, SpisF + pozNameF[i]);                   //Р”РѕР±Р°РІРёР»Рё РёРјСЏ С„Р°Р№Р»Р°
       sprintf(Ss, "%s:   %d  ( %d )", (Lan+24)->msg, i+1, numF_Sp);
-      int ret = WriteFile_ToHDD(NameF, Ss);                  //Запись файла на HDD рекордера
+      int ret = WriteFile_ToHDD(NameF, Ss);                  //Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
       CloseFile(&inFile);
       if(ret < 0) return -1;
       Close_ProgressBar();
    }
-#if !defined EMULATOR_HDD                                    //Режим эмулятора
-   if(Save_FAT1() < 0) return -1;                            //Сохранение обновленной FAT первого раздела
-   if(Save_Dir() < 0) return -1;                             //Сохранение кластера каталога
-   if(Change_Sec67(-writeNewCl) < 0) return -1;              //Внесение изменений в содержимое сектора 67
+#if !defined EMULATOR_HDD                                    //Р РµР¶РёРј СЌРјСѓР»СЏС‚РѕСЂР°
+   if(Save_FAT1() < 0) return -1;                            //РЎРѕС…СЂР°РЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРЅРѕР№ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+   if(Save_Dir() < 0) return -1;                             //РЎРѕС…СЂР°РЅРµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+   if(Change_Sec67(-writeNewCl) < 0) return -1;              //Р’РЅРµСЃРµРЅРёРµ РёР·РјРµРЅРµРЅРёР№ РІ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРµРєС‚РѕСЂР° 67
 #endif
-   writeCl += writeNewCl;                                    //Число записанных кластеров
-   ViewSize();                                               //Показа дискового пространства
+   writeCl += writeNewCl;                                    //Р§РёСЃР»Рѕ Р·Р°РїРёСЃР°РЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+   ViewSize();                                               //РџРѕРєР°Р·Р° РґРёСЃРєРѕРІРѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР°
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Copy_File_ToHDD(int sm)                           //Запись нескольких файлов на HDD рекордера
+static int Copy_File_ToHDD(int sm)                           //Р—Р°РїРёСЃСЊ РЅРµСЃРєРѕР»СЊРєРёС… С„Р°Р№Р»РѕРІ РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
 {
-   writeNewCl = 0;                                           //Число записанных кластеров
-   if(Work_Spis(spisF, sm) < 0) return -1;                   //Разборка списка нескольких файлов на HDD рекордера
-   if(Mk_AllSize(spisF) < 0) return -1;                      //Вычисление общего число кластеров записи
-   InitProgressBar = InitProgressBar1_2;                     //Функция прогресса для одного файла из группы
+   writeNewCl = 0;                                           //Р§РёСЃР»Рѕ Р·Р°РїРёСЃР°РЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+   if(Work_Spis(spisF, sm) < 0) return -1;                   //Р Р°Р·Р±РѕСЂРєР° СЃРїРёСЃРєР° РЅРµСЃРєРѕР»СЊРєРёС… С„Р°Р№Р»РѕРІ РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
+   if(Mk_AllSize(spisF) < 0) return -1;                      //Р’С‹С‡РёСЃР»РµРЅРёРµ РѕР±С‰РµРіРѕ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ Р·Р°РїРёСЃРё
+   InitProgressBar = InitProgressBar1_2;                     //Р¤СѓРЅРєС†РёСЏ РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р° РёР· РіСЂСѓРїРїС‹
    ProgressBar = ProgressBar2;
    Close_ProgressBar = Close_ProgressBar1_2;
-   int ret = CopyAll_FileToHDD(spisF);                       //Запись списка файла на HDD рекордера
+   int ret = CopyAll_FileToHDD(spisF);                       //Р—Р°РїРёСЃСЊ СЃРїРёСЃРєР° С„Р°Р№Р»Р° РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
    Close_ProgressBar2_2();
    MyFreeMem(&(void*)c_FAT1);
    MyFreeMem(&(void*)spisF);
@@ -194,69 +194,69 @@ static int Copy_File_ToHDD(int sm)                           //Запись нескольких
 
 //------------------------------------------------------------------------------
 
-int File_ToHDD(void)                                         //Запись файлов на диск LG
+int File_ToHDD(void)                                         //Р—Р°РїРёСЃСЊ С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє LG
 {
    int sm;
    spisF = (char *)MyAllocMem(MAX_SP + MAX_NAME_S*sizeof(DWORD));
-   if(spisF == NULL) return -1;                              //Нет памяти
-   pozNameF = (DWORD*)(spisF + MAX_SP);                      //Таблица смещений к именам файла в списке
+   if(spisF == NULL) return -1;                              //РќРµС‚ РїР°РјСЏС‚Рё
+   pozNameF = (DWORD*)(spisF + MAX_SP);                      //РўР°Р±Р»РёС†Р° СЃРјРµС‰РµРЅРёР№ Рє РёРјРµРЅР°Рј С„Р°Р№Р»Р° РІ СЃРїРёСЃРєРµ
    *spisF = 0;
-   int ret = GetSpNameInFile(spisF, MAX_SP, &sm);            //Ввод списка имен для записи
+   int ret = GetSpNameInFile(spisF, MAX_SP, &sm);            //Р’РІРѕРґ СЃРїРёСЃРєР° РёРјРµРЅ РґР»СЏ Р·Р°РїРёСЃРё
    if(ret != 0)  return ret;
-   if(*(spisF+sm-1) != 0)                                    //Проверка это единственное имя или список
-      return CopyOneFileToHDD(spisF);                        //Запись единственного файла на HDD рекордера
-   return Copy_File_ToHDD(sm);                               //Запись нескольких файлов на HDD рекордера
+   if(*(spisF+sm-1) != 0)                                    //РџСЂРѕРІРµСЂРєР° СЌС‚Рѕ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРµ РёРјСЏ РёР»Рё СЃРїРёСЃРѕРє
+      return CopyOneFileToHDD(spisF);                        //Р—Р°РїРёСЃСЊ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРіРѕ С„Р°Р№Р»Р° РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
+   return Copy_File_ToHDD(sm);                               //Р—Р°РїРёСЃСЊ РЅРµСЃРєРѕР»СЊРєРёС… С„Р°Р№Р»РѕРІ РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
 }
 
 //------------------------------------------------------------------------------
 
-static int CreateNewFolder(void)                             //Создание новой папки на HDD рекордера
+static int CreateNewFolder(void)                             //РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ РїР°РїРєРё РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
 {
    DWORD nCl = 2;
-   for(; nCl<maxZapFAT1; nCl++)                              //Просмотр FAT для поиска первого свободного кластера
+   for(; nCl<maxZapFAT1; nCl++)                              //РџСЂРѕСЃРјРѕС‚СЂ FAT РґР»СЏ РїРѕРёСЃРєР° РїРµСЂРІРѕРіРѕ СЃРІРѕР±РѕРґРЅРѕРіРѕ РєР»Р°СЃС‚РµСЂР°
       if(*(c_FAT1 + nCl) == 0) break;
    if(nCl >= maxZapFAT1)
-      return Error1((Lan+190)->msg);                         //"Запись невозможна, на HDD LG нет свободного места."},
-   ZeroMemory(bufIO, sCl_B);                                 //Все очистили
+      return Error1((Lan+190)->msg);                         //"Р—Р°РїРёСЃСЊ РЅРµРІРѕР·РјРѕР¶РЅР°, РЅР° HDD LG РЅРµС‚ СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°."},
+   ZeroMemory(bufIO, sCl_B);                                 //Р’СЃРµ РѕС‡РёСЃС‚РёР»Рё
    SYSTEMTIME sysTime;
    GetLocalTime(&sysTime);
-   One_Str_Cat *Kat = (One_Str_Cat *)bufIO;                  //Каталог
-   *(DWORD *)(Kat+0)->Name = 0x00002E00;                     //Это одна точка т.е. кластер текущего каталога
-   *(DWORD *)(Kat+1)->Name = 0x2E002E00;                     //Это две точки т.е. кластер предыдущего каталога
-   (Kat+0)->pf.type = (Kat+1)->pf.type = 48;                 //Тип папка
-   (Kat+0)->pf.ClSt = nCl_1 = nCl;                           //Номер кластера текущего каталога
-   (Kat+1)->pf.ClSt = ClStDir;                               //Номер кластера родительского каталога
+   One_Str_Cat *Kat = (One_Str_Cat *)bufIO;                  //РљР°С‚Р°Р»РѕРі
+   *(DWORD *)(Kat+0)->Name = 0x00002E00;                     //Р­С‚Рѕ РѕРґРЅР° С‚РѕС‡РєР° С‚.Рµ. РєР»Р°СЃС‚РµСЂ С‚РµРєСѓС‰РµРіРѕ РєР°С‚Р°Р»РѕРіР°
+   *(DWORD *)(Kat+1)->Name = 0x2E002E00;                     //Р­С‚Рѕ РґРІРµ С‚РѕС‡РєРё С‚.Рµ. РєР»Р°СЃС‚РµСЂ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РєР°С‚Р°Р»РѕРіР°
+   (Kat+0)->pf.type = (Kat+1)->pf.type = 48;                 //РўРёРї РїР°РїРєР°
+   (Kat+0)->pf.ClSt = nCl_1 = nCl;                           //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° С‚РµРєСѓС‰РµРіРѕ РєР°С‚Р°Р»РѕРіР°
+   (Kat+1)->pf.ClSt = ClStDir;                               //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РєР°С‚Р°Р»РѕРіР°
    (Kat+0)->pf.Sec  = (Kat+1)->pf.Sec  = sysTime.wSecond;
    (Kat+0)->pf.Min  = (Kat+1)->pf.Min  = sysTime.wMinute;
    (Kat+0)->pf.Hour = (Kat+1)->pf.Hour = sysTime.wHour;
    (Kat+0)->pf.Day  = (Kat+1)->pf.Day  = sysTime.wDay;
    (Kat+0)->pf.Mon  = (Kat+1)->pf.Mon  = sysTime.wMonth;
    (Kat+0)->pf.Year = (Kat+1)->pf.Year = sysTime.wYear;
-#if !defined EMULATOR_HDD                                    //Режим эмулятора
-   if(WriteClast1P(nCl, bufIO) < 0) return -1;               //Запись кластера
+#if !defined EMULATOR_HDD                                    //Р РµР¶РёРј СЌРјСѓР»СЏС‚РѕСЂР°
+   if(WriteClast1P(nCl, bufIO) < 0) return -1;               //Р—Р°РїРёСЃСЊ РєР»Р°СЃС‚РµСЂР°
 #endif
-   *(c_FAT1 + nCl) = 0x0FFFFFFF;                             //Признак конца цепочки
-   return Change_Dir_For_Folder(NameFoFi);                   //Изменение каталога (запись новой папки)
+   *(c_FAT1 + nCl) = 0x0FFFFFFF;                             //РџСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё
+   return Change_Dir_For_Folder(NameFoFi);                   //РР·РјРµРЅРµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (Р·Р°РїРёСЃСЊ РЅРѕРІРѕР№ РїР°РїРєРё)
 }
 
 //------------------------------------------------------------------------------
 
-static int Create_New_Folder_ToHDD(void)                     //Cоздание папки на диске LG
+static int Create_New_Folder_ToHDD(void)                     //CРѕР·РґР°РЅРёРµ РїР°РїРєРё РЅР° РґРёСЃРєРµ LG
 {
    if(*NameFoFi == 0)
-     return Error1((Lan+184)->msg);                          //"Недопустимое имя"
-   c_FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                  //Память под FAT
+     return Error1((Lan+184)->msg);                          //"РќРµРґРѕРїСѓСЃС‚РёРјРѕРµ РёРјСЏ"
+   c_FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                  //РџР°РјСЏС‚СЊ РїРѕРґ FAT
    if(c_FAT1 == NULL)  return -1;
-   CopyMemory(c_FAT1, FAT1, Size_FAT1);                      //Скопировали содержимое FAT1
-   if(Load_Dir() < 0) return -1;                             //Загрузка кластера каталога
-   if(CreateNewFolder() < 0) return -1;                      //Создание новой папки на HDD рекордера
-#if !defined EMULATOR_HDD                                    //Режим эмулятора
-   if(Save_FAT1() < 0) return -1;                            //Сохранение обновленной FAT первого раздела
-   if(Save_Dir() < 0) return -1;                             //Сохранение кластера каталога
-   if(Change_Sec67(-1) < 0) return -1;                       //Внесение изменений в содержимое сектора 67
+   CopyMemory(c_FAT1, FAT1, Size_FAT1);                      //РЎРєРѕРїРёСЂРѕРІР°Р»Рё СЃРѕРґРµСЂР¶РёРјРѕРµ FAT1
+   if(Load_Dir() < 0) return -1;                             //Р—Р°РіСЂСѓР·РєР° РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+   if(CreateNewFolder() < 0) return -1;                      //РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ РїР°РїРєРё РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
+#if !defined EMULATOR_HDD                                    //Р РµР¶РёРј СЌРјСѓР»СЏС‚РѕСЂР°
+   if(Save_FAT1() < 0) return -1;                            //РЎРѕС…СЂР°РЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРЅРѕР№ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+   if(Save_Dir() < 0) return -1;                             //РЎРѕС…СЂР°РЅРµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+   if(Change_Sec67(-1) < 0) return -1;                       //Р’РЅРµСЃРµРЅРёРµ РёР·РјРµРЅРµРЅРёР№ РІ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРµРєС‚РѕСЂР° 67
 #endif
-   writeCl++;                                                //Число записанных кластеров
-   ViewSize();                                               //Показа дискового пространства
+   writeCl++;                                                //Р§РёСЃР»Рѕ Р·Р°РїРёСЃР°РЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+   ViewSize();                                               //РџРѕРєР°Р·Р° РґРёСЃРєРѕРІРѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР°
    MyFreeMem(&(void*)c_FAT1);
    MyFreeMem(&(void*)spisF);
    return 0;
@@ -264,11 +264,11 @@ static int Create_New_Folder_ToHDD(void)                     //Cоздание папки на
 
 //------------------------------------------------------------------------------
 
-int New_Folder_ToHDD(void)                                   //Cоздание папок на диске LG
+int New_Folder_ToHDD(void)                                   //CРѕР·РґР°РЅРёРµ РїР°РїРѕРє РЅР° РґРёСЃРєРµ LG
 {
    if(DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_NAME),
                 MainWin, Dlg_NewName, LPARAM(0)) == IDCANCEL) return -1;
-   return Create_New_Folder_ToHDD();                         //Cоздание папки на диске LG
+   return Create_New_Folder_ToHDD();                         //CРѕР·РґР°РЅРёРµ РїР°РїРєРё РЅР° РґРёСЃРєРµ LG
 }
 
 //------------------------------------------------------------------------------
@@ -277,10 +277,10 @@ typedef char OneExt[5];
 static OneExt ExtEn[] =  { ".mp3", ".wma",
                            ".jpg",
                            ".avi", ".srt", ".smi", ".sub", ".txt", ".mpg", ".divx" };
-static int nExt[3] = {2, 1, 7};                              //Число расширений в списке
-static int pExt[3] = {0, 2, 3};                              //Позиция первого расширений в списке
+static int nExt[3] = {2, 1, 7};                              //Р§РёСЃР»Рѕ СЂР°СЃС€РёСЂРµРЅРёР№ РІ СЃРїРёСЃРєРµ
+static int pExt[3] = {0, 2, 3};                              //РџРѕР·РёС†РёСЏ РїРµСЂРІРѕРіРѕ СЂР°СЃС€РёСЂРµРЅРёР№ РІ СЃРїРёСЃРєРµ
 
-static int Make_Spis(int *n)                                 //Создание списка файлов
+static int Make_Spis(int *n)                                 //РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° С„Р°Р№Р»РѕРІ
 {
    char NameF[256];
    char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
@@ -291,16 +291,16 @@ static int Make_Spis(int *n)                                 //Создание списка ф
    int l = lstrlen(spisF) + 1;
    lstrcpy(NameF, spisF);
    lstrcat(NameF, "\\*.*");
-   if((File = FindFirstFile(NameF, &Data)) == INVALID_HANDLE_VALUE)  return -1; //Файл не найден (папка пустая)
+   if((File = FindFirstFile(NameF, &Data)) == INVALID_HANDLE_VALUE)  return -1; //Р¤Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ (РїР°РїРєР° РїСѓСЃС‚Р°СЏ)
    for(;;)
    {
       fnsplit(Data.cFileName, Driv, Dir, Name, Ext);
-      if(!(lstrcmp(Data.cFileName, ".") == 0 ||              //Имя файла  "." нас не интересует
-           lstrcmp(Data.cFileName, "..") == 0))              //Имя файла  ".." нас не интересует
-      {  //lstrcpy(NameF+l, Data.cFileName);                 //Сделали полное имя с путем
-         if((Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) //Текущее имя это вложенная папка
+      if(!(lstrcmp(Data.cFileName, ".") == 0 ||              //РРјСЏ С„Р°Р№Р»Р°  "." РЅР°СЃ РЅРµ РёРЅС‚РµСЂРµСЃСѓРµС‚
+           lstrcmp(Data.cFileName, "..") == 0))              //РРјСЏ С„Р°Р№Р»Р°  ".." РЅР°СЃ РЅРµ РёРЅС‚РµСЂРµСЃСѓРµС‚
+      {  //lstrcpy(NameF+l, Data.cFileName);                 //РЎРґРµР»Р°Р»Рё РїРѕР»РЅРѕРµ РёРјСЏ СЃ РїСѓС‚РµРј
+         if((Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) //РўРµРєСѓС‰РµРµ РёРјСЏ СЌС‚Рѕ РІР»РѕР¶РµРЅРЅР°СЏ РїР°РїРєР°
          {
-   //Если внутри папки есть другие папки, то повторить все для внутренний папок, т.е. писать все дерево
+   //Р•СЃР»Рё РІРЅСѓС‚СЂРё РїР°РїРєРё РµСЃС‚СЊ РґСЂСѓРіРёРµ РїР°РїРєРё, С‚Рѕ РїРѕРІС‚РѕСЂРёС‚СЊ РІСЃРµ РґР»СЏ РІРЅСѓС‚СЂРµРЅРЅРёР№ РїР°РїРѕРє, С‚.Рµ. РїРёСЃР°С‚СЊ РІСЃРµ РґРµСЂРµРІРѕ
          }
          else
          {  OneExt *ExtE = ExtEn + pExt[prFolder];
@@ -323,24 +323,24 @@ static int Make_Spis(int *n)                                 //Создание списка ф
 
 //------------------------------------------------------------------------------
 
-int Folder_ToHDD(void)                                       //Запись папок на диск LG
+int Folder_ToHDD(void)                                       //Р—Р°РїРёСЃСЊ РїР°РїРѕРє РЅР° РґРёСЃРє LG
 {
    char NameDir[256], Driv[MAXDRIVE], Dir[MAXPATH], Ext[MAXEXT];
 
-   if(Get_Name_Dir((Lan+186)->msg, NameDir, 1) < 0) return -1;//Запрос имени папки
+   if(Get_Name_Dir((Lan+186)->msg, NameDir, 1) < 0) return -1;//Р—Р°РїСЂРѕСЃ РёРјРµРЅРё РїР°РїРєРё
    fnsplit(NameDir, Driv, Dir, NameFoFi, Ext);
-   lstrcat(NameFoFi, Ext);                                   //У папки расширения нет как такового
-   if(Create_New_Folder_ToHDD() < 0) return -1;              //Cоздание папки на диске LG
-   ClStDir = nCl_1;                                          //Номер кластера каталога в который выполняется запись, т.е. вновь созданный каталог
+   lstrcat(NameFoFi, Ext);                                   //РЈ РїР°РїРєРё СЂР°СЃС€РёСЂРµРЅРёСЏ РЅРµС‚ РєР°Рє С‚Р°РєРѕРІРѕРіРѕ
+   if(Create_New_Folder_ToHDD() < 0) return -1;              //CРѕР·РґР°РЅРёРµ РїР°РїРєРё РЅР° РґРёСЃРєРµ LG
+   ClStDir = nCl_1;                                          //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР° РІ РєРѕС‚РѕСЂС‹Р№ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ Р·Р°РїРёСЃСЊ, С‚.Рµ. РІРЅРѕРІСЊ СЃРѕР·РґР°РЅРЅС‹Р№ РєР°С‚Р°Р»РѕРі
    spisF = (char *)MyAllocMem(MAX_SP + MAX_NAME_S * sizeof(DWORD));
-   if(spisF == NULL) return -1;                              //Нет памяти
-   pozNameF = (DWORD*)(spisF + MAX_SP);                      //Таблица смещений к именам файла в списке
+   if(spisF == NULL) return -1;                              //РќРµС‚ РїР°РјСЏС‚Рё
+   pozNameF = (DWORD*)(spisF + MAX_SP);                      //РўР°Р±Р»РёС†Р° СЃРјРµС‰РµРЅРёР№ Рє РёРјРµРЅР°Рј С„Р°Р№Р»Р° РІ СЃРїРёСЃРєРµ
    lstrcpy(spisF, NameDir);
    int sm = lstrlen(spisF) + 1;
    int n = 0;
-   if(Make_Spis(&n) < 0) return -1;                          //Создание списка файлов
-   if(n == 0) return 0;                                      //Нет ни одного имени в списке
-   return Copy_File_ToHDD(sm);                               //Запись нескольких файлов на HDD рекордера
+   if(Make_Spis(&n) < 0) return -1;                          //РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° С„Р°Р№Р»РѕРІ
+   if(n == 0) return 0;                                      //РќРµС‚ РЅРё РѕРґРЅРѕРіРѕ РёРјРµРЅРё РІ СЃРїРёСЃРєРµ
+   return Copy_File_ToHDD(sm);                               //Р—Р°РїРёСЃСЊ РЅРµСЃРєРѕР»СЊРєРёС… С„Р°Р№Р»РѕРІ РЅР° HDD СЂРµРєРѕСЂРґРµСЂР°
 }
 
 #endif

@@ -7,25 +7,25 @@
 #include "from_hdd_lg_to_pc.h"
 
 //==============================================================================
-   HINSTANCE MainInst;                                       //Идентификатор приложения
-   HWND  MainWin;                                            //Главное окно
-   HWND  hwndTree;                                           //Окно дерева
-   DWORD FonLTGRAY;                                          //Фоновый цвет
-   HBRUSH FonBrush;                                          //Фоновая кисть
+   HINSTANCE MainInst;                                       //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРёР»РѕР¶РµРЅРёСЏ
+   HWND  MainWin;                                            //Р“Р»Р°РІРЅРѕРµ РѕРєРЅРѕ
+   HWND  hwndTree;                                           //РћРєРЅРѕ РґРµСЂРµРІР°
+   DWORD FonLTGRAY;                                          //Р¤РѕРЅРѕРІС‹Р№ С†РІРµС‚
+   HBRUSH FonBrush;                                          //Р¤РѕРЅРѕРІР°СЏ РєРёСЃС‚СЊ
    HICON MyIcon;                                             //
    HFONT MyFont, MyFont_Cur, MyFontSm;
-   HWND hCopy, hConf, hClose, hClear, hSizeHDD;              //Окна кнопок
-   HWND hMap, hToTxt, hPrShift;                              //Окна кнопок
-   HWND hNumSel, hSizeSel, hAbout;                           //Окна кнопок
-   HWND hWriteFi, hWriteFo, hNew_Fo, hRenFi, hDelFi;         //Кнопки для записи
+   HWND hCopy, hConf, hClose, hClear, hSizeHDD;              //РћРєРЅР° РєРЅРѕРїРѕРє
+   HWND hMap, hToTxt, hPrShift;                              //РћРєРЅР° РєРЅРѕРїРѕРє
+   HWND hNumSel, hSizeSel, hAbout;                           //РћРєРЅР° РєРЅРѕРїРѕРє
+   HWND hWriteFi, hWriteFo, hNew_Fo, hRenFi, hDelFi;         //РљРЅРѕРїРєРё РґР»СЏ Р·Р°РїРёСЃРё
    HWND hCorr67;
-   int prHDD_LG_Yes;                                         //Признак, присутствия HDD: 0-есть, 1-не найден
+   int prHDD_LG_Yes;                                         //РџСЂРёР·РЅР°Рє, РїСЂРёСЃСѓС‚СЃС‚РІРёСЏ HDD: 0-РµСЃС‚СЊ, 1-РЅРµ РЅР°Р№РґРµРЅ
 #if defined EMULATOR_HDD
-   const char *NVER_TXT = N_VER_TXT"-emul";                  //Текст в "О Программе"
+   const char *NVER_TXT = N_VER_TXT"-emul";                  //РўРµРєСЃС‚ РІ "Рћ РџСЂРѕРіСЂР°РјРјРµ"
 #else
    const char *NVER_TXT = N_VER_TXT;
 #endif
-#if defined OUT_TEST                                         //Заголовок программы
+#if defined OUT_TEST                                         //Р—Р°РіРѕР»РѕРІРѕРє РїСЂРѕРіСЂР°РјРјС‹
    char *AppName = " From_HDD_LG_to_PC ("N_VER_TXT".dump."TEST_N_VER_TXT") (The special test version with creation of a dump for Val238)";
 #else
 #if defined TEST_WIN
@@ -46,11 +46,11 @@ static HANDLE hMutex;
 //------------------------------------------------------------------------------
 
 #pragma argsused
-static void M_Win_OnClose(HWND hwnd)                         //Если нажимается кнопка закрытия окна
+static void M_Win_OnClose(HWND hwnd)                         //Р•СЃР»Рё РЅР°Р¶РёРјР°РµС‚СЃСЏ РєРЅРѕРїРєР° Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР°
 {
-   if(prProcCopy == FALSE)                                   //Признак процесса копирования
-   {  Error1((Lan+105)->msg); return;  }                     //Error1("Для выхода из программы прервите процесс копирования.");
-   DestroyWindow(hwnd);                                      //Разрушили окно
+   if(prProcCopy == FALSE)                                   //РџСЂРёР·РЅР°Рє РїСЂРѕС†РµСЃСЃР° РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+   {  Error1((Lan+105)->msg); return;  }                     //Error1("Р”Р»СЏ РІС‹С…РѕРґР° РёР· РїСЂРѕРіСЂР°РјРјС‹ РїСЂРµСЂРІРёС‚Рµ РїСЂРѕС†РµСЃСЃ РєРѕРїРёСЂРѕРІР°РЅРёСЏ.");
+   DestroyWindow(hwnd);                                      //Р Р°Р·СЂСѓС€РёР»Рё РѕРєРЅРѕ
 }
 
 //------------------------------------------------------------------------------
@@ -58,16 +58,16 @@ static void M_Win_OnClose(HWND hwnd)                         //Если нажимается к
 #pragma argsused
 static void M_Win_OnDestroy(HWND hwnd)
 {
-   if(MyFont != NULL) DeleteObject(MyFont);                  //Массив фонта
-   if(MyFontSm != NULL) DeleteObject(MyFontSm);              //Массив фонта
-   if(MyFont_Cur != NULL) DeleteObject(MyFont_Cur);          //Массив фонта
-   if(FonBrush != NULL) DeleteObject(FonBrush);              //Фоновая кисть
-   CloseFile(&hDrive);                                       //Закрыли входной файл
+   if(MyFont != NULL) DeleteObject(MyFont);                  //РњР°СЃСЃРёРІ С„РѕРЅС‚Р°
+   if(MyFontSm != NULL) DeleteObject(MyFontSm);              //РњР°СЃСЃРёРІ С„РѕРЅС‚Р°
+   if(MyFont_Cur != NULL) DeleteObject(MyFont_Cur);          //РњР°СЃСЃРёРІ С„РѕРЅС‚Р°
+   if(FonBrush != NULL) DeleteObject(FonBrush);              //Р¤РѕРЅРѕРІР°СЏ РєРёСЃС‚СЊ
+   CloseFile(&hDrive);                                       //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
    MyFreeMem(&(void*)FAT1);
    MyFreeMem(&(void*)FAT2);
    MyFreeMem(&(void*)aTree);
    MyFreeMem(&(void*)MMe);
-   MyFreeMem(&(void*)tabMME);                                //Таблица соответствия имен
+   MyFreeMem(&(void*)tabMME);                                //РўР°Р±Р»РёС†Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРјРµРЅ
 #if defined EMULATOR_HDD
    MyFreeMem(&(void*)inBuf);
 #endif
@@ -87,26 +87,26 @@ int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 */
 //------------------------------------------------------------------------------
 
-#define sw_d    6                                            //Расстояние от нижнего края окна до нижнего края кнопок
-#define sw_hb  24                                            //Высота кнопок
-#define sw_lx  100                                           //Ширина клавиш
-#define sw_lx2 120                                           //Ширина клавиш
-#define sw_dx  20                                            //Расстояние меду клавишами
-#define sw_xs   6                                            //Позиция левой границы окна дерева
-#define sw_ys  24                                            //Позиция верхней границы окна дерева !!! Эта же константа есть в модуле вывода карты
+#define sw_d    6                                            //Р Р°СЃСЃС‚РѕСЏРЅРёРµ РѕС‚ РЅРёР¶РЅРµРіРѕ РєСЂР°СЏ РѕРєРЅР° РґРѕ РЅРёР¶РЅРµРіРѕ РєСЂР°СЏ РєРЅРѕРїРѕРє
+#define sw_hb  24                                            //Р’С‹СЃРѕС‚Р° РєРЅРѕРїРѕРє
+#define sw_lx  100                                           //РЁРёСЂРёРЅР° РєР»Р°РІРёС€
+#define sw_lx2 120                                           //РЁРёСЂРёРЅР° РєР»Р°РІРёС€
+#define sw_dx  20                                            //Р Р°СЃСЃС‚РѕСЏРЅРёРµ РјРµРґСѓ РєР»Р°РІРёС€Р°РјРё
+#define sw_xs   6                                            //РџРѕР·РёС†РёСЏ Р»РµРІРѕР№ РіСЂР°РЅРёС†С‹ РѕРєРЅР° РґРµСЂРµРІР°
+#define sw_ys  24                                            //РџРѕР·РёС†РёСЏ РІРµСЂС…РЅРµР№ РіСЂР°РЅРёС†С‹ РѕРєРЅР° РґРµСЂРµРІР° !!! Р­С‚Р° Р¶Рµ РєРѕРЅСЃС‚Р°РЅС‚Р° РµСЃС‚СЊ РІ РјРѕРґСѓР»Рµ РІС‹РІРѕРґР° РєР°СЂС‚С‹
 
 #pragma argsused
 static BOOL M_Win_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
 {
-   RECT WRect;                                               //Размеры рабочей области окна
-   GetClientRect(hwnd, &WRect);                              //Получили размеры рабочей области окна
-   if(CreateMyFont() < 0) return FALSE;                      //Создание логического фонта
+   RECT WRect;                                               //Р Р°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
+   GetClientRect(hwnd, &WRect);                              //РџРѕР»СѓС‡РёР»Рё СЂР°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
+   if(CreateMyFont() < 0) return FALSE;                      //РЎРѕР·РґР°РЅРёРµ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ С„РѕРЅС‚Р°
    int sw_x1 = WRect.right / 2 - sw_lx / 2 - 2*sw_lx - 2*sw_dx;
    int sw_x2 = WRect.right / 2 - sw_lx / 2 - sw_lx - sw_dx;
    int sw_x3 = WRect.right / 2 - sw_lx / 2;
    int sw_x4 = WRect.right / 2 + sw_lx / 2 + sw_dx;
    int sw_x5 = WRect.right / 2 + sw_lx / 2 + sw_lx + 2*sw_dx;
-#if defined WRITE_YES                                        //Режим записи разрешен
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
    int ddh2 = (Conf.WriteYes != 1) ? 0 : sw_hb;
    int sw_xx1 = WRect.right / 2 - sw_lx2 / 2 - 2*sw_lx2 - 2*sw_dx;
    int sw_xx2 = WRect.right / 2 - sw_lx2 / 2 - sw_lx2 - sw_dx;
@@ -117,34 +117,34 @@ static BOOL M_Win_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
    #define ddh2 0
 #endif
    int sw_y1 = WRect.bottom - sw_hb - sw_d;
-   int sw_ls = WRect.right - 2 * sw_xs;                      //Ширина окна дерева
-   int sw_hs = WRect.bottom - sw_ys - sw_hb - 3 * sw_d - ddh2;//Высота окна дерева
+   int sw_ls = WRect.right - 2 * sw_xs;                      //РЁРёСЂРёРЅР° РѕРєРЅР° РґРµСЂРµРІР°
+   int sw_hs = WRect.bottom - sw_ys - sw_hb - 3 * sw_d - ddh2;//Р’С‹СЃРѕС‚Р° РѕРєРЅР° РґРµСЂРµРІР°
 
-#if defined WRITE_YES                                        //Режим записи разрешен
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
    int sw_y2 = WRect.bottom - sw_hb - 2*sw_d - ddh2;
 #endif
-   hSizeHDD = CreateWindowEx(WS_EX_STATICEDGE, "button", "", //Кнопка размеров диска
+   hSizeHDD = CreateWindowEx(WS_EX_STATICEDGE, "button", "", //РљРЅРѕРїРєР° СЂР°Р·РјРµСЂРѕРІ РґРёСЃРєР°
                     WS_CHILD | WS_VISIBLE,
                     sw_xs, sw_ys-22, 560, 22, hwnd, HMENU(IDC_SIZE_HDD),
                     MainInst, NULL);
    SendMessage(hSizeHDD, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-   hPrShift = CreateWindow("static", "",                     //Признак выбранной границы
-//                    WS_BORDER |                              //Черная рамка толщиной в пиксель
+   hPrShift = CreateWindow("static", "",                     //РџСЂРёР·РЅР°Рє РІС‹Р±СЂР°РЅРЅРѕР№ РіСЂР°РЅРёС†С‹
+//                    WS_BORDER |                              //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                     SS_RIGHT | WS_CHILD | WS_VISIBLE,
                     sw_xs+sw_ls-200, sw_ys-18, 200, 18, hwnd, HMENU(IDC_PR_SHIFT),
                     MainInst, NULL);
    SendMessage(hPrShift, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-   hwndTree = CreateWindowEx(WS_EX_CLIENTEDGE, WC_TREEVIEW, "Tree View", //Окно дерева
+   hwndTree = CreateWindowEx(WS_EX_CLIENTEDGE, WC_TREEVIEW, "Tree View", //РћРєРЅРѕ РґРµСЂРµРІР°
                     TVS_HASBUTTONS |
                     TVS_HASLINES |
                     TVS_DISABLEDRAGDROP |
                //   TVS_FULLROWSELECT |
-               //   TVS_SINGLEEXPAND |                       //При нажатии CTRL стрелки сдвигают список
-               //   TVS_TRACKSELECT |                        //При движении мыши выводит горизонтальную подчеркивающую линию
+               //   TVS_SINGLEEXPAND |                       //РџСЂРё РЅР°Р¶Р°С‚РёРё CTRL СЃС‚СЂРµР»РєРё СЃРґРІРёРіР°СЋС‚ СЃРїРёСЃРѕРє
+               //   TVS_TRACKSELECT |                        //РџСЂРё РґРІРёР¶РµРЅРёРё РјС‹С€Рё РІС‹РІРѕРґРёС‚ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅСѓСЋ РїРѕРґС‡РµСЂРєРёРІР°СЋС‰СѓСЋ Р»РёРЅРёСЋ
                     TVS_LINESATROOT |
-               //   TVS_CHECKBOXES |                         //Между иконкой и именем появляется ChekBox в котором можно ставить и убирать галочки
+               //   TVS_CHECKBOXES |                         //РњРµР¶РґСѓ РёРєРѕРЅРєРѕР№ Рё РёРјРµРЅРµРј РїРѕСЏРІР»СЏРµС‚СЃСЏ ChekBox РІ РєРѕС‚РѕСЂРѕРј РјРѕР¶РЅРѕ СЃС‚Р°РІРёС‚СЊ Рё СѓР±РёСЂР°С‚СЊ РіР°Р»РѕС‡РєРё
                     TVS_SHOWSELALWAYS | WS_VISIBLE | WS_CHILD | WS_BORDER,
                     sw_xs, sw_ys, sw_ls, sw_hs, hwnd, HMENU(IDC_TREEBOX),
                     MainInst, NULL);
@@ -153,78 +153,78 @@ static BOOL M_Win_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
 // psort.hParent = psort.lpfnCompare = CompareFunc;
 // TreeView_SortChildrenCB(hwndTree, &psort, 0);
 
-   hNumSel = CreateWindow("static", "",                      //Число выбранных файлов
-//                    WS_BORDER |                              //Черная рамка толщиной в пиксель
+   hNumSel = CreateWindow("static", "",                      //Р§РёСЃР»Рѕ РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ
+//                    WS_BORDER |                              //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                     WS_CHILD | WS_VISIBLE,
                     sw_xs, sw_y1-4, 160, 18, hwnd, HMENU(IDC_NUM_SEL),
                     MainInst, NULL);
    SendMessage(hNumSel, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
-   hSizeSel = CreateWindow("static", "",                     //Суммарный размер выбранных файлов
-//                    WS_BORDER |                              //Черная рамка толщиной в пиксель
-               //   WS_BORDER | SS_CENTER |                  //Черная рамка толщиной в пиксель
+   hSizeSel = CreateWindow("static", "",                     //РЎСѓРјРјР°СЂРЅС‹Р№ СЂР°Р·РјРµСЂ РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ
+//                    WS_BORDER |                              //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
+               //   WS_BORDER | SS_CENTER |                  //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                     WS_CHILD | WS_VISIBLE,
                     sw_xs, sw_y1+12, 160, 18, hwnd, HMENU(IDC_SIZE_SEL),
                     MainInst, NULL);
    SendMessage(hSizeSel, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-   hCopy = CreateWindow("button", (Lan+4)->msg,              //"Копировать файл",
+   hCopy = CreateWindow("button", (Lan+4)->msg,              //"РљРѕРїРёСЂРѕРІР°С‚СЊ С„Р°Р№Р»",
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_x1, sw_y1, sw_lx, sw_hb, hwnd, HMENU(IDC_COPY),
                      MainInst, NULL);
    SendMessage(hCopy, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-   hClear = CreateWindow("button", (Lan+123)->msg,           //"Очистить",
+   hClear = CreateWindow("button", (Lan+123)->msg,           //"РћС‡РёСЃС‚РёС‚СЊ",
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_DISABLED,
                      sw_x2, sw_y1, sw_lx, sw_hb, hwnd, HMENU(IDC_CLEAR),
                      MainInst, NULL);
    SendMessage(hClear, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-   hToTxt = CreateWindow("button", (Lan+146)->msg,           //Запись txt
+   hToTxt = CreateWindow("button", (Lan+146)->msg,           //Р—Р°РїРёСЃСЊ txt
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
                      sw_x3, sw_y1, sw_lx, sw_hb, hwnd, HMENU(IDC_TO_TXT),
                      MainInst, NULL);
    SendMessage(hToTxt, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-   hConf = CreateWindow("button", (Lan+5)->msg,              //"Настройка",
+   hConf = CreateWindow("button", (Lan+5)->msg,              //"РќР°СЃС‚СЂРѕР№РєР°",
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_x4, sw_y1, sw_lx, sw_hb, hwnd, HMENU(IDC_CONFIG),
                      MainInst, NULL);
    SendMessage(hConf, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-   hClose = CreateWindow("button", (Lan+6)->msg,             //"Выход"
+   hClose = CreateWindow("button", (Lan+6)->msg,             //"Р’С‹С…РѕРґ"
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_x5, sw_y1, sw_lx, sw_hb, hwnd, HMENU(IDCANCEL),
                      MainInst, NULL);
    SendMessage(hClose, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-#if defined WRITE_YES                                        //Режим записи разрешен
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
    if(Conf.WriteYes == 1)
    {
-      hWriteFi = CreateWindow("button", (Lan+177)->msg,      //"Копирование файла на HDD LG"
+      hWriteFi = CreateWindow("button", (Lan+177)->msg,      //"РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р° РЅР° HDD LG"
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_xx1, sw_y2, sw_lx2, sw_hb, hwnd, HMENU(IDC_WRITE_FI),
                      MainInst, NULL);
       SendMessage(hWriteFi, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-      hWriteFo = CreateWindow("button", (Lan+178)->msg,      //"Копирование папки на HDD LG"
+      hWriteFo = CreateWindow("button", (Lan+178)->msg,      //"РљРѕРїРёСЂРѕРІР°РЅРёРµ РїР°РїРєРё РЅР° HDD LG"
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_xx2, sw_y2, sw_lx2, sw_hb, hwnd, HMENU(IDC_WRITE_FO),
                      MainInst, NULL);
       SendMessage(hWriteFo, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-      hNew_Fo = CreateWindow("button", (Lan+179)->msg,       //"Создание папки на HDD LG"
+      hNew_Fo = CreateWindow("button", (Lan+179)->msg,       //"РЎРѕР·РґР°РЅРёРµ РїР°РїРєРё РЅР° HDD LG"
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_xx3, sw_y2, sw_lx2, sw_hb, hwnd, HMENU(IDC_NEW_FO),
                      MainInst, NULL);
       SendMessage(hNew_Fo, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-      hRenFi = CreateWindow("button", (Lan+163)->msg,       //"Переименовать"
+      hRenFi = CreateWindow("button", (Lan+163)->msg,       //"РџРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ"
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_xx4, sw_y2, sw_lx2, sw_hb, hwnd, HMENU(IDC_REN_FI),
                      MainInst, NULL);
       SendMessage(hRenFi, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
-      hDelFi = CreateWindow("button", (Lan+187)->msg,       //"Удалить"
+      hDelFi = CreateWindow("button", (Lan+187)->msg,       //"РЈРґР°Р»РёС‚СЊ"
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_xx5, sw_y2, sw_lx2, sw_hb, hwnd, HMENU(IDC_DEL_FI),
                      MainInst, NULL);
@@ -247,7 +247,7 @@ static BOOL M_Win_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
    SendMessage(hAbout, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 
    HBITMAP hBitMap;
-   HIMAGELIST hImageList;                                    //Иконки для дерева файлов
+   HIMAGELIST hImageList;                                    //РРєРѕРЅРєРё РґР»СЏ РґРµСЂРµРІР° С„Р°Р№Р»РѕРІ
    hImageList = ImageList_Create(16, 16, ILC_COLOR16, 15, 15);
    hBitMap = LoadBitmap(MainInst, MAKEINTRESOURCE(IDB_ICON));
    ImageList_Add(hImageList, hBitMap, NULL);                                                                                      // Macro: Attach the image, to the image list
@@ -258,9 +258,9 @@ static BOOL M_Win_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
 //------------------------------------------------------------------------------
 
 #pragma argsused
-static BOOL NoPosChanged(HWND hwnd, WINDOWPOS *Pos)          //Запрет изменения размеров и положения окна
+static BOOL NoPosChanged(HWND hwnd, WINDOWPOS *Pos)          //Р—Р°РїСЂРµС‚ РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ Рё РїРѕР»РѕР¶РµРЅРёСЏ РѕРєРЅР°
 {
-   Pos->flags |= SWP_NOSIZE; //SWP_NOMOVE;                   //Запретить изменение размеров окна
+   Pos->flags |= SWP_NOSIZE; //SWP_NOMOVE;                   //Р—Р°РїСЂРµС‚РёС‚СЊ РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
    return FALSE;
 }
 
@@ -269,28 +269,28 @@ static BOOL NoPosChanged(HWND hwnd, WINDOWPOS *Pos)          //Запрет изменения 
 #pragma argsused
 LRESULT M_Win_OnNotify(HWND hwnd, int idFrom, NMHDR *pnmhdr)
 {
-// if(pnmhdr->code == NM_RETURN)                             //Нажат Enter
-//    return ChangeSelect();                                 //Изменение выбора файлов в дерева
-   if(pnmhdr->code == TVN_KEYDOWN)                           //Нажата какая-то клавиша
+// if(pnmhdr->code == NM_RETURN)                             //РќР°Р¶Р°С‚ Enter
+//    return ChangeSelect();                                 //РР·РјРµРЅРµРЅРёРµ РІС‹Р±РѕСЂР° С„Р°Р№Р»РѕРІ РІ РґРµСЂРµРІР°
+   if(pnmhdr->code == TVN_KEYDOWN)                           //РќР°Р¶Р°С‚Р° РєР°РєР°СЏ-С‚Рѕ РєР»Р°РІРёС€Р°
    {  TV_KEYDOWN *ptvkd = (TV_KEYDOWN *)pnmhdr;
       switch(ptvkd->wVKey)
-      {  case VK_INSERT:                                     //Нажата клавиша Insert
-                return ChangeSelect_and_Down();              //Изменение выбора файлов в дерева
+      {  case VK_INSERT:                                     //РќР°Р¶Р°С‚Р° РєР»Р°РІРёС€Р° Insert
+                return ChangeSelect_and_Down();              //РР·РјРµРЅРµРЅРёРµ РІС‹Р±РѕСЂР° С„Р°Р№Р»РѕРІ РІ РґРµСЂРµРІР°
 //       case VK_UP:
 //       case VK_DOWN:
-//              return ChangeSelect_for_UpDown(ptvkd);       //Изменение выбора файлов в дерева
+//              return ChangeSelect_for_UpDown(ptvkd);       //РР·РјРµРЅРµРЅРёРµ РІС‹Р±РѕСЂР° С„Р°Р№Р»РѕРІ РІ РґРµСЂРµРІР°
       }
       return false;
    }
 
-   if(pnmhdr->code == NM_DBLCLK)                             //Двойной click левой кнопкой на строке
-   {  int sShift = ((GetKeyState(VK_SHIFT) & 0xFF00) == 0) ? 0 : 1;  //Проверка состояния клавиши Shift
-      return ChangeSelect(sShift);                           //Изменение выбора файлов в дерева
+   if(pnmhdr->code == NM_DBLCLK)                             //Р”РІРѕР№РЅРѕР№ click Р»РµРІРѕР№ РєРЅРѕРїРєРѕР№ РЅР° СЃС‚СЂРѕРєРµ
+   {  int sShift = ((GetKeyState(VK_SHIFT) & 0xFF00) == 0) ? 0 : 1;  //РџСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РєР»Р°РІРёС€Рё Shift
+      return ChangeSelect(sShift);                           //РР·РјРµРЅРµРЅРёРµ РІС‹Р±РѕСЂР° С„Р°Р№Р»РѕРІ РІ РґРµСЂРµРІР°
    }
 /*
-   if(pnmhdr->code == NM_CLICK)                              //Одиночный click на строке
-     if(numSel > 0)                                          //Число выбранных имен при групповом выборе
-     {  TV_ITEM tvi;                                         //если есть групповой выбор, то убираем вбор по одиночносу клику
+   if(pnmhdr->code == NM_CLICK)                              //РћРґРёРЅРѕС‡РЅС‹Р№ click РЅР° СЃС‚СЂРѕРєРµ
+     if(numSel > 0)                                          //Р§РёСЃР»Рѕ РІС‹Р±СЂР°РЅРЅС‹С… РёРјРµРЅ РїСЂРё РіСЂСѓРїРїРѕРІРѕРј РІС‹Р±РѕСЂРµ
+     {  TV_ITEM tvi;                                         //РµСЃР»Рё РµСЃС‚СЊ РіСЂСѓРїРїРѕРІРѕР№ РІС‹Р±РѕСЂ, С‚Рѕ СѓР±РёСЂР°РµРј РІР±РѕСЂ РїРѕ РѕРґРёРЅРѕС‡РЅРѕСЃСѓ РєР»РёРєСѓ
         memset(&tvi, 0, sizeof(tvi));
         HTREEITEM Selected = TreeView_GetSelection(hwndTree);
         if(Selected == NULL) return false;
@@ -309,12 +309,12 @@ LRESULT M_Win_OnNotify(HWND hwnd, int idFrom, NMHDR *pnmhdr)
 //------------------------------------------------------------------------------
 
 #pragma argsused
-static void M_Win_Size(HWND hwnd, WPARAM wParam, LPARAM lParam, long fn) //Изменение размеров окна
+static void M_Win_Size(HWND hwnd, WPARAM wParam, LPARAM lParam, long fn) //РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
 {
-   if(wParam == SIZE_MINIMIZED) prWinMinMax = 1;             //0-окно распахнутое, 1-окно свернутое
+   if(wParam == SIZE_MINIMIZED) prWinMinMax = 1;             //0-РѕРєРЅРѕ СЂР°СЃРїР°С…РЅСѓС‚РѕРµ, 1-РѕРєРЅРѕ СЃРІРµСЂРЅСѓС‚РѕРµ
    if(wParam == SIZE_RESTORED)
-   {  prWinMinMax = 0;                                       //0-окно распахнутое, 1-окно свернутое
-      SetWindowText(MainWin, AppName);                       //Восстановили заголовок
+   {  prWinMinMax = 0;                                       //0-РѕРєРЅРѕ СЂР°СЃРїР°С…РЅСѓС‚РѕРµ, 1-РѕРєРЅРѕ СЃРІРµСЂРЅСѓС‚РѕРµ
+      SetWindowText(MainWin, AppName);                       //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё Р·Р°РіРѕР»РѕРІРѕРє
    }
 }
 
@@ -324,27 +324,27 @@ static void M_Win_Size(HWND hwnd, WPARAM wParam, LPARAM lParam, long fn) //Измен
 static void M_Win_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT CodeNotify)
 {
    switch(id)
-   {  case IDC_COPY:     CopyFiles();                        //Выполнение копирования
+   {  case IDC_COPY:     CopyFiles();                        //Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
                          break;
-      case IDC_CLEAR:    ClearSelect();                      //Снятие всех выделений
+      case IDC_CLEAR:    ClearSelect();                      //РЎРЅСЏС‚РёРµ РІСЃРµС… РІС‹РґРµР»РµРЅРёР№
                          break;
-      case IDC_CONFIG:   NewConfig();                        //Изменение конфигурации
+      case IDC_CONFIG:   NewConfig();                        //РР·РјРµРЅРµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
                          break;
-      case IDCANCEL:     SendMessage(hwnd, WM_DESTROY, 0, 0);//Завершение программы и закрытие окон
+      case IDCANCEL:     SendMessage(hwnd, WM_DESTROY, 0, 0);//Р—Р°РІРµСЂС€РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ Рё Р·Р°РєСЂС‹С‚РёРµ РѕРєРѕРЅ
                          break;
-      case IDC_SIZE_HDD: View_Map_HDD();                     //Карта занятости HDD
+      case IDC_SIZE_HDD: View_Map_HDD();                     //РљР°СЂС‚Р° Р·Р°РЅСЏС‚РѕСЃС‚Рё HDD
                          break;
-      case IDC_ABOUT:    About();                            //Вывод информации
+      case IDC_ABOUT:    About();                            //Р’С‹РІРѕРґ РёРЅС„РѕСЂРјР°С†РёРё
                          break;
-      case IDC_TO_TXT:   OutTxt();                           //Запись дерева в текстовый файл
+      case IDC_TO_TXT:   OutTxt();                           //Р—Р°РїРёСЃСЊ РґРµСЂРµРІР° РІ С‚РµРєСЃС‚РѕРІС‹Р№ С„Р°Р№Р»
                          break;
-#if defined WRITE_YES                                        //Режим записи разрешен
-      case IDC_WRITE_FI: WriteFileToHDD(0);  break;          //Запись файлов на диск
-      case IDC_WRITE_FO: WriteFileToHDD(1);  break;          //Запись файлов на диск
-      case IDC_NEW_FO:   WriteFileToHDD(2);  break;          //Запись файлов на диск
-      case IDC_REN_FI:   WriteFileToHDD(3);  break;          //Переименование
-      case IDC_DEL_FI:   WriteFileToHDD(4);  break;          //Удаление
-      case IDC_CORR67:   Correct67Sec();     break;          //Коррекция содержимого 67 сектора
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
+      case IDC_WRITE_FI: WriteFileToHDD(0);  break;          //Р—Р°РїРёСЃСЊ С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє
+      case IDC_WRITE_FO: WriteFileToHDD(1);  break;          //Р—Р°РїРёСЃСЊ С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє
+      case IDC_NEW_FO:   WriteFileToHDD(2);  break;          //Р—Р°РїРёСЃСЊ С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє
+      case IDC_REN_FI:   WriteFileToHDD(3);  break;          //РџРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ
+      case IDC_DEL_FI:   WriteFileToHDD(4);  break;          //РЈРґР°Р»РµРЅРёРµ
+      case IDC_CORR67:   Correct67Sec();     break;          //РљРѕСЂСЂРµРєС†РёСЏ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ 67 СЃРµРєС‚РѕСЂР°
 #endif
    }
 }
@@ -379,53 +379,53 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lPara
 //   HANDLE_MSG(hwnd, WM_PAINT,   Decod_OnPaint);
      HANDLE_MSG(hwnd, WM_COMMAND, M_Win_OnCommand);
      HANDLE_MSG(hwnd, WM_NOTIFY,  M_Win_OnNotify);
-     HANDLE_MSG(hwnd, WM_SIZE,    M_Win_Size);               //Изменение размеров окна
-     HANDLE_MSG(hwnd, WM_WINDOWPOSCHANGING, NoPosChanged);   //Изменение положения окна
+     HANDLE_MSG(hwnd, WM_SIZE,    M_Win_Size);               //РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
+     HANDLE_MSG(hwnd, WM_WINDOWPOSCHANGING, NoPosChanged);   //РР·РјРµРЅРµРЅРёРµ РїРѕР»РѕР¶РµРЅРёСЏ РѕРєРЅР°
      default: return DefWindowProc(hwnd, Msg, wParam, lParam);
   }
 }
 
 //------------------------------------------------------------------------------
 
-static BOOL Register(HINSTANCE hInst)                        //Регистрация окна
+static BOOL Register(HINSTANCE hInst)                        //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 {
    WNDCLASS WndClass;
 
-   WndClass.style         = CS_HREDRAW | CS_VREDRAW;         //Внешний вид окна
-   WndClass.lpfnWndProc   = WndProc;                         //Имя оконной процедуры
+   WndClass.style         = CS_HREDRAW | CS_VREDRAW;         //Р’РЅРµС€РЅРёР№ РІРёРґ РѕРєРЅР°
+   WndClass.lpfnWndProc   = WndProc;                         //РРјСЏ РѕРєРѕРЅРЅРѕР№ РїСЂРѕС†РµРґСѓСЂС‹
    WndClass.cbClsExtra    = 0;
    WndClass.cbWndExtra    = 0;
    WndClass.hInstance     = hInst;
    WndClass.hIcon         = MyIcon;
 // WndClass.hIcon         = LoadIcon(hInst, NULL);
-   WndClass.hCursor       = LoadCursor(NULL, IDC_ARROW);     //Форма курсора
-   WndClass.hbrBackground = FonBrush;//GetStockBrush(LTGRAY_BRUSH);   //Цвет окна
-// WndClass.lpszMenuName  = "Menu1";                         //Меню окна
-   WndClass.lpszMenuName  = NULL;                            //Меню окна
-   WndClass.lpszClassName = ClassName;                       //Имя класа окна
+   WndClass.hCursor       = LoadCursor(NULL, IDC_ARROW);     //Р¤РѕСЂРјР° РєСѓСЂСЃРѕСЂР°
+   WndClass.hbrBackground = FonBrush;//GetStockBrush(LTGRAY_BRUSH);   //Р¦РІРµС‚ РѕРєРЅР°
+// WndClass.lpszMenuName  = "Menu1";                         //РњРµРЅСЋ РѕРєРЅР°
+   WndClass.lpszMenuName  = NULL;                            //РњРµРЅСЋ РѕРєРЅР°
+   WndClass.lpszClassName = ClassName;                       //РРјСЏ РєР»Р°СЃР° РѕРєРЅР°
    return RegisterClass(&WndClass);
 }
 
 //------------------------------------------------------------------------------
 
-static HWND CreateNewWin(HINSTANCE hInst, int nCmdShow)      //Создание окна
+static HWND CreateNewWin(HINSTANCE hInst, int nCmdShow)      //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
 {
    int WinScrS_x = 982;
-   int WinScrS_y = 680;                                      //Размер экрана
+   int WinScrS_y = 680;                                      //Р Р°Р·РјРµСЂ СЌРєСЂР°РЅР°
    int ScrSize_x = GetSystemMetrics(SM_CXFULLSCREEN);
    int ScrSize_y = GetSystemMetrics(SM_CYFULLSCREEN) + GetSystemMetrics(SM_CYCAPTION);
    if(WinScrS_x > ScrSize_x) WinScrS_x = ScrSize_x;
    if(WinScrS_y > ScrSize_y) WinScrS_y = ScrSize_y;
-   int Win_ScrSt_x = (ScrSize_x - WinScrS_x) / 2;            //Позиция начала окна
-   int Win_ScrSt_y = (ScrSize_y - WinScrS_y) / 2;            //Позиция начала окна
+   int Win_ScrSt_x = (ScrSize_x - WinScrS_x) / 2;            //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РѕРєРЅР°
+   int Win_ScrSt_y = (ScrSize_y - WinScrS_y) / 2;            //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РѕРєРЅР°
 
    MainWin = CreateWindow(ClassName, AppName, // WS_OVERLAPPEDWINDOW,
                           WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX, // | WS_MAXIMIZEBOX
                           Win_ScrSt_x, Win_ScrSt_y, WinScrS_x, WinScrS_y,
                           NULL, NULL, hInst, NULL);
    if(MainWin == NULL)  return MainWin;
-   ShowWindow(MainWin, nCmdShow);                            //Показать только что созданное окно
-   UpdateWindow(MainWin);                                    //Послать только что споявившемуся окну сообщение WM_PAINT
+   ShowWindow(MainWin, nCmdShow);                            //РџРѕРєР°Р·Р°С‚СЊ С‚РѕР»СЊРєРѕ С‡С‚Рѕ СЃРѕР·РґР°РЅРЅРѕРµ РѕРєРЅРѕ
+   UpdateWindow(MainWin);                                    //РџРѕСЃР»Р°С‚СЊ С‚РѕР»СЊРєРѕ С‡С‚Рѕ СЃРїРѕСЏРІРёРІС€РµРјСѓСЃСЏ РѕРєРЅСѓ СЃРѕРѕР±С‰РµРЅРёРµ WM_PAINT
    return MainWin;
 }
 
@@ -452,49 +452,49 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpszCmdParam,
    MSG Msg;
 
    MainWin = NULL;
-   LoadConfig();                                             //Загрузка конфигурации
+   LoadConfig();                                             //Р—Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
    hMutex = CreateMutex(NULL, TRUE, "From_HDD_LG_to_PC");
    if(GetLastError() == ERROR_ALREADY_EXISTS)
-      if(MsgYesNo3(AppName, (Lan+0)->msg, (Lan+1)->msg) == 'N')//if(MsgYesNo3(AppName, "Программа уже запущена.", "Вы настаивайте на запуске еще одной копии ?") == 'N') return FALSE;
+      if(MsgYesNo3(AppName, (Lan+0)->msg, (Lan+1)->msg) == 'N')//if(MsgYesNo3(AppName, "РџСЂРѕРіСЂР°РјРјР° СѓР¶Рµ Р·Р°РїСѓС‰РµРЅР°.", "Р’С‹ РЅР°СЃС‚Р°РёРІР°Р№С‚Рµ РЅР° Р·Р°РїСѓСЃРєРµ РµС‰Рµ РѕРґРЅРѕР№ РєРѕРїРёРё ?") == 'N') return FALSE;
       {  CloseHandle(hMutex);  return FALSE; }
-   prProcCopy = TRUE;                                        //Признак процесса копирования
+   prProcCopy = TRUE;                                        //РџСЂРёР·РЅР°Рє РїСЂРѕС†РµСЃСЃР° РєРѕРїРёСЂРѕРІР°РЅРёСЏ
    MainInst = hInst;
    MyIcon = LoadIcon(MainInst, MAKEINTRESOURCE(IDI_ICON1));
-                                          //Окна еще нет
-   CreateDialog(MainInst, MAKEINTRESOURCE(IDD_DLG_PUST), MainWin, (DLGPROC)DlgPust); //Для привязки моей иконки ко всем стандартным диалогам
+                                          //РћРєРЅР° РµС‰Рµ РЅРµС‚
+   CreateDialog(MainInst, MAKEINTRESOURCE(IDD_DLG_PUST), MainWin, (DLGPROC)DlgPust); //Р”Р»СЏ РїСЂРёРІСЏР·РєРё РјРѕРµР№ РёРєРѕРЅРєРё РєРѕ РІСЃРµРј СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рј РґРёР°Р»РѕРіР°Рј
 // if(FindWindow(ClassName, AppName) != 0)
-//    if(MsgYesNo3(AppName, (Lan+0)->msg, (Lan+1)->msg) == 'N') return FALSE; //if(MsgYesNo3(AppName, "Программа уже запущена.", "Вы настаивайте на запуске еще одной копии ?") == 'N') return FALSE;
-// LoadConfig();                                             //Загрузка конфигурации
-   InitCommonControls();                                     //Подключение библиотеки
-   FonLTGRAY = GetSysColor(COLOR_BTNFACE);                   //Фоновый цвет - цвет кнопок(серый)
-   FonBrush = CreateSolidBrush(FonLTGRAY);                   //Фоновая кисть
+//    if(MsgYesNo3(AppName, (Lan+0)->msg, (Lan+1)->msg) == 'N') return FALSE; //if(MsgYesNo3(AppName, "РџСЂРѕРіСЂР°РјРјР° СѓР¶Рµ Р·Р°РїСѓС‰РµРЅР°.", "Р’С‹ РЅР°СЃС‚Р°РёРІР°Р№С‚Рµ РЅР° Р·Р°РїСѓСЃРєРµ РµС‰Рµ РѕРґРЅРѕР№ РєРѕРїРёРё ?") == 'N') return FALSE;
+// LoadConfig();                                             //Р—Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+   InitCommonControls();                                     //РџРѕРґРєР»СЋС‡РµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё
+   FonLTGRAY = GetSysColor(COLOR_BTNFACE);                   //Р¤РѕРЅРѕРІС‹Р№ С†РІРµС‚ - С†РІРµС‚ РєРЅРѕРїРѕРє(СЃРµСЂС‹Р№)
+   FonBrush = CreateSolidBrush(FonLTGRAY);                   //Р¤РѕРЅРѕРІР°СЏ РєРёСЃС‚СЊ
    if(FonBrush == NULL)
-   {  Error1((Lan+2)->msg);  return FALSE;  }                //"Ошибка при создании фоновой кисти."
+   {  Error1((Lan+2)->msg);  return FALSE;  }                //"РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё С„РѕРЅРѕРІРѕР№ РєРёСЃС‚Рё."
    if(!hPrevInstance)
      if(!Register(hInst))  return FALSE;
    if(CreateNewWin(hInst, nCmdShow) == NULL) return FALSE;
    OSVERSIONINFO VersionInformation;
    VersionInformation.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
    GetVersionEx(&VersionInformation);
-   if(!(VersionInformation.dwPlatformId == VER_PLATFORM_WIN32_NT && //Win NT ночиная с 4 версии
+   if(!(VersionInformation.dwPlatformId == VER_PLATFORM_WIN32_NT && //Win NT РЅРѕС‡РёРЅР°СЏ СЃ 4 РІРµСЂСЃРёРё
         VersionInformation.dwMajorVersion >= 4))
-   {  Error1((Lan+3)->msg); return FALSE; }                  //"Данная программа не работает в операционных системах Windows 95/98/ME."
-   if(Ctrl_Adm() < 0) return FALSE;                          //Проверка наличия прав администратора
-   if(!Register_MapHDDWin()) return FALSE;                   //Регистрация окна
+   {  Error1((Lan+3)->msg); return FALSE; }                  //"Р”Р°РЅРЅР°СЏ РїСЂРѕРіСЂР°РјРјР° РЅРµ СЂР°Р±РѕС‚Р°РµС‚ РІ РѕРїРµСЂР°С†РёРѕРЅРЅС‹С… СЃРёСЃС‚РµРјР°С… Windows 95/98/ME."
+   if(Ctrl_Adm() < 0) return FALSE;                          //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїСЂР°РІ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°
+   if(!Register_MapHDDWin()) return FALSE;                   //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 #if defined OUT_TEST
    if(!Register_SpecWin()) return FALSE;
    if(Create_SpecWin() == NULL) return FALSE;
    Add_SpecSpis(AppName);
-   AddToSpecSpis_VerWin();                                   //Запись в дамп версии Windows
+   AddToSpecSpis_VerWin();                                   //Р—Р°РїРёСЃСЊ РІ РґР°РјРї РІРµСЂСЃРёРё Windows
 #endif
 #if defined TEST_WIN
    if(!Register_TestWin()) return FALSE;
    if(Create_TestWin() == NULL) return FALSE;
 #endif
-   prHDD_LG_Yes = 0;                                         //Признак, присутствия HDD: 0-есть, 1-не найден
+   prHDD_LG_Yes = 0;                                         //РџСЂРёР·РЅР°Рє, РїСЂРёСЃСѓС‚СЃС‚РІРёСЏ HDD: 0-РµСЃС‚СЊ, 1-РЅРµ РЅР°Р№РґРµРЅ
 #if defined TEST_IDX
-   prHDD_LG_Yes = 1;                                         //Признак, присутствия HDD: 0-есть, 1-не найден
-   EnableWindow(hwndTree, FALSE);                            //Если диск не найден, то остаемся в программе
+   prHDD_LG_Yes = 1;                                         //РџСЂРёР·РЅР°Рє, РїСЂРёСЃСѓС‚СЃС‚РІРёСЏ HDD: 0-РµСЃС‚СЊ, 1-РЅРµ РЅР°Р№РґРµРЅ
+   EnableWindow(hwndTree, FALSE);                            //Р•СЃР»Рё РґРёСЃРє РЅРµ РЅР°Р№РґРµРЅ, С‚Рѕ РѕСЃС‚Р°РµРјСЃСЏ РІ РїСЂРѕРіСЂР°РјРјРµ
    EnableWindow(hCopy, FALSE);
    EnableWindow(hToTxt, FALSE);
    EnableWindow(hWriteFi, false);
@@ -506,9 +506,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpszCmdParam,
    EnableWindow(hCorr67, false);
    Read_File_idx();
 #else
-   if(Read_HDD() < 0)                                        //Поиск HDD из рекордера LG и загрузка служебной информации
-   {  prHDD_LG_Yes = 1;                                      //Признак, присутствия HDD: 0-есть, 1-не найден
-      EnableWindow(hwndTree, FALSE);                         //Если диск не найден, то остаемся в программе но все гасим
+   if(Read_HDD() < 0)                                        //РџРѕРёСЃРє HDD РёР· СЂРµРєРѕСЂРґРµСЂР° LG Рё Р·Р°РіСЂСѓР·РєР° СЃР»СѓР¶РµР±РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
+   {  prHDD_LG_Yes = 1;                                      //РџСЂРёР·РЅР°Рє, РїСЂРёСЃСѓС‚СЃС‚РІРёСЏ HDD: 0-РµСЃС‚СЊ, 1-РЅРµ РЅР°Р№РґРµРЅ
+      EnableWindow(hwndTree, FALSE);                         //Р•СЃР»Рё РґРёСЃРє РЅРµ РЅР°Р№РґРµРЅ, С‚Рѕ РѕСЃС‚Р°РµРјСЃСЏ РІ РїСЂРѕРіСЂР°РјРјРµ РЅРѕ РІСЃРµ РіР°СЃРёРј
       EnableWindow(hCopy, FALSE);
       EnableWindow(hToTxt, FALSE);
       EnableWindow(hWriteFi, false);

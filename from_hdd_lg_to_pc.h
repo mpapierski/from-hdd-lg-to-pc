@@ -16,76 +16,76 @@
 #include "from_hdd_lg_to_pc_def.h"
 
 //==============================================================================
-   extern HINSTANCE MainInst;                                //Идентификатор приложения
-   extern HWND  MainWin;                                     //Главное окно
-   extern HWND  hwndTree;                                    //Окно дерева
-   extern DWORD FonLTGRAY;                                   //Фоновый цвет
-   extern HBRUSH FonBrush;                                   //Фоновая кисть
+   extern HINSTANCE MainInst;                                //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРёР»РѕР¶РµРЅРёСЏ
+   extern HWND  MainWin;                                     //Р“Р»Р°РІРЅРѕРµ РѕРєРЅРѕ
+   extern HWND  hwndTree;                                    //РћРєРЅРѕ РґРµСЂРµРІР°
+   extern DWORD FonLTGRAY;                                   //Р¤РѕРЅРѕРІС‹Р№ С†РІРµС‚
+   extern HBRUSH FonBrush;                                   //Р¤РѕРЅРѕРІР°СЏ РєРёСЃС‚СЊ
    extern HFONT MyFont, MyFont_Cur, MyFontSm;
-   extern HWND hCopy, hConf, hClose, hClear, hSizeHDD;       //Окна кнопок
-   extern HWND hMap, hToTxt, hPrShift;                       //Окна кнопок
-   extern HWND hNumSel, hSizeSel, hAbout;                    //Окна кнопок
-   extern HWND hWriteFi, hWriteFo, hNew_Fo, hRenFi, hDelFi;  //Кнопки для записи
+   extern HWND hCopy, hConf, hClose, hClear, hSizeHDD;       //РћРєРЅР° РєРЅРѕРїРѕРє
+   extern HWND hMap, hToTxt, hPrShift;                       //РћРєРЅР° РєРЅРѕРїРѕРє
+   extern HWND hNumSel, hSizeSel, hAbout;                    //РћРєРЅР° РєРЅРѕРїРѕРє
+   extern HWND hWriteFi, hWriteFo, hNew_Fo, hRenFi, hDelFi;  //РљРЅРѕРїРєРё РґР»СЏ Р·Р°РїРёСЃРё
    extern HWND hCorr67;
-   extern int prHDD_LG_Yes;                                  //Признак, присутствия HDD: 0-есть, 1-не найден
+   extern int prHDD_LG_Yes;                                  //РџСЂРёР·РЅР°Рє, РїСЂРёСЃСѓС‚СЃС‚РІРёСЏ HDD: 0-РµСЃС‚СЊ, 1-РЅРµ РЅР°Р№РґРµРЅ
    extern const char *NVER_TXT;
    extern char *AppName;
 
 //============================ config_io =======================================
-int  WriteConfig(void);                                      //Запись файла конфигурации
-int  LoadConfig(void);                                       //Загрузка конфигурации
-void NewConfig(void);                                        //Изменение конфигурации
+int  WriteConfig(void);                                      //Р—Р°РїРёСЃСЊ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+int  LoadConfig(void);                                       //Р—Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+void NewConfig(void);                                        //РР·РјРµРЅРµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
      extern LANG *Lan;
-     extern CONF Conf;                                       //Параметры
+     extern CONF Conf;                                       //РџР°СЂР°РјРµС‚СЂС‹
 
 //============================ hdd_lg_copy =====================================
-int  CopyFiles(void);                                        //Выполнение копирования
-     extern DWORD num_Sel;                                   //Число выбранных имен при групповом выборе
-     extern LONGLONG size_Sel;                               //Суммарный размер выбранных файлов
-     extern DWORD indF;                                      //Индекс копируемого файла
+int  CopyFiles(void);                                        //Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+     extern DWORD num_Sel;                                   //Р§РёСЃР»Рѕ РІС‹Р±СЂР°РЅРЅС‹С… РёРјРµРЅ РїСЂРё РіСЂСѓРїРїРѕРІРѕРј РІС‹Р±РѕСЂРµ
+     extern LONGLONG size_Sel;                               //РЎСѓРјРјР°СЂРЅС‹Р№ СЂР°Р·РјРµСЂ РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ
+     extern DWORD indF;                                      //РРЅРґРµРєСЃ РєРѕРїРёСЂСѓРµРјРѕРіРѕ С„Р°Р№Р»Р°
 
-#if defined TEST_FAT1                                        //Проверка FAT1
+#if defined TEST_FAT1                                        //РџСЂРѕРІРµСЂРєР° FAT1
 //============================ hdd_lg_ctrl_fat =====================================
-int  Ctrl_FAT1(void);                                        //Проверка структуры служебных записей
-int  Vost_FAT1(void);                                        //Чистка FAT1 от потерянных кластеров
-     extern DWORD *cTestFAT1;                                //Копия таблицы FAT первого раздела
-     extern DWORD sumClTestFAT1;                             //Суммарное количество занятых кластеров при тестировании FAT1
+int  Ctrl_FAT1(void);                                        //РџСЂРѕРІРµСЂРєР° СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃР»СѓР¶РµР±РЅС‹С… Р·Р°РїРёСЃРµР№
+int  Vost_FAT1(void);                                        //Р§РёСЃС‚РєР° FAT1 РѕС‚ РїРѕС‚РµСЂСЏРЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+     extern DWORD *cTestFAT1;                                //РљРѕРїРёСЏ С‚Р°Р±Р»РёС†С‹ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern DWORD sumClTestFAT1;                             //РЎСѓРјРјР°СЂРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РЅСЏС‚С‹С… РєР»Р°СЃС‚РµСЂРѕРІ РїСЂРё С‚РµСЃС‚РёСЂРѕРІР°РЅРёРё FAT1
 #endif
 
 #if defined EMULATOR_HDD
 //============================ hdd_lg_emulator =================================
-int ReadClastEmul(DWORDLONG Poz, BYTE *buff);                //Чтение кластера эмулятором
-int ReadClast2Emul(DWORDLONG Poz, BYTE *buff);               //Чтение кластера эмулятором
-int ReadFATEmul(DWORDLONG Poz);                              //Чтение FAT эмулятором
-int ReadFAT2Emul(DWORDLONG Poz);                             //Чтение FAT эмулятором
-int Read_Sec_Emul(int Num, BYTE* Sec);                       //Чтение сектора по номеру эмулятором
-int FindHDD_LG_Emul(void);                                   //Поиск диска из рекордера LG эмулятором
+int ReadClastEmul(DWORDLONG Poz, BYTE *buff);                //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int ReadClast2Emul(DWORDLONG Poz, BYTE *buff);               //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int ReadFATEmul(DWORDLONG Poz);                              //Р§С‚РµРЅРёРµ FAT СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int ReadFAT2Emul(DWORDLONG Poz);                             //Р§С‚РµРЅРёРµ FAT СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int Read_Sec_Emul(int Num, BYTE* Sec);                       //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР° РїРѕ РЅРѕРјРµСЂСѓ СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int FindHDD_LG_Emul(void);                                   //РџРѕРёСЃРє РґРёСЃРєР° РёР· СЂРµРєРѕСЂРґРµСЂР° LG СЌРјСѓР»СЏС‚РѕСЂРѕРј
     extern char *inBuf;
-    extern char NameFDump[];                                 //Имя файла с дампом
+    extern char NameFDump[];                                 //РРјСЏ С„Р°Р№Р»Р° СЃ РґР°РјРїРѕРј
 #endif
 
 #if defined FIND_NO_ZERO_SEC
 //============================ hdd_lg_find_zero ================================
-int FindNoZeroSec(void);                                     //Поиск не нулевых секторов и создание списка
+int FindNoZeroSec(void);                                     //РџРѕРёСЃРє РЅРµ РЅСѓР»РµРІС‹С… СЃРµРєС‚РѕСЂРѕРІ Рё СЃРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР°
 #endif
 
 //============================ hdd_lg_func =====================================
-int  CreateMyFont(void);                                     //Создание фонта
-char *Char_Dig_p(char *CharDig, int N);                      //Преобразование символьного числа в разрядку
-char *Char_Dig_p_n(char *CharDig, int N, int n);             //Преобразование символьного числа в разрядку с "n" знаками после запятой
-char *FileSize_Txt(DWORDLONG Size);                          //Размер файла в текст
-void CenterDlg(HWND hDlg, int yPoz);                         //Центрирование окна диалога в главном окне
-void OutNameDlg(HWND hDlg, int ID_T, char *inText);          //Усечение имени
-void UnicodeToAnsi(WCHAR *inUNI, char *outANSI, int maxN);   //Преобразование Unicode в символы
-void Open_Wait_Found_HDD(void);                              //Окошко со словами подождите
-void Close_Wait_Found_HDD(void);                             //Окошко со словами подождите
-int  Ctrl_Adm(void);                                         //Проверка наличия прав администратора
+int  CreateMyFont(void);                                     //РЎРѕР·РґР°РЅРёРµ С„РѕРЅС‚Р°
+char *Char_Dig_p(char *CharDig, int N);                      //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
+char *Char_Dig_p_n(char *CharDig, int N, int n);             //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ СЃ "n" Р·РЅР°РєР°РјРё РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№
+char *FileSize_Txt(DWORDLONG Size);                          //Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ С‚РµРєСЃС‚
+void CenterDlg(HWND hDlg, int yPoz);                         //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РґРёР°Р»РѕРіР° РІ РіР»Р°РІРЅРѕРј РѕРєРЅРµ
+void OutNameDlg(HWND hDlg, int ID_T, char *inText);          //РЈСЃРµС‡РµРЅРёРµ РёРјРµРЅРё
+void UnicodeToAnsi(WCHAR *inUNI, char *outANSI, int maxN);   //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Unicode РІ СЃРёРјРІРѕР»С‹
+void Open_Wait_Found_HDD(void);                              //РћРєРѕС€РєРѕ СЃРѕ СЃР»РѕРІР°РјРё РїРѕРґРѕР¶РґРёС‚Рµ
+void Close_Wait_Found_HDD(void);                             //РћРєРѕС€РєРѕ СЃРѕ СЃР»РѕРІР°РјРё РїРѕРґРѕР¶РґРёС‚Рµ
+int  Ctrl_Adm(void);                                         //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РїСЂР°РІ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°
 void About(void);
-void AddToSpecSpis_VerWin(void);                            //Запись в дамп версии Windows
+void AddToSpecSpis_VerWin(void);                            //Р—Р°РїРёСЃСЊ РІ РґР°РјРї РІРµСЂСЃРёРё Windows
 
 //============================ hdd_lg_func_1 ===================================
-void *MyAllocMem(DWORD Size);                                //Запрос динамической памяти
-void MyFreeMem(void **Adr);                                  //Освобождение блока памяти
+void *MyAllocMem(DWORD Size);                                //Р—Р°РїСЂРѕСЃ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ РїР°РјСЏС‚Рё
+void MyFreeMem(void **Adr);                                  //РћСЃРІРѕР±РѕР¶РґРµРЅРёРµ Р±Р»РѕРєР° РїР°РјСЏС‚Рё
 int  Error1(char *Msg);
 int  Error2(char *Msg1, char *Msg2);
 int  Error3(char *Msg1, char *Msg2, char *Msg3);
@@ -101,120 +101,120 @@ void Message1(char *Msg1);
 void Message2(char *Msg1, char *Msg2);
 
 //============================ hdd_lg_func_io_folder ===========================
-int  Get_Name_Dir(char *msg, char *Name_Dir, int pr);        //Запрос имени папки
+int  Get_Name_Dir(char *msg, char *Name_Dir, int pr);        //Р—Р°РїСЂРѕСЃ РёРјРµРЅРё РїР°РїРєРё
 
 //============================ hdd_lg_func_io =====================================
-void ClearDopDlg(void);                                      //Очистка параметров дополнительного диалога
-int  SetInFilePointer(LONGLONG Poz);                         //Изменение позиции указателя в файле (на физическом диске)
-void CloseFile(HANDLE *File);                                //Закрыли файл (физический диск)
-int  GetName_OutFile(char *NameF);                           //Ввод имени для записи файла
-int  CtrlFileYesNo(char *NameF);                             //Проверка наличия файла
-int  DiskFreeSpaceEx_F(char *Name_Dir, DWORDLONG Size);      //Проверка свободного места
-int  Open_OutFileAlw(char *Name, HANDLE *File);              //Открытие выходного файла
-//int  Open_FileR(char *Name, HANDLE *File, int *nn);        //Открытие существующего файла
-//11int  Open_OutFile512(char *Name, HANDLE *File);          //Открытие выходного файла
-int  Open_OutFile(char *Name, HANDLE *File);                 //Открытие выходного файла
-int  DiskFreeSpaceEx(char *NameF, DWORDLONG Size);           //Проверка свободного места
-     extern ModifDialog ModDlg;                              //Для модификации диалога
-     extern WIN32_FIND_DATA DataF;                           //Параметры файла если он есть
+void ClearDopDlg(void);                                      //РћС‡РёСЃС‚РєР° РїР°СЂР°РјРµС‚СЂРѕРІ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РґРёР°Р»РѕРіР°
+int  SetInFilePointer(LONGLONG Poz);                         //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ (РЅР° С„РёР·РёС‡РµСЃРєРѕРј РґРёСЃРєРµ)
+void CloseFile(HANDLE *File);                                //Р—Р°РєСЂС‹Р»Рё С„Р°Р№Р» (С„РёР·РёС‡РµСЃРєРёР№ РґРёСЃРє)
+int  GetName_OutFile(char *NameF);                           //Р’РІРѕРґ РёРјРµРЅРё РґР»СЏ Р·Р°РїРёСЃРё С„Р°Р№Р»Р°
+int  CtrlFileYesNo(char *NameF);                             //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р°
+int  DiskFreeSpaceEx_F(char *Name_Dir, DWORDLONG Size);      //РџСЂРѕРІРµСЂРєР° СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
+int  Open_OutFileAlw(char *Name, HANDLE *File);              //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+//int  Open_FileR(char *Name, HANDLE *File, int *nn);        //РћС‚РєСЂС‹С‚РёРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р°
+//11int  Open_OutFile512(char *Name, HANDLE *File);          //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+int  Open_OutFile(char *Name, HANDLE *File);                 //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+int  DiskFreeSpaceEx(char *NameF, DWORDLONG Size);           //РџСЂРѕРІРµСЂРєР° СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
+     extern ModifDialog ModDlg;                              //Р”Р»СЏ РјРѕРґРёС„РёРєР°С†РёРё РґРёР°Р»РѕРіР°
+     extern WIN32_FIND_DATA DataF;                           //РџР°СЂР°РјРµС‚СЂС‹ С„Р°Р№Р»Р° РµСЃР»Рё РѕРЅ РµСЃС‚СЊ
 
 //============================ hdd_lg_func_io_1 ================================
-//11int  OpenOutFile(char *Name, LONGLONG Size, HANDLE *File);    //Открытие выходного файла
-void Ctrl_Name_Ch(char *Name);                               //Проверка имени на недопустимые символы и замена недопустимых символов
-int  OpenOutFileName_New(char *Name, LONGLONG Size, HANDLE *File);//Открытие выходного файла
-int  OpenOutFileName_Yes(char *Name, LONGLONG Size, HANDLE *File);//Открытие выходного файла
-     extern int prCopy;                                      //Признак действия при групповом копировании
-     extern char ndS[9];                                     //Перечень недопустимых символов
-   //extern int  pr_ndS;                                     //Признак выполненной замены недопустимого символа. 1-была замена
+//11int  OpenOutFile(char *Name, LONGLONG Size, HANDLE *File);    //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+void Ctrl_Name_Ch(char *Name);                               //РџСЂРѕРІРµСЂРєР° РёРјРµРЅРё РЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹ Рё Р·Р°РјРµРЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
+int  OpenOutFileName_New(char *Name, LONGLONG Size, HANDLE *File);//РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+int  OpenOutFileName_Yes(char *Name, LONGLONG Size, HANDLE *File);//РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+     extern int prCopy;                                      //РџСЂРёР·РЅР°Рє РґРµР№СЃС‚РІРёСЏ РїСЂРё РіСЂСѓРїРїРѕРІРѕРј РєРѕРїРёСЂРѕРІР°РЅРёРё
+     extern char ndS[9];                                     //РџРµСЂРµС‡РµРЅСЊ РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
+   //extern int  pr_ndS;                                     //РџСЂРёР·РЅР°Рє РІС‹РїРѕР»РЅРµРЅРЅРѕР№ Р·Р°РјРµРЅС‹ РЅРµРґРѕРїСѓСЃС‚РёРјРѕРіРѕ СЃРёРјРІРѕР»Р°. 1-Р±С‹Р»Р° Р·Р°РјРµРЅР°
 
 //============================ hdd_lg_language =================================
   extern LANG Lan_EN[];
   extern LANG Lan_RU[];
-  extern const int numStrLan;                                //Число языковых строк
-  extern LANG Lan_Any[];                                     //Произвольный язык
+  extern const int numStrLan;                                //Р§РёСЃР»Рѕ СЏР·С‹РєРѕРІС‹С… СЃС‚СЂРѕРє
+  extern LANG Lan_Any[];                                     //РџСЂРѕРёР·РІРѕР»СЊРЅС‹Р№ СЏР·С‹Рє
 
 //============================ hdd_lg_make_tree ================================
-#if defined WRITE_YES                                        //Режим записи разрешен
-int AddItemToTree_forWrite(char *Name, char *Ext, PAR_FILE *pf);   //Добавление новой строки в дерево при записи
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
+int AddItemToTree_forWrite(char *Name, char *Ext, PAR_FILE *pf);   //Р”РѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё РІ РґРµСЂРµРІРѕ РїСЂРё Р·Р°РїРёСЃРё
 #endif
-int  AddItemToTree(char *Name, char *Ext, PAR_FILE *pf, int Level);//Добавление новой строки в дерево
-void Expand_Tree(int hitem);                                 //Распахивание дерева
-int  ClearSelect(void);                                      //Снятие всех выделений
-int  RemoveSelectionFromCopy(int n);                         //Снятие выделение файла в дереве при копировании
-bool ChangeSelect(int sShift);                               //Изменение выбора файлов в дерева
-bool ChangeSelect_and_Down(void);                            //Изменение выбора файлов в дерева
-void ViewSize(void);                                         //Показ дискового пространства
-     extern int numEl_Tree;                                  //Число элементров в дереве имен
-     extern OneStrTree *aTree;                               //Информация по дереву
-     extern HTREEITEM hPrev[MAX_U];                          //Массив уровней вложенности дерева
+int  AddItemToTree(char *Name, char *Ext, PAR_FILE *pf, int Level);//Р”РѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё РІ РґРµСЂРµРІРѕ
+void Expand_Tree(int hitem);                                 //Р Р°СЃРїР°С…РёРІР°РЅРёРµ РґРµСЂРµРІР°
+int  ClearSelect(void);                                      //РЎРЅСЏС‚РёРµ РІСЃРµС… РІС‹РґРµР»РµРЅРёР№
+int  RemoveSelectionFromCopy(int n);                         //РЎРЅСЏС‚РёРµ РІС‹РґРµР»РµРЅРёРµ С„Р°Р№Р»Р° РІ РґРµСЂРµРІРµ РїСЂРё РєРѕРїРёСЂРѕРІР°РЅРёРё
+bool ChangeSelect(int sShift);                               //РР·РјРµРЅРµРЅРёРµ РІС‹Р±РѕСЂР° С„Р°Р№Р»РѕРІ РІ РґРµСЂРµРІР°
+bool ChangeSelect_and_Down(void);                            //РР·РјРµРЅРµРЅРёРµ РІС‹Р±РѕСЂР° С„Р°Р№Р»РѕРІ РІ РґРµСЂРµРІР°
+void ViewSize(void);                                         //РџРѕРєР°Р· РґРёСЃРєРѕРІРѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР°
+     extern int numEl_Tree;                                  //Р§РёСЃР»Рѕ СЌР»РµРјРµРЅС‚СЂРѕРІ РІ РґРµСЂРµРІРµ РёРјРµРЅ
+     extern OneStrTree *aTree;                               //РРЅС„РѕСЂРјР°С†РёСЏ РїРѕ РґРµСЂРµРІСѓ
+     extern HTREEITEM hPrev[MAX_U];                          //РњР°СЃСЃРёРІ СѓСЂРѕРІРЅРµР№ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё РґРµСЂРµРІР°
 
 //============================ hdd_lg_map_hdd ==================================
-int  View_Map_HDD(void);                                     //Карта занятости HDD
-BOOL Register_MapHDDWin(void);                               //Регистрация окна
+int  View_Map_HDD(void);                                     //РљР°СЂС‚Р° Р·Р°РЅСЏС‚РѕСЃС‚Рё HDD
+BOOL Register_MapHDDWin(void);                               //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 
 //============================ hdd_lg_mk_name ==================================
-int  MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf);//Создание строки символов для отражения в дереве
-int  ViewAbsendName(void);                                   //Показ имен присутствующих в файле MME.DB, но отсутствующих в каталоге
+int  MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf);//РЎРѕР·РґР°РЅРёРµ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РґР»СЏ РѕС‚СЂР°Р¶РµРЅРёСЏ РІ РґРµСЂРµРІРµ
+int  ViewAbsendName(void);                                   //РџРѕРєР°Р· РёРјРµРЅ РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РІ С„Р°Р№Р»Рµ MME.DB, РЅРѕ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РІ РєР°С‚Р°Р»РѕРіРµ
 
 //============================ hdd_lg_mme_db ===================================
-int  CtrlSize_MME(DWORD Delta);                              //Контроль смещения в массиве MME
-int  CtrlRecoder(void);                                      //Идентификация рекордера
-int  Read_Dir_Part2_MME(void);                               //Чтение каталога второго раздела и файла MME
-int  ReadMME_DB(void);                                       //Чтение файла базы записей
-int  Update_MME_DB(void);                                    //Пересоздание массива информативных имен
-     extern BYTE *MMe;                                       //Содержимое файла базы
-     extern DWORD SizeMME;                                   //Число байт в файле MME
-     extern TABL_MME *tabMME;                                //Таблица соответствия имен
-     extern DWORD numNam;                                    //Число имен в таблице MME
-     extern TABL_MME *tabMME_Part;                           //Таблица имен отредактированных Title
-     extern DWORD numNam_Part;                               //Число имен в таблице имен отредактированных Title
+int  CtrlSize_MME(DWORD Delta);                              //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
+int  CtrlRecoder(void);                                      //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
+int  Read_Dir_Part2_MME(void);                               //Р§С‚РµРЅРёРµ РєР°С‚Р°Р»РѕРіР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° Рё С„Р°Р№Р»Р° MME
+int  ReadMME_DB(void);                                       //Р§С‚РµРЅРёРµ С„Р°Р№Р»Р° Р±Р°Р·С‹ Р·Р°РїРёСЃРµР№
+int  Update_MME_DB(void);                                    //РџРµСЂРµСЃРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР° РёРЅС„РѕСЂРјР°С‚РёРІРЅС‹С… РёРјРµРЅ
+     extern BYTE *MMe;                                       //РЎРѕРґРµСЂР¶РёРјРѕРµ С„Р°Р№Р»Р° Р±Р°Р·С‹
+     extern DWORD SizeMME;                                   //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ С„Р°Р№Р»Рµ MME
+     extern TABL_MME *tabMME;                                //РўР°Р±Р»РёС†Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРјРµРЅ
+     extern DWORD numNam;                                    //Р§РёСЃР»Рѕ РёРјРµРЅ РІ С‚Р°Р±Р»РёС†Рµ MME
+     extern TABL_MME *tabMME_Part;                           //РўР°Р±Р»РёС†Р° РёРјРµРЅ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅС‹С… Title
+     extern DWORD numNam_Part;                               //Р§РёСЃР»Рѕ РёРјРµРЅ РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅС‹С… Title
 
 #if defined OUT_TEST
 //============================ hdd_lg_out_test =====================================
-void Add_SpecSpis(char *Str);                                //Добавление строки в список
-void View_HEX_Any(BYTE *buff, DWORD Size);                   //Вывод шеснадцатиричных кодов
-HWND Create_SpecWin(void);                                   //Создание окна
-BOOL Register_SpecWin(void);                                 //Регистрация окна
+void Add_SpecSpis(char *Str);                                //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+void View_HEX_Any(BYTE *buff, DWORD Size);                   //Р’С‹РІРѕРґ С€РµСЃРЅР°РґС†Р°С‚РёСЂРёС‡РЅС‹С… РєРѕРґРѕРІ
+HWND Create_SpecWin(void);                                   //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
+BOOL Register_SpecWin(void);                                 //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 #endif
 
 //============================ hdd_lg_read =====================================
-int  Update_Tree(void);                                      //Пересоздание дерева файлов и папок при изменении настроек
-int  Read_HDD(void);                                         //Поиск HDD из рекордера LG и загрузка служебной информации
-     extern HANDLE hDrive;                                   //Указатель на диск
-     extern DWORD *FAT1;                                     //Таблица FAT первого раздела
-     extern DWORD Start_SecDir1;                             //Позиция начала первого каталога первого раздела
-     extern DWORD Start_SecFAT1;                             //Позиция начала таблицы FAT первого раздела
-     extern DWORD num_SecFAT1;                               //Число секторов в FAT
-     extern DWORD Size_FAT1;                                 //Число байт в FAT
-     extern DWORD maxZapFAT1;                                //Максимальное число записей в FAT
-     extern DWORD *FAT2;                                     //Таблица FAT второго раздела
-     extern DWORD Start_SecDir2;                             //Позиция начала первого каталога второго раздела
-     extern DWORD Start_SecFAT2;                             //Позиция начала таблицы FAT второго раздела
-     extern DWORD num_SecFAT2;                               //Число секторов в FAT второго раздела
-     extern DWORD Size_FAT2;                                 //Число байт в FAT второго раздела
-     extern DWORD maxZapFAT2;                                //Максимальное число записей в FAT второго раздела
-     extern int indTabMME;                                   //Индекс в таблице MME.DB для текущего файла в папке MEDIA
-     extern DWORD writeCl;                                   //Число занятых кластеров
-     extern int prMEDIA;                                     //Признак обрабатываемой папка
-     extern int pr_tRec;                                     //Признак рекордера 0 или 1 (старейшая серия)
+int  Update_Tree(void);                                      //РџРµСЂРµСЃРѕР·РґР°РЅРёРµ РґРµСЂРµРІР° С„Р°Р№Р»РѕРІ Рё РїР°РїРѕРє РїСЂРё РёР·РјРµРЅРµРЅРёРё РЅР°СЃС‚СЂРѕРµРє
+int  Read_HDD(void);                                         //РџРѕРёСЃРє HDD РёР· СЂРµРєРѕСЂРґРµСЂР° LG Рё Р·Р°РіСЂСѓР·РєР° СЃР»СѓР¶РµР±РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
+     extern HANDLE hDrive;                                   //РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РґРёСЃРє
+     extern DWORD *FAT1;                                     //РўР°Р±Р»РёС†Р° FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern DWORD Start_SecDir1;                             //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРµСЂРІРѕРіРѕ РєР°С‚Р°Р»РѕРіР° РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern DWORD Start_SecFAT1;                             //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° С‚Р°Р±Р»РёС†С‹ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern DWORD num_SecFAT1;                               //Р§РёСЃР»Рѕ СЃРµРєС‚РѕСЂРѕРІ РІ FAT
+     extern DWORD Size_FAT1;                                 //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ FAT
+     extern DWORD maxZapFAT1;                                //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ Р·Р°РїРёСЃРµР№ РІ FAT
+     extern DWORD *FAT2;                                     //РўР°Р±Р»РёС†Р° FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern DWORD Start_SecDir2;                             //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРµСЂРІРѕРіРѕ РєР°С‚Р°Р»РѕРіР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern DWORD Start_SecFAT2;                             //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° С‚Р°Р±Р»РёС†С‹ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern DWORD num_SecFAT2;                               //Р§РёСЃР»Рѕ СЃРµРєС‚РѕСЂРѕРІ РІ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern DWORD Size_FAT2;                                 //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern DWORD maxZapFAT2;                                //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ Р·Р°РїРёСЃРµР№ РІ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
+     extern int indTabMME;                                   //РРЅРґРµРєСЃ РІ С‚Р°Р±Р»РёС†Рµ MME.DB РґР»СЏ С‚РµРєСѓС‰РµРіРѕ С„Р°Р№Р»Р° РІ РїР°РїРєРµ MEDIA
+     extern DWORD writeCl;                                   //Р§РёСЃР»Рѕ Р·Р°РЅСЏС‚С‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+     extern int prMEDIA;                                     //РџСЂРёР·РЅР°Рє РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјРѕР№ РїР°РїРєР°
+     extern int pr_tRec;                                     //РџСЂРёР·РЅР°Рє СЂРµРєРѕСЂРґРµСЂР° 0 РёР»Рё 1 (СЃС‚Р°СЂРµР№С€Р°СЏ СЃРµСЂРёСЏ)
 
 //============================ hdd_lg_read_io ==================================
-int  ReadSec(BYTE *buff);                                    //Чтение сектора
-int  ReadClast1(BYTE *buff);                                 //Чтение кластера первого раздела начиная с текущего сектора
-int  ReadClast1_P(DWORD nSector, BYTE *buff);                //Чтение кластера первого раздела начиная с указанного сектора
-int  ReadClast2(BYTE *buff);                                 //Чтение кластера второго раздела начиная с текущего сектора
-int  ReadClast2_P(DWORD nSector, BYTE *buff);                //Чтение кластера второго раздела начиная с указанного сектора
-int  Load_FAT1(void);                                        //Загрузка FAT первого раздела
-int  Load_FAT2(void);                                        //Загрузка FAT второго раздела
-int  FindHDD_LG(void);                                       //Поиск диска из рекордера LG
-     extern DWORD stCl_Media2;                               //Кластер начала второй части папки MEDIA
+int  ReadSec(BYTE *buff);                                    //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
+int  ReadClast1(BYTE *buff);                                 //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р° РЅР°С‡РёРЅР°СЏ СЃ С‚РµРєСѓС‰РµРіРѕ СЃРµРєС‚РѕСЂР°
+int  ReadClast1_P(DWORD nSector, BYTE *buff);                //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р° РЅР°С‡РёРЅР°СЏ СЃ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЃРµРєС‚РѕСЂР°
+int  ReadClast2(BYTE *buff);                                 //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° РЅР°С‡РёРЅР°СЏ СЃ С‚РµРєСѓС‰РµРіРѕ СЃРµРєС‚РѕСЂР°
+int  ReadClast2_P(DWORD nSector, BYTE *buff);                //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° РЅР°С‡РёРЅР°СЏ СЃ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЃРµРєС‚РѕСЂР°
+int  Load_FAT1(void);                                        //Р—Р°РіСЂСѓР·РєР° FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+int  Load_FAT2(void);                                        //Р—Р°РіСЂСѓР·РєР° FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
+int  FindHDD_LG(void);                                       //РџРѕРёСЃРє РґРёСЃРєР° РёР· СЂРµРєРѕСЂРґРµСЂР° LG
+     extern DWORD stCl_Media2;                               //РљР»Р°СЃС‚РµСЂ РЅР°С‡Р°Р»Р° РІС‚РѕСЂРѕР№ С‡Р°СЃС‚Рё РїР°РїРєРё MEDIA
 
 //============================ hdd_lg_remake_tree ==============================
-int  RemakeTree(void);                                       //Переформирование дерева с учетом многофайловых Titles
+int  RemakeTree(void);                                       //РџРµСЂРµС„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РґРµСЂРµРІР° СЃ СѓС‡РµС‚РѕРј РјРЅРѕРіРѕС„Р°Р№Р»РѕРІС‹С… Titles
 
-#if defined TEST_67_68_70_71                                 //Сектора
+#if defined TEST_67_68_70_71                                 //РЎРµРєС‚РѕСЂР°
 //============================ hdd_lg_sect_68_68_70_71 =========================
-int  Read_Sec_67_68_70_71(void);                             //Чтение специальных секторов
+int  Read_Sec_67_68_70_71(void);                             //Р§С‚РµРЅРёРµ СЃРїРµС†РёР°Р»СЊРЅС‹С… СЃРµРєС‚РѕСЂРѕРІ
 #endif
 
 #if defined TEST_IDX
@@ -224,81 +224,81 @@ int Read_File_idx(void);
 
 #if defined TEST_WIN
 //============================ hdd_lg_test0 ====================================
-void View_Sec_Hex(BYTE *buff, int pr);                       //Вывод содержимого сектора
-void Add_Spis(char *Str);                                    //Добавление строки в список
-HWND Create_TestWin(void);                                   //Создание окна
-BOOL Register_TestWin(void);                                 //Регистрация окна
+void View_Sec_Hex(BYTE *buff, int pr);                       //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ СЃРµРєС‚РѕСЂР°
+void Add_Spis(char *Str);                                    //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+HWND Create_TestWin(void);                                   //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
+BOOL Register_TestWin(void);                                 //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 #endif
 
 #if defined TEST_LG1
 //============================ hdd_lg_test1 ====================================
-int  Read_Test1(void);                                       //Тестовое чтение и вывод
+int  Read_Test1(void);                                       //РўРµСЃС‚РѕРІРѕРµ С‡С‚РµРЅРёРµ Рё РІС‹РІРѕРґ
 #endif
 
 #if defined TEST_LG2_MME
 //============================ hdd_lg_test2 ====================================
-int  Read_Test2(void);                                       //Тестовое чтение и вывод
+int  Read_Test2(void);                                       //РўРµСЃС‚РѕРІРѕРµ С‡С‚РµРЅРёРµ Рё РІС‹РІРѕРґ
 #endif
 
 //============================ hdd_lg_to_txt =====================================
-int OutTxt(void);                                            //Запись дерева в текстовый файл
+int OutTxt(void);                                            //Р—Р°РїРёСЃСЊ РґРµСЂРµРІР° РІ С‚РµРєСЃС‚РѕРІС‹Р№ С„Р°Р№Р»
 
-#if defined WRITE_YES                                        //Режим записи разрешен
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
 //============================ hdd_lg_write ====================================
-int  WriteFileToHDD(int pr);                                 //Запись файлов на диск
-     extern int prFolder;                                    //Вариант расширения файла (0-mp3, 1-jpg, 2-avi)
-     extern DWORD ClStDir;                                   //Номер кластера каталога в который выполняется запись
-     extern TV_ITEM item_Add;                                //Выбор в строке дерева куда будет добавление
-     extern int NumMsg38;                                    //Число сообщений о превышении длины имени
+int  WriteFileToHDD(int pr);                                 //Р—Р°РїРёСЃСЊ С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє
+     extern int prFolder;                                    //Р’Р°СЂРёР°РЅС‚ СЂР°СЃС€РёСЂРµРЅРёСЏ С„Р°Р№Р»Р° (0-mp3, 1-jpg, 2-avi)
+     extern DWORD ClStDir;                                   //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР° РІ РєРѕС‚РѕСЂС‹Р№ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ Р·Р°РїРёСЃСЊ
+     extern TV_ITEM item_Add;                                //Р’С‹Р±РѕСЂ РІ СЃС‚СЂРѕРєРµ РґРµСЂРµРІР° РєСѓРґР° Р±СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅРёРµ
+     extern int NumMsg38;                                    //Р§РёСЃР»Рѕ СЃРѕРѕР±С‰РµРЅРёР№ Рѕ РїСЂРµРІС‹С€РµРЅРёРё РґР»РёРЅС‹ РёРјРµРЅРё
 
 //============================ hdd_lg_write_1 ==================================
-int  File_ToHDD(void);                                       //Запись файлов на диск LG
-int  Folder_ToHDD(void);                                     //Запись папок на диск LG
-int  New_Folder_ToHDD(void);                                 //Cоздание папок на диске LG
-     extern char *spisF;                                     //Память списка файлов
+int  File_ToHDD(void);                                       //Р—Р°РїРёСЃСЊ С„Р°Р№Р»РѕРІ РЅР° РґРёСЃРє LG
+int  Folder_ToHDD(void);                                     //Р—Р°РїРёСЃСЊ РїР°РїРѕРє РЅР° РґРёСЃРє LG
+int  New_Folder_ToHDD(void);                                 //CРѕР·РґР°РЅРёРµ РїР°РїРѕРє РЅР° РґРёСЃРєРµ LG
+     extern char *spisF;                                     //РџР°РјСЏС‚СЊ СЃРїРёСЃРєР° С„Р°Р№Р»РѕРІ
 
 //============================ hdd_lg_write_2 ==================================
 BOOL CALLBACK Dlg_NewName(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-int  RenameFiFo(HTREEITEM hitem, OneStrTree *aTree);         //Переименование
-int  DeleteFiFo(HTREEITEM hitem, OneStrTree *aTree);         //Удаление
-int  Change_Sec67(int num_Cl);                               //Внесение изменений в содержимое сектора 67
-int  Correct67Sec(void);                                     //Коррекция содержимого 67 сектора
-     extern char NameFoFi[];                                 //Имя создаваемой папки
-     extern DWORD MaxClast;                                  //Номер самого старшего кластера использованного для записи
+int  RenameFiFo(HTREEITEM hitem, OneStrTree *aTree);         //РџРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ
+int  DeleteFiFo(HTREEITEM hitem, OneStrTree *aTree);         //РЈРґР°Р»РµРЅРёРµ
+int  Change_Sec67(int num_Cl);                               //Р’РЅРµСЃРµРЅРёРµ РёР·РјРµРЅРµРЅРёР№ РІ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРµРєС‚РѕСЂР° 67
+int  Correct67Sec(void);                                     //РљРѕСЂСЂРµРєС†РёСЏ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ 67 СЃРµРєС‚РѕСЂР°
+     extern char NameFoFi[];                                 //РРјСЏ СЃРѕР·РґР°РІР°РµРјРѕР№ РїР°РїРєРё
+     extern DWORD MaxClast;                                  //РќРѕРјРµСЂ СЃР°РјРѕРіРѕ СЃС‚Р°СЂС€РµРіРѕ РєР»Р°СЃС‚РµСЂР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРЅРѕРіРѕ РґР»СЏ Р·Р°РїРёСЃРё
 
 //============================ hdd_lg_write_io =================================
-int  GetSpNameInFile(char *Spis, int N, int *sm);            //Ввод списка имен для записи
-int  OpenInFilePC(char *NameF);                              //Открыли входной файл для чтения с компьютера
-int  WriteClast1P(DWORD nClast, BYTE *buff);                 //Запись кластера
-int  Save_FAT1(void);                                        //Сохранение обновленной FAT первого раздела
-void Ansi_To_Unicode(char *inANSI, WCHAR *outUNI, int maxN); //Преобразование строки символов в Unicode
-int  Load_Dir(void);                                         //Загрузка кластера каталога
-int  Change_Dir_For_File(char *NameF);                       //Изменение каталога (внесение нового файла)
-int  Change_Dir_For_Folder(char *NameF);                     //Изменение каталога (внесение новой папки)
-int  Save_Dir(void);                                         //Сохранение кластера каталога
-    extern DWORD *c_FAT1;                                    //Копия таблицы FAT первого раздела
+int  GetSpNameInFile(char *Spis, int N, int *sm);            //Р’РІРѕРґ СЃРїРёСЃРєР° РёРјРµРЅ РґР»СЏ Р·Р°РїРёСЃРё
+int  OpenInFilePC(char *NameF);                              //РћС‚РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ СЃ РєРѕРјРїСЊСЋС‚РµСЂР°
+int  WriteClast1P(DWORD nClast, BYTE *buff);                 //Р—Р°РїРёСЃСЊ РєР»Р°СЃС‚РµСЂР°
+int  Save_FAT1(void);                                        //РЎРѕС…СЂР°РЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРЅРѕР№ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+void Ansi_To_Unicode(char *inANSI, WCHAR *outUNI, int maxN); //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РІ Unicode
+int  Load_Dir(void);                                         //Р—Р°РіСЂСѓР·РєР° РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+int  Change_Dir_For_File(char *NameF);                       //РР·РјРµРЅРµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (РІРЅРµСЃРµРЅРёРµ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°)
+int  Change_Dir_For_Folder(char *NameF);                     //РР·РјРµРЅРµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (РІРЅРµСЃРµРЅРёРµ РЅРѕРІРѕР№ РїР°РїРєРё)
+int  Save_Dir(void);                                         //РЎРѕС…СЂР°РЅРµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+    extern DWORD *c_FAT1;                                    //РљРѕРїРёСЏ С‚Р°Р±Р»РёС†С‹ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
     extern HANDLE inFile;
-    extern ULARGE_INTEGER Size_inF;                          //Размер файла м.б. > 4 ГБ
-    extern int nCl_1;                                        //Номер кластера начала файла
-    extern BYTE bufDir[];                                    //Память под один кластер
+    extern ULARGE_INTEGER Size_inF;                          //Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° Рј.Р±. > 4 Р“Р‘
+    extern int nCl_1;                                        //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РЅР°С‡Р°Р»Р° С„Р°Р№Р»Р°
+    extern BYTE bufDir[];                                    //РџР°РјСЏС‚СЊ РїРѕРґ РѕРґРёРЅ РєР»Р°СЃС‚РµСЂ
 #endif
 
 //============================ ProgressBar =====================================
-void EnableW(bool T_F);                                      //Изменение активности кнопок
+void EnableW(bool T_F);                                      //РР·РјРµРЅРµРЅРёРµ Р°РєС‚РёРІРЅРѕСЃС‚Рё РєРЅРѕРїРѕРє
 void InitProgressBar1(DWORD Size, char *Msg);
 int  ProgressBar1(DWORD Size);
 void Close_ProgressBar1(void);
-void InitProgressBar1_2(DWORD Size, char *Msg);              //Функция прогресса для одного файла
-void InitProgressBar2_2(DWORD Size, char *Msg);              //Функция прогресса для нескольких файлов
+void InitProgressBar1_2(DWORD Size, char *Msg);              //Р¤СѓРЅРєС†РёСЏ РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+void InitProgressBar2_2(DWORD Size, char *Msg);              //Р¤СѓРЅРєС†РёСЏ РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РЅРµСЃРєРѕР»СЊРєРёС… С„Р°Р№Р»РѕРІ
 int  ProgressBar2(DWORD Size);
-void ScipProgressBar2(DWORDLONG SizeF);                      //Отработка прогресса для пропускаемых файлов
+void ScipProgressBar2(DWORDLONG SizeF);                      //РћС‚СЂР°Р±РѕС‚РєР° РїСЂРѕРіСЂРµСЃСЃР° РґР»СЏ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… С„Р°Р№Р»РѕРІ
 void Close_ProgressBar1_2(void);
 void Close_ProgressBar2_2(void);
      extern void (*InitProgressBar)(DWORD Size, char *Msg);
      extern int  (*ProgressBar)(DWORD Size);
      extern void (*Close_ProgressBar)(void);
-     extern bool prProcCopy;                                 //Признак процесса копирования
-     extern int  prWinMinMax;                                //0-окно распахнутое, 1-окно свернутое
+     extern bool prProcCopy;                                 //РџСЂРёР·РЅР°Рє РїСЂРѕС†РµСЃСЃР° РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+     extern int  prWinMinMax;                                //0-РѕРєРЅРѕ СЂР°СЃРїР°С…РЅСѓС‚РѕРµ, 1-РѕРєРЅРѕ СЃРІРµСЂРЅСѓС‚РѕРµ
      extern DWORD tStart2;
 
 #endif

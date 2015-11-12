@@ -8,98 +8,98 @@
 #if defined EMULATOR_HDD
 
 //============================ hdd_lg_emulator =================================
-int ReadClastEmul(DWORDLONG Poz, BYTE *buff);                //Чтение кластера эмулятором
-int ReadClast2Emul(DWORDLONG Poz, BYTE *buff);               //Чтение кластера эмулятором
-int ReadFATEmul(DWORDLONG Poz);                              //Чтение FAT эмулятором
-int ReadFAT2Emul(DWORDLONG Poz);                             //Чтение FAT эмулятором
-int Read_Sec_Emul(int Num, BYTE* Sec);                       //Чтение сектора по номеру эмулятором
-int FindHDD_LG_Emul(void);                                   //Поиск диска из рекордера LG эмулятором
+int ReadClastEmul(DWORDLONG Poz, BYTE *buff);                //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int ReadClast2Emul(DWORDLONG Poz, BYTE *buff);               //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int ReadFATEmul(DWORDLONG Poz);                              //Р§С‚РµРЅРёРµ FAT СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int ReadFAT2Emul(DWORDLONG Poz);                             //Р§С‚РµРЅРёРµ FAT СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int Read_Sec_Emul(int Num, BYTE* Sec);                       //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР° РїРѕ РЅРѕРјРµСЂСѓ СЌРјСѓР»СЏС‚РѕСЂРѕРј
+int FindHDD_LG_Emul(void);                                   //РџРѕРёСЃРє РґРёСЃРєР° РёР· СЂРµРєРѕСЂРґРµСЂР° LG СЌРјСѓР»СЏС‚РѕСЂРѕРј
     char *inBuf;
-    char NameFDump[260];                                     //Имя файла с дампом
+    char NameFDump[260];                                     //РРјСЏ С„Р°Р№Р»Р° СЃ РґР°РјРїРѕРј
 
 static DWORD inSize;
 static char *Adr, *AdrEnd;
 
 //------------------------------------------------------------------------------
 
-static int OpenInFile(char *NameF, HANDLE *inFile)                           //Открытие файла
+static int OpenInFile(char *NameF, HANDLE *inFile)                           //РћС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 {
-   *inFile = CreateFile(NameF,                                //Адрес строки с именем файла
-                       GENERIC_READ,                         //Способ доступа к файлу
-                       FILE_SHARE_READ,                      //Посторонний процес может только читать файл
-                       NULL,                                 //Адрес структуры с параметрами защиты ядра
-                       OPEN_EXISTING,                        //Тип открытия файла
-                       FILE_ATTRIBUTE_NORMAL,                //Атрибуты файла
-                       NULL);                                //Используется для временных файлов
+   *inFile = CreateFile(NameF,                                //РђРґСЂРµСЃ СЃС‚СЂРѕРєРё СЃ РёРјРµРЅРµРј С„Р°Р№Р»Р°
+                       GENERIC_READ,                         //РЎРїРѕСЃРѕР± РґРѕСЃС‚СѓРїР° Рє С„Р°Р№Р»Сѓ
+                       FILE_SHARE_READ,                      //РџРѕСЃС‚РѕСЂРѕРЅРЅРёР№ РїСЂРѕС†РµСЃ РјРѕР¶РµС‚ С‚РѕР»СЊРєРѕ С‡РёС‚Р°С‚СЊ С„Р°Р№Р»
+                       NULL,                                 //РђРґСЂРµСЃ СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё Р·Р°С‰РёС‚С‹ СЏРґСЂР°
+                       OPEN_EXISTING,                        //РўРёРї РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°
+                       FILE_ATTRIBUTE_NORMAL,                //РђС‚СЂРёР±СѓС‚С‹ С„Р°Р№Р»Р°
+                       NULL);                                //РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РІСЂРµРјРµРЅРЅС‹С… С„Р°Р№Р»РѕРІ
    if(*inFile == INVALID_HANDLE_VALUE)
-     return ErrorSys2("Ошибка при открытии файла", NameF);
+     return ErrorSys2("РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р°", NameF);
    inSize = GetFileSize(*inFile, NULL);
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int GetName_InFile(char *NameF)                       //Ввод имени обрабатываемого файла
+static int GetName_InFile(char *NameF)                       //Р’РІРѕРґ РёРјРµРЅРё РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјРѕРіРѕ С„Р°Р№Р»Р°
 {
    OPENFILENAME ofn;
-   char DirName[260];                                        //Начальный путь для поиска файлов
-   char FileTitle[256];                                      //Заголовок окна
-   char Filter[256];                                         //Фильтры поиска
+   char DirName[260];                                        //РќР°С‡Р°Р»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+   char FileTitle[256];                                      //Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
+   char Filter[256];                                         //Р¤РёР»СЊС‚СЂС‹ РїРѕРёСЃРєР°
    char NameFile[260];
 
-   strcpy(NameFile, NameF);                                  //Начальный путь для поиска файлов
-   *DirName = 0;                                             //На случай если имени небыло
-   if(*NameFile != 0)                                        //Имя уже было
+   strcpy(NameFile, NameF);                                  //РќР°С‡Р°Р»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+   *DirName = 0;                                             //РќР° СЃР»СѓС‡Р°Р№ РµСЃР»Рё РёРјРµРЅРё РЅРµР±С‹Р»Рѕ
+   if(*NameFile != 0)                                        //РРјСЏ СѓР¶Рµ Р±С‹Р»Рѕ
    {  char *A;
-      lstrcpy(DirName, NameFile);                            //Начальный путь для поиска файлов
-      //Наверно логично создать полное имя
-      A = strrchr(DirName, '\\');                            //Нашли последний разделитель
+      lstrcpy(DirName, NameFile);                            //РќР°С‡Р°Р»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+      //РќР°РІРµСЂРЅРѕ Р»РѕРіРёС‡РЅРѕ СЃРѕР·РґР°С‚СЊ РїРѕР»РЅРѕРµ РёРјСЏ
+      A = strrchr(DirName, '\\');                            //РќР°С€Р»Рё РїРѕСЃР»РµРґРЅРёР№ СЂР°Р·РґРµР»РёС‚РµР»СЊ
       if(A != NULL) *A = 0;
-      else *DirName = 0;                                     //Нет имени файла
+      else *DirName = 0;                                     //РќРµС‚ РёРјРµРЅРё С„Р°Р№Р»Р°
    }
    *NameFile = 0;
-   lstrcpy(Filter, "Файлы дампа|*.txt|Все файлы (*.*)|*.*|");
-   for(int i=0; Filter[i]!=0; i++)                           //Заменили разделитель 0
+   lstrcpy(Filter, "Р¤Р°Р№Р»С‹ РґР°РјРїР°|*.txt|Р’СЃРµ С„Р°Р№Р»С‹ (*.*)|*.*|");
+   for(int i=0; Filter[i]!=0; i++)                           //Р—Р°РјРµРЅРёР»Рё СЂР°Р·РґРµР»РёС‚РµР»СЊ 0
      if(Filter[i] == '|') Filter[i] = 0;
-   ZeroMemory(&ofn, sizeof(OPENFILENAME));                   //Заполнили нулями
-   ofn.lStructSize = sizeof(OPENFILENAME);                   //Длина структуры
-   ofn.hwndOwner = MainWin;                                  //Владелец диалога
-   ofn.hInstance = MainInst;                                 //Идентификатор программы владеющая диалогом
-   ofn.lpstrFilter = Filter;                                 //Типы просматриваемых файлов
-// ofn.lpstrCustomFilter                                     //Специальные фильтры
-// ofn.nMaxCustFilter                                        //Длина специального фильтра
-   ofn.nFilterIndex = 1;                                     //Индекс для работы с фильтрами
-   ofn.lpstrFile = NameFile;                                 //Имя файла в случае успеха
-   ofn.nMaxFile = sizeof(NameFile);                          //Длина поля имени файла
-   ofn.lpstrFileTitle = FileTitle;                           //Маршрут и имя файла в случае успеха
-   ofn.nMaxFileTitle = sizeof(FileTitle);                    //Длина поля
-   ofn.lpstrInitialDir = DirName;                            //Начальный каталог файлов
-   ofn.lpstrTitle = "Укажите имя файла дампа";
+   ZeroMemory(&ofn, sizeof(OPENFILENAME));                   //Р—Р°РїРѕР»РЅРёР»Рё РЅСѓР»СЏРјРё
+   ofn.lStructSize = sizeof(OPENFILENAME);                   //Р”Р»РёРЅР° СЃС‚СЂСѓРєС‚СѓСЂС‹
+   ofn.hwndOwner = MainWin;                                  //Р’Р»Р°РґРµР»РµС† РґРёР°Р»РѕРіР°
+   ofn.hInstance = MainInst;                                 //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРѕРіСЂР°РјРјС‹ РІР»Р°РґРµСЋС‰Р°СЏ РґРёР°Р»РѕРіРѕРј
+   ofn.lpstrFilter = Filter;                                 //РўРёРїС‹ РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРјС‹С… С„Р°Р№Р»РѕРІ
+// ofn.lpstrCustomFilter                                     //РЎРїРµС†РёР°Р»СЊРЅС‹Рµ С„РёР»СЊС‚СЂС‹
+// ofn.nMaxCustFilter                                        //Р”Р»РёРЅР° СЃРїРµС†РёР°Р»СЊРЅРѕРіРѕ С„РёР»СЊС‚СЂР°
+   ofn.nFilterIndex = 1;                                     //РРЅРґРµРєСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„РёР»СЊС‚СЂР°РјРё
+   ofn.lpstrFile = NameFile;                                 //РРјСЏ С„Р°Р№Р»Р° РІ СЃР»СѓС‡Р°Рµ СѓСЃРїРµС…Р°
+   ofn.nMaxFile = sizeof(NameFile);                          //Р”Р»РёРЅР° РїРѕР»СЏ РёРјРµРЅРё С„Р°Р№Р»Р°
+   ofn.lpstrFileTitle = FileTitle;                           //РњР°СЂС€СЂСѓС‚ Рё РёРјСЏ С„Р°Р№Р»Р° РІ СЃР»СѓС‡Р°Рµ СѓСЃРїРµС…Р°
+   ofn.nMaxFileTitle = sizeof(FileTitle);                    //Р”Р»РёРЅР° РїРѕР»СЏ
+   ofn.lpstrInitialDir = DirName;                            //РќР°С‡Р°Р»СЊРЅС‹Р№ РєР°С‚Р°Р»РѕРі С„Р°Р№Р»РѕРІ
+   ofn.lpstrTitle = "РЈРєР°Р¶РёС‚Рµ РёРјСЏ С„Р°Р№Р»Р° РґР°РјРїР°";
    ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-// ofn.Flags |= OFN_ENABLESIZING;                            //Можно менять размер окна диалога
-// ofn.nFileOffset;                                          //Смещение в внутри lpstrFile
-// ofn.nFileExtension;                                       //Смещение в внутри lpstrFile
-   ofn.lpstrDefExt = "txt";                                  //Расширение по умолчанию
-// ofn.lCustData;                                            //Для функции обработчиков
-//   ofn.lpfnHook = ModDlg.fnHook;                           //Функция обработки дополнительного диалога
-//   ofn.lpTemplateName = ModDlg.DopDlgName;                 //Дополнительный диалог который суммируется с основным
-//   if(NumWinNT != 0)                                       //0-Система Win95/98 или номер NT
-//     ofn.FlagsEx = OFN_EX_NOPLACESBAR;                     //Убирает иконку слева
+// ofn.Flags |= OFN_ENABLESIZING;                            //РњРѕР¶РЅРѕ РјРµРЅСЏС‚СЊ СЂР°Р·РјРµСЂ РѕРєРЅР° РґРёР°Р»РѕРіР°
+// ofn.nFileOffset;                                          //РЎРјРµС‰РµРЅРёРµ РІ РІРЅСѓС‚СЂРё lpstrFile
+// ofn.nFileExtension;                                       //РЎРјРµС‰РµРЅРёРµ РІ РІРЅСѓС‚СЂРё lpstrFile
+   ofn.lpstrDefExt = "txt";                                  //Р Р°СЃС€РёСЂРµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+// ofn.lCustData;                                            //Р”Р»СЏ С„СѓРЅРєС†РёРё РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
+//   ofn.lpfnHook = ModDlg.fnHook;                           //Р¤СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РґРёР°Р»РѕРіР°
+//   ofn.lpTemplateName = ModDlg.DopDlgName;                 //Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РґРёР°Р»РѕРі РєРѕС‚РѕСЂС‹Р№ СЃСѓРјРјРёСЂСѓРµС‚СЃСЏ СЃ РѕСЃРЅРѕРІРЅС‹Рј
+//   if(NumWinNT != 0)                                       //0-РЎРёСЃС‚РµРјР° Win95/98 РёР»Рё РЅРѕРјРµСЂ NT
+//     ofn.FlagsEx = OFN_EX_NOPLACESBAR;                     //РЈР±РёСЂР°РµС‚ РёРєРѕРЅРєСѓ СЃР»РµРІР°
    if(GetOpenFileName(&ofn) == FALSE) return -1;
    if(*NameFile == 0) return -1;
-   strcpy(NameF, NameFile);                                  //Переслали имя файла
+   strcpy(NameF, NameFile);                                  //РџРµСЂРµСЃР»Р°Р»Рё РёРјСЏ С„Р°Р№Р»Р°
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int FindStr(char *msg)                                //Поиск строки начинающейся со строк msg
+static int FindStr(char *msg)                                //РџРѕРёСЃРє СЃС‚СЂРѕРєРё РЅР°С‡РёРЅР°СЋС‰РµР№СЃСЏ СЃРѕ СЃС‚СЂРѕРє msg
 {
    int n = lstrlen(msg);
    Adr = inBuf;
-   for(;;)                                                   //До конца файла
+   for(;;)                                                   //Р”Рѕ РєРѕРЅС†Р° С„Р°Р№Р»Р°
    {  char *NewAdr = strchr(Adr, '\0');
-      if(NewAdr > AdrEnd || NewAdr == NULL) return -1;       //Данные кончились и Больше нет ни одной полной строки
+      if(NewAdr > AdrEnd || NewAdr == NULL) return -1;       //Р”Р°РЅРЅС‹Рµ РєРѕРЅС‡РёР»РёСЃСЊ Рё Р‘РѕР»СЊС€Рµ РЅРµС‚ РЅРё РѕРґРЅРѕР№ РїРѕР»РЅРѕР№ СЃС‚СЂРѕРєРё
       if(strncmp(Adr, msg, n) == 0) return 0;
       Adr = NewAdr + 1;
    }
@@ -110,27 +110,27 @@ static int FindStr(char *msg)                                //Поиск строки начи
 static int Read_Dump(BYTE *buf, DWORD size)
 {
    int num, ahex;
-   ZeroMemory(buf, size);                                    //Обнулили буфер на случай группового нуля
+   ZeroMemory(buf, size);                                    //РћР±РЅСѓР»РёР»Рё Р±СѓС„РµСЂ РЅР° СЃР»СѓС‡Р°Р№ РіСЂСѓРїРїРѕРІРѕРіРѕ РЅСѓР»СЏ
    char *NewAdr = strchr(Adr, '\0');
-   if(NewAdr > AdrEnd || NewAdr == NULL) return -1;          //Данные кончились и Больше нет ни одной полной строки
+   if(NewAdr > AdrEnd || NewAdr == NULL) return -1;          //Р”Р°РЅРЅС‹Рµ РєРѕРЅС‡РёР»РёСЃСЊ Рё Р‘РѕР»СЊС€Рµ РЅРµС‚ РЅРё РѕРґРЅРѕР№ РїРѕР»РЅРѕР№ СЃС‚СЂРѕРєРё
    Adr = NewAdr + 1;
    DWORD nn = 0;
-   for(int n=1, hex=0; ; n++,hex+=128)                       //До конца файла
+   for(int n=1, hex=0; ; n++,hex+=128)                       //Р”Рѕ РєРѕРЅС†Р° С„Р°Р№Р»Р°
    {  NewAdr = strchr(Adr, '\0');
-      if(NewAdr > AdrEnd || NewAdr == NULL) return -1;       //Данные кончились и Больше нет ни одной полной строки
-      if(lstrcmp(Adr, "All bytes == 0\r") == 0) return 0;    //Абсолютно везде нули
+      if(NewAdr > AdrEnd || NewAdr == NULL) return -1;       //Р”Р°РЅРЅС‹Рµ РєРѕРЅС‡РёР»РёСЃСЊ Рё Р‘РѕР»СЊС€Рµ РЅРµС‚ РЅРё РѕРґРЅРѕР№ РїРѕР»РЅРѕР№ СЃС‚СЂРѕРєРё
+      if(lstrcmp(Adr, "All bytes == 0\r") == 0) return 0;    //РђР±СЃРѕР»СЋС‚РЅРѕ РІРµР·РґРµ РЅСѓР»Рё
       sscanf(Adr, "%d: %x:", &num, &ahex);
       if(n != num && ahex != hex)
-        return Error2("Нарушение порядка следования строк.", "Эмулятор.");
+        return Error2("РќР°СЂСѓС€РµРЅРёРµ РїРѕСЂСЏРґРєР° СЃР»РµРґРѕРІР°РЅРёСЏ СЃС‚СЂРѕРє.", "Р­РјСѓР»СЏС‚РѕСЂ.");
       Adr += 14;
       for(int j=1; j<=128; j++)
-      {  if(strncmp(Adr, "(0)", 3) == 0) return 0;           //Далее все нули
+      {  if(strncmp(Adr, "(0)", 3) == 0) return 0;           //Р”Р°Р»РµРµ РІСЃРµ РЅСѓР»Рё
          DWORD OneB;
          sscanf(Adr, "%x", &OneB);
          *(buf + nn) = BYTE(OneB);
          nn++;
          if(nn > size)
-           return Error2("Переполнение буфера.", "Эмулятор.");
+           return Error2("РџРµСЂРµРїРѕР»РЅРµРЅРёРµ Р±СѓС„РµСЂР°.", "Р­РјСѓР»СЏС‚РѕСЂ.");
          Adr += 3;
          if((j % 8) == 0) Adr++;
       }
@@ -141,23 +141,23 @@ static int Read_Dump(BYTE *buf, DWORD size)
 
 //------------------------------------------------------------------------------
 
-static int Load_Dump(void)                                   //Загрузка дампа
+static int Load_Dump(void)                                   //Р—Р°РіСЂСѓР·РєР° РґР°РјРїР°
 {
    HANDLE inFile;
    DWORD nb;
-   if(GetName_InFile(NameFDump) < 0) return -1;              //Ввод имени обрабатываемого файла
-   if(OpenInFile(NameFDump, &inFile) < 0) return -1;         //Открытие входного файла
+   if(GetName_InFile(NameFDump) < 0) return -1;              //Р’РІРѕРґ РёРјРµРЅРё РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјРѕРіРѕ С„Р°Р№Р»Р°
+   if(OpenInFile(NameFDump, &inFile) < 0) return -1;         //РћС‚РєСЂС‹С‚РёРµ РІС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
    inBuf = (char *)MyAllocMem(inSize);
    if(inBuf == NULL) return -1;
    if(ReadFile(inFile, inBuf, inSize, &nb, NULL) == FALSE || nb != inSize)
-      return ErrorSys2("Ошибка при чтении исходного файла", NameFDump);
-   CloseFile(&inFile);                                       //Закрыли входной файл
+      return ErrorSys2("РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°", NameFDump);
+   CloseFile(&inFile);                                       //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
    AdrEnd = inBuf + inSize;
    Adr = inBuf;
-   for(;;)                                                   //До конца файла
+   for(;;)                                                   //Р”Рѕ РєРѕРЅС†Р° С„Р°Р№Р»Р°
    {  char *NewAdr = strchr(Adr, '\n');
-      if(NewAdr > AdrEnd || NewAdr == NULL) break;           //Данные кончились и Больше нет ни одной полной строки
-      *NewAdr = 0;                                           //Ограничили строку
+      if(NewAdr > AdrEnd || NewAdr == NULL) break;           //Р”Р°РЅРЅС‹Рµ РєРѕРЅС‡РёР»РёСЃСЊ Рё Р‘РѕР»СЊС€Рµ РЅРµС‚ РЅРё РѕРґРЅРѕР№ РїРѕР»РЅРѕР№ СЃС‚СЂРѕРєРё
+      *NewAdr = 0;                                           //РћРіСЂР°РЅРёС‡РёР»Рё СЃС‚СЂРѕРєСѓ
       Adr = NewAdr + 1;
    }
    return 0;
@@ -165,30 +165,30 @@ static int Load_Dump(void)                                   //Загрузка дампа
 
 //------------------------------------------------------------------------------
 
-int ReadClastEmul(DWORDLONG Poz, BYTE *buff)                 //Чтение кластера эмулятором
+int ReadClastEmul(DWORDLONG Poz, BYTE *buff)                 //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° СЌРјСѓР»СЏС‚РѕСЂРѕРј
 {
    DWORD nSector = DWORD(Poz / sSecB);
    DWORD nClast = (nSector - Start_SecDir1) / sClSec + 1;
    char Ss[300];
    wsprintf(Ss, "Load Dir (claster %d, sector %d)", nClast, nSector);
    if(FindStr(Ss) < 0)
-//     return Error2("Не найдена строка", Ss);
-   {  Error3("Не найдена строка", Ss, "Эмулятор.");  return 0;  }
+//     return Error2("РќРµ РЅР°Р№РґРµРЅР° СЃС‚СЂРѕРєР°", Ss);
+   {  Error3("РќРµ РЅР°Р№РґРµРЅР° СЃС‚СЂРѕРєР°", Ss, "Р­РјСѓР»СЏС‚РѕСЂ.");  return 0;  }
    if(Read_Dump(buff, sCl_B) < 0) return -1;
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int ReadClast2Emul(DWORDLONG Poz, BYTE *buff)                //Чтение кластера эмулятором
+int ReadClast2Emul(DWORDLONG Poz, BYTE *buff)                //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° СЌРјСѓР»СЏС‚РѕСЂРѕРј
 {
    DWORD nSector = DWORD(Poz / sSecB);
    DWORD nClast = (nSector - Start_SecDir2) / sClSec2 + 1;
    char Ss[300];
    wsprintf(Ss, "Load Dir (claster2 %d, sector %d)", nClast, nSector);
    if(FindStr(Ss) < 0)
-//     return Error2("Не найдена строка", Ss);
-   { Error3("Не найдена строка", Ss, "Эмулятор.");  return 0; }
+//     return Error2("РќРµ РЅР°Р№РґРµРЅР° СЃС‚СЂРѕРєР°", Ss);
+   { Error3("РќРµ РЅР°Р№РґРµРЅР° СЃС‚СЂРѕРєР°", Ss, "Р­РјСѓР»СЏС‚РѕСЂ.");  return 0; }
    if(Read_Dump(buff, sCl2_B) < 0) return -1;
    return 0;
 }
@@ -196,7 +196,7 @@ int ReadClast2Emul(DWORDLONG Poz, BYTE *buff)                //Чтение кластера э
 //------------------------------------------------------------------------------
 
 #pragma argsused
-int ReadFATEmul(DWORDLONG Poz)                               //Чтение FAT эмулятором
+int ReadFATEmul(DWORDLONG Poz)                               //Р§С‚РµРЅРёРµ FAT СЌРјСѓР»СЏС‚РѕСЂРѕРј
 {
    if(FindStr("Load FAT 1") < 0) return -1;
    if(Read_Dump((BYTE*)FAT1, Size_FAT1) < 0) return -1;
@@ -206,7 +206,7 @@ int ReadFATEmul(DWORDLONG Poz)                               //Чтение FAT эмулят
 //------------------------------------------------------------------------------
 
 #pragma argsused
-int ReadFAT2Emul(DWORDLONG Poz)                               //Чтение FAT эмулятором
+int ReadFAT2Emul(DWORDLONG Poz)                               //Р§С‚РµРЅРёРµ FAT СЌРјСѓР»СЏС‚РѕСЂРѕРј
 {
    if(FindStr("Load FAT 2") < 0) return -1;
    if(Read_Dump((BYTE*)FAT2, Size_FAT2) < 0) return -1;
@@ -215,7 +215,7 @@ int ReadFAT2Emul(DWORDLONG Poz)                               //Чтение FAT эмуля
 
 //-------------------------------------------------------------------------------
 
-int Read_Sec_Emul(int Num, BYTE* Sec)                        //Чтение сектора по номеру эмулятором
+int Read_Sec_Emul(int Num, BYTE* Sec)                        //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР° РїРѕ РЅРѕРјРµСЂСѓ СЌРјСѓР»СЏС‚РѕСЂРѕРј
 {
    char Ss[100];
    sprintf (Ss, "Sector %d", Num);
@@ -226,17 +226,17 @@ int Read_Sec_Emul(int Num, BYTE* Sec)                        //Чтение сектора по
 
 //-------------------------------------------------------------------------------
 
-int FindHDD_LG_Emul(void)                                    //Поиск диска из рекордера LG эмулятором
+int FindHDD_LG_Emul(void)                                    //РџРѕРёСЃРє РґРёСЃРєР° РёР· СЂРµРєРѕСЂРґРµСЂР° LG СЌРјСѓР»СЏС‚РѕСЂРѕРј
 {
-#if !defined EMULATOR_HDD_AND_COPY                           //Режим эмулятора с эмуляцией копирования
+#if !defined EMULATOR_HDD_AND_COPY                           //Р РµР¶РёРј СЌРјСѓР»СЏС‚РѕСЂР° СЃ СЌРјСѓР»СЏС†РёРµР№ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
    EnableWindow(hCopy, FALSE);
 #endif
-   if(Load_Dump() < 0) return -1;                            //Загрузка дампа
+   if(Load_Dump() < 0) return -1;                            //Р—Р°РіСЂСѓР·РєР° РґР°РјРїР°
 
    SEC_0 Sec0;
 // if(FindStr("Sector 0") < 0) return -1;
 // if(Read_Dump((BYTE*)&Sec0, 512) < 0) return -1;
-   if(Read_Sec_Emul(0, (BYTE*)&Sec0) < 0) return -1;         //Чтение сектора по номеру эмулятором
+   if(Read_Sec_Emul(0, (BYTE*)&Sec0) < 0) return -1;         //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР° РїРѕ РЅРѕРјРµСЂСѓ СЌРјСѓР»СЏС‚РѕСЂРѕРј
 #if defined OUT_TEST
    Add_SpecSpis("Find HDD from LG emulator");
 #endif
@@ -245,21 +245,21 @@ int FindHDD_LG_Emul(void)                                    //Поиск диска из ре
    if(Read_Dump((BYTE*)&Sec63, 512) < 0) return -1;
    if(strncmp(Sec63.Met, "LGEINC  ", 8) != 0 ||
       strncmp(Sec63.Name, "VOLUMELABE FAT32   ", 19) != 0)
-     return Error2("Содержимое сектора 63 не соответствует требованиям.", "Эмулятор.");
+     return Error2("РЎРѕРґРµСЂР¶РёРјРѕРµ СЃРµРєС‚РѕСЂР° 63 РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С‚СЂРµР±РѕРІР°РЅРёСЏРј.", "Р­РјСѓР»СЏС‚РѕСЂ.");
 #if defined OUT_TEST
    Add_SpecSpis("HDD from LG found");
    Add_SpecSpis("Sector 63");
    View_HEX_Any((BYTE *)&Sec63, 512);
 #endif
    if(Sec63.nf != 1 || Sec63.F8 != 0xF8 || Sec63.SecPerCl != sClSec)
-     return Error1((Lan+19)->msg);                           //return Error1("Найден жесткий диск только частично похожий на то, что он из рекордера LG.");
+     return Error1((Lan+19)->msg);                           //return Error1("РќР°Р№РґРµРЅ Р¶РµСЃС‚РєРёР№ РґРёСЃРє С‚РѕР»СЊРєРѕ С‡Р°СЃС‚РёС‡РЅРѕ РїРѕС…РѕР¶РёР№ РЅР° С‚Рѕ, С‡С‚Рѕ РѕРЅ РёР· СЂРµРєРѕСЂРґРµСЂР° LG.");
 
-   Start_SecFAT1 = 63 + Sec63.numRezSec;                     //Позиция начала таблицы FAT
-   Start_SecDir1 = Start_SecFAT1 + Sec63.nSecDir;            //Позиция начала первого каталога
-   num_SecFAT1 = Sec63.numSecFAT;                            //Число секторов в FAT
-   Size_FAT1 = num_SecFAT1 * sSecB;                          //Число байт в FAT
-// maxZapFAT1 = sSecB / 4 * num_SecFAT1;                     //Число записей в FAT (по 4 байта)
-   maxZapFAT1 = Sec63.numSecPart / sClSec;                   //Максимальное число записей в FAT (по 4 байта)
+   Start_SecFAT1 = 63 + Sec63.numRezSec;                     //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° С‚Р°Р±Р»РёС†С‹ FAT
+   Start_SecDir1 = Start_SecFAT1 + Sec63.nSecDir;            //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРµСЂРІРѕРіРѕ РєР°С‚Р°Р»РѕРіР°
+   num_SecFAT1 = Sec63.numSecFAT;                            //Р§РёСЃР»Рѕ СЃРµРєС‚РѕСЂРѕРІ РІ FAT
+   Size_FAT1 = num_SecFAT1 * sSecB;                          //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ FAT
+// maxZapFAT1 = sSecB / 4 * num_SecFAT1;                     //Р§РёСЃР»Рѕ Р·Р°РїРёСЃРµР№ РІ FAT (РїРѕ 4 Р±Р°Р№С‚Р°)
+   maxZapFAT1 = Sec63.numSecPart / sClSec;                   //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ Р·Р°РїРёСЃРµР№ РІ FAT (РїРѕ 4 Р±Р°Р№С‚Р°)
    SEC_63 Sec64;
    if(FindStr("Sector 64") < 0) return -1;
    if(Read_Dump((BYTE*)&Sec64, 512) < 0) return -1;
@@ -269,12 +269,12 @@ int FindHDD_LG_Emul(void)                                    //Поиск диска из ре
 #endif
    if(strncmp(Sec64.Met, "LGEINC  ", 8) != 0 ||
       strncmp(Sec64.Name, "VOLUMELABE FAT32   ", 19) != 0)
-     return Error2("Содержимое сектора 64 не соответствует требованиям.", "Эмулятор.");
-   Start_SecDir2 = Sec63.numSecPart + 63 + Sec64.numRezSec + Sec64.nSecDir; //Номер сектора начала каталога во втором разделе
-   num_SecFAT2 = Sec64.numSecFAT;                            //Число секторов в FAT
-   Size_FAT2 = num_SecFAT2 * sSecB;                          //Число байт в FAT
-   maxZapFAT2 = sSecB / 4 * num_SecFAT2;                     //Число записей в FAT (по 4 байта)
-   Start_SecFAT2 = Start_SecFAT1 + Sec0.numClP1;             //Позиция начала таблицы FAT2
+     return Error2("РЎРѕРґРµСЂР¶РёРјРѕРµ СЃРµРєС‚РѕСЂР° 64 РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С‚СЂРµР±РѕРІР°РЅРёСЏРј.", "Р­РјСѓР»СЏС‚РѕСЂ.");
+   Start_SecDir2 = Sec63.numSecPart + 63 + Sec64.numRezSec + Sec64.nSecDir; //РќРѕРјРµСЂ СЃРµРєС‚РѕСЂР° РЅР°С‡Р°Р»Р° РєР°С‚Р°Р»РѕРіР° РІРѕ РІС‚РѕСЂРѕРј СЂР°Р·РґРµР»Рµ
+   num_SecFAT2 = Sec64.numSecFAT;                            //Р§РёСЃР»Рѕ СЃРµРєС‚РѕСЂРѕРІ РІ FAT
+   Size_FAT2 = num_SecFAT2 * sSecB;                          //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ FAT
+   maxZapFAT2 = sSecB / 4 * num_SecFAT2;                     //Р§РёСЃР»Рѕ Р·Р°РїРёСЃРµР№ РІ FAT (РїРѕ 4 Р±Р°Р№С‚Р°)
+   Start_SecFAT2 = Start_SecFAT1 + Sec0.numClP1;             //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° С‚Р°Р±Р»РёС†С‹ FAT2
    return 0;
 }
 

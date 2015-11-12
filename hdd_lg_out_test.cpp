@@ -8,10 +8,10 @@
 #if defined OUT_TEST
 
 //============================ hdd_lg_out_test =================================
-void Add_SpecSpis(char *Str);                                //Добавление строки в список
-void View_HEX_Any(BYTE *buff, DWORD Size);                   //Вывод шеснадцатиричных кодов
-HWND Create_SpecWin(void);                                   //Создание окна
-BOOL Register_SpecWin(void);                                 //Регистрация окна
+void Add_SpecSpis(char *Str);                                //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+void View_HEX_Any(BYTE *buff, DWORD Size);                   //Р’С‹РІРѕРґ С€РµСЃРЅР°РґС†Р°С‚РёСЂРёС‡РЅС‹С… РєРѕРґРѕРІ
+HWND Create_SpecWin(void);                                   //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
+BOOL Register_SpecWin(void);                                 //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 
 static HWND SpecWin;
 static HWND hListBoxS;
@@ -27,9 +27,9 @@ static int SaveDump(void)
    SYSTEMTIME ST;
    GetLocalTime(&ST);
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return -1;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
+   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Р Р°Р·Р»РѕР¶РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
    wsprintf(Name, "%04d_%02d_%02d_%02d_%02d_dump_for_val238", ST.wYear, ST.wMonth, ST.wDay, ST.wHour, ST.wMinute);
-   fnmerge(NameF, Driv, Dir, Name, ".txt");                  //Получили имя файла
+   fnmerge(NameF, Driv, Dir, Name, ".txt");                  //РџРѕР»СѓС‡РёР»Рё РёРјСЏ С„Р°Р№Р»Р°
    FILE *PrgF;
    if((PrgF = fopen(NameF, "wt")) == NULL)
       return Error2(NameF, "Error open file.");
@@ -52,40 +52,40 @@ static int SaveDump(void)
 
 //------------------------------------------------------------------------------
 
-void Add_SpecSpis(char *Str)                                 //Добавление строки в список
+void Add_SpecSpis(char *Str)                                 //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
 {
    if(hListBoxS == NULL) return;
    SendMessage(hListBoxS, LB_ADDSTRING, 0, (LPARAM)Str);
    int Poz = SendMessage(hListBoxS, LB_GETCOUNT, 0, 0);      
    SendMessage(hListBoxS,LB_SETCURSEL, Poz-1, 0);
 // FormList->ListBox1->Update();
-   UpdateWindow(hListBoxS);                                  //Восстановили окно после диалога выбора файла
+   UpdateWindow(hListBoxS);                                  //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё РѕРєРЅРѕ РїРѕСЃР»Рµ РґРёР°Р»РѕРіР° РІС‹Р±РѕСЂР° С„Р°Р№Р»Р°
 }
 
 //------------------------------------------------------------------------------
-
-void View_HEX_Any(BYTE *buff, DWORD Size)                    //Вывод шеснадцатиричных кодов
+
+void View_HEX_Any(BYTE *buff, DWORD Size)                    //Р’С‹РІРѕРґ С€РµСЃРЅР°РґС†Р°С‚РёСЂРёС‡РЅС‹С… РєРѕРґРѕРІ
 {
    char Ss[4096];
    DWORD iEnd, Size1 = Size - 1;
 
-   for(iEnd=Size-1; iEnd>0; iEnd--)                          //Поиск последнего значащего байта
+   for(iEnd=Size-1; iEnd>0; iEnd--)                          //РџРѕРёСЃРє РїРѕСЃР»РµРґРЅРµРіРѕ Р·РЅР°С‡Р°С‰РµРіРѕ Р±Р°Р№С‚Р°
      if(*(buff + iEnd) != 0) break;
    if(iEnd <= 0)
    { Add_SpecSpis("All bytes == 0");
      return;
    }
-// if(iEnd > Size - 4)  iEnd = Size-1;                       //Нет смысла писать заменитель
-   if(iEnd < Size1 && ((iEnd+1) % 128) == 0) iEnd++;         //Заменитель попал на конец строки
+// if(iEnd > Size - 4)  iEnd = Size-1;                       //РќРµС‚ СЃРјС‹СЃР»Р° РїРёСЃР°С‚СЊ Р·Р°РјРµРЅРёС‚РµР»СЊ
+   if(iEnd < Size1 && ((iEnd+1) % 128) == 0) iEnd++;         //Р—Р°РјРµРЅРёС‚РµР»СЊ РїРѕРїР°Р» РЅР° РєРѕРЅРµС† СЃС‚СЂРѕРєРё
    for(DWORD i=0,n=1; i<=iEnd; i+=128,n++)
    {  char *Adr = Ss;
-      sprintf(Adr, "%4d: %06X:", n, i);                      //Смещение первого байта строки в секторе
+      sprintf(Adr, "%4d: %06X:", n, i);                      //РЎРјРµС‰РµРЅРёРµ РїРµСЂРІРѕРіРѕ Р±Р°Р№С‚Р° СЃС‚СЂРѕРєРё РІ СЃРµРєС‚РѕСЂРµ
       Adr += 13;
       for(DWORD j=0; j<128; j++)
       {   sprintf(Adr, " %02X", *(buff+i+j));
           Adr += 3;
           if((j+1)%8 == 0)
-          {  *Adr = ' ';   Adr++; }                          //Увеличили интервал
+          {  *Adr = ' ';   Adr++; }                          //РЈРІРµР»РёС‡РёР»Рё РёРЅС‚РµСЂРІР°Р»
           if((i+j) >= iEnd && iEnd < Size1)
           { lstrcpy(Adr, " (0)");
             Adr += 4;
@@ -98,12 +98,12 @@ void View_HEX_Any(BYTE *buff, DWORD Size)                    //Вывод шеснадцатир
 }
 
 //------------------------------------------------------------------------------
-
+
 #pragma argsused
 static BOOL SpecWin_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
 {
-   RECT WRect;                                              //Размеры рабочей области окна
-   GetClientRect(hwnd, &WRect);                             //Получили размеры рабочей области окна
+   RECT WRect;                                              //Р Р°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
+   GetClientRect(hwnd, &WRect);                             //РџРѕР»СѓС‡РёР»Рё СЂР°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
 
    int sw_xs = 6;
    int sw_ys = 6;
@@ -157,10 +157,10 @@ static LRESULT CALLBACK WndProc_SpecW(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM
 
 //------------------------------------------------------------------------------
 
-HWND Create_SpecWin(void)                                    //Создание окна
+HWND Create_SpecWin(void)                                    //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
 {
-   RECT WRect;                                               //Размеры рабочей области окна
-   GetWindowRect(hwndTree, &WRect);                          //Получили размеры рабочей области окна
+   RECT WRect;                                               //Р Р°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
+   GetWindowRect(hwndTree, &WRect);                          //РџРѕР»СѓС‡РёР»Рё СЂР°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
    int WinScrS_x = WRect.right - WRect.left - 16;
    int WinScrS_y = WRect.bottom - WRect.top - 16;
    int Win_ScrSt_x = WRect.left + 8;
@@ -175,21 +175,21 @@ HWND Create_SpecWin(void)                                    //Создание окна
 
 //------------------------------------------------------------------------------
 
-BOOL Register_SpecWin(void)                                  //Регистрация окна
+BOOL Register_SpecWin(void)                                  //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 {
    WNDCLASS WndClass;
 
-   WndClass.style         = CS_HREDRAW | CS_VREDRAW;         //Внешний вид окна
-   WndClass.lpfnWndProc   = WndProc_SpecW;                   //Имя оконной процедуры
+   WndClass.style         = CS_HREDRAW | CS_VREDRAW;         //Р’РЅРµС€РЅРёР№ РІРёРґ РѕРєРЅР°
+   WndClass.lpfnWndProc   = WndProc_SpecW;                   //РРјСЏ РѕРєРѕРЅРЅРѕР№ РїСЂРѕС†РµРґСѓСЂС‹
    WndClass.cbClsExtra    = 0;
    WndClass.cbWndExtra    = 0;
    WndClass.hInstance     = MainInst;
 // WndClass.hIcon         = MyIcon;
    WndClass.hIcon         = LoadIcon(MainInst, NULL);
-   WndClass.hCursor       = LoadCursor(NULL, IDC_ARROW);     //Форма курсора
-   WndClass.hbrBackground = FonBrush;//GetStockBrush(LTGRAY_BRUSH);   //Цвет окна
-   WndClass.lpszMenuName  = NULL;                            //Меню окна
-   WndClass.lpszClassName = SW_Name;                         //Имя класа окна
+   WndClass.hCursor       = LoadCursor(NULL, IDC_ARROW);     //Р¤РѕСЂРјР° РєСѓСЂСЃРѕСЂР°
+   WndClass.hbrBackground = FonBrush;//GetStockBrush(LTGRAY_BRUSH);   //Р¦РІРµС‚ РѕРєРЅР°
+   WndClass.lpszMenuName  = NULL;                            //РњРµРЅСЋ РѕРєРЅР°
+   WndClass.lpszClassName = SW_Name;                         //РРјСЏ РєР»Р°СЃР° РѕРєРЅР°
    return RegisterClass(&WndClass);
 }
 

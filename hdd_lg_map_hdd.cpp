@@ -6,86 +6,86 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_map_hdd ==================================
-int  View_Map_HDD(void);                                     //Карта занятости HDD
-BOOL Register_MapHDDWin(void);                               //Регистрация окна
+int  View_Map_HDD(void);                                     //РљР°СЂС‚Р° Р·Р°РЅСЏС‚РѕСЃС‚Рё HDD
+BOOL Register_MapHDDWin(void);                               //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 
 static HWND MapHDD_WinM, MapHDD_WinM1;
 static char *MapWM_Name = "MapM_HDD";
 static char *MapW1_Name = "Map1_HDD";
-#define xM 4                                                 //Размер квадратика
-#define yM 4                                                 //Размер квадратика
-static int nG;                                               //Число прямоугольников по горизонтали
-static int NumCl_Bl;                                         //Число кластеров в одном квадратике
-static int numBl;                                            //Сколько получится квадратиков
-static int numErr;                                           //Число ошибок
-static short *Map;                                           //Память под число блоков
+#define xM 4                                                 //Р Р°Р·РјРµСЂ РєРІР°РґСЂР°С‚РёРєР°
+#define yM 4                                                 //Р Р°Р·РјРµСЂ РєРІР°РґСЂР°С‚РёРєР°
+static int nG;                                               //Р§РёСЃР»Рѕ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєРѕРІ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё
+static int NumCl_Bl;                                         //Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІ РѕРґРЅРѕРј РєРІР°РґСЂР°С‚РёРєРµ
+static int numBl;                                            //РЎРєРѕР»СЊРєРѕ РїРѕР»СѓС‡РёС‚СЃСЏ РєРІР°РґСЂР°С‚РёРєРѕРІ
+static int numErr;                                           //Р§РёСЃР»Рѕ РѕС€РёР±РѕРє
+static short *Map;                                           //РџР°РјСЏС‚СЊ РїРѕРґ С‡РёСЃР»Рѕ Р±Р»РѕРєРѕРІ
 static HWND hLegend1, hLegend2, hLegend3, hLegend4, hLegend5;
-static COLORREF ColFu = RGB(0, 0, 180);                      //Цвет полностью занятого блока
-static COLORREF Col_P = RGB(0, 255, 255);                    //Цвет частично занятого/свободдного блока
-static COLORREF ColFr = RGB(0, 180, 0);                      //Цвет полностью свободного блока
-static COLORREF ColEr = RGB(255, 0, 0);                      //Цвет блока с ошибкой
-static DWORD numCl_Err;                                      //Число занятых кластеров не числящихся в каталогах
+static COLORREF ColFu = RGB(0, 0, 180);                      //Р¦РІРµС‚ РїРѕР»РЅРѕСЃС‚СЊСЋ Р·Р°РЅСЏС‚РѕРіРѕ Р±Р»РѕРєР°
+static COLORREF Col_P = RGB(0, 255, 255);                    //Р¦РІРµС‚ С‡Р°СЃС‚РёС‡РЅРѕ Р·Р°РЅСЏС‚РѕРіРѕ/СЃРІРѕР±РѕРґРґРЅРѕРіРѕ Р±Р»РѕРєР°
+static COLORREF ColFr = RGB(0, 180, 0);                      //Р¦РІРµС‚ РїРѕР»РЅРѕСЃС‚СЊСЋ СЃРІРѕР±РѕРґРЅРѕРіРѕ Р±Р»РѕРєР°
+static COLORREF ColEr = RGB(255, 0, 0);                      //Р¦РІРµС‚ Р±Р»РѕРєР° СЃ РѕС€РёР±РєРѕР№
+static DWORD numCl_Err;                                      //Р§РёСЃР»Рѕ Р·Р°РЅСЏС‚С‹С… РєР»Р°СЃС‚РµСЂРѕРІ РЅРµ С‡РёСЃР»СЏС‰РёС…СЃСЏ РІ РєР°С‚Р°Р»РѕРіР°С…
 #define IDC_VOST 3000
 
 //------------------------------------------------------------------------------
 
 static int Init_Map(void)
 {
-   RECT WRect;                                               //Размеры рабочей области окна
-   GetClientRect(MapHDD_WinM1, &WRect);                      //Получили размеры рабочей области окна
+   RECT WRect;                                               //Р Р°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
+   GetClientRect(MapHDD_WinM1, &WRect);                      //РџРѕР»СѓС‡РёР»Рё СЂР°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
 
-   int nZ_FAT = maxZapFAT1 - 2;                              //Минус признак
-   nG = WRect.right / (xM + 1);                              //Число прямоугольников по горизонтали
-   int nV = WRect.bottom / (yM + 1);                         //Число прямоугольников по вертикали
-   NumCl_Bl = (nZ_FAT + nV * nG - 1)/ (nV * nG);             //Число кластеров в одном квадратике
-   numBl = nZ_FAT / NumCl_Bl;                                //Сколько получится квадратиков
-   Map = (short *)MyAllocMem(numBl * sizeof(short));         //Память под число блоков
+   int nZ_FAT = maxZapFAT1 - 2;                              //РњРёРЅСѓСЃ РїСЂРёР·РЅР°Рє
+   nG = WRect.right / (xM + 1);                              //Р§РёСЃР»Рѕ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєРѕРІ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё
+   int nV = WRect.bottom / (yM + 1);                         //Р§РёСЃР»Рѕ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєРѕРІ РїРѕ РІРµСЂС‚РёРєР°Р»Рё
+   NumCl_Bl = (nZ_FAT + nV * nG - 1)/ (nV * nG);             //Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІ РѕРґРЅРѕРј РєРІР°РґСЂР°С‚РёРєРµ
+   numBl = nZ_FAT / NumCl_Bl;                                //РЎРєРѕР»СЊРєРѕ РїРѕР»СѓС‡РёС‚СЃСЏ РєРІР°РґСЂР°С‚РёРєРѕРІ
+   Map = (short *)MyAllocMem(numBl * sizeof(short));         //РџР°РјСЏС‚СЊ РїРѕРґ С‡РёСЃР»Рѕ Р±Р»РѕРєРѕРІ
    if(Map == NULL)  return -1;
 
-   numErr = 0;                                               //Число ошибок
-#if defined TEST_FAT1                                        //Проверка FAT1
+   numErr = 0;                                               //Р§РёСЃР»Рѕ РѕС€РёР±РѕРє
+#if defined TEST_FAT1                                        //РџСЂРѕРІРµСЂРєР° FAT1
    DWORD *FAT_ = cTestFAT1 + 2;
 #else
    DWORD *FAT_ = FAT1 + 2;
 #endif
-   numCl_Err = 0;                                            //Число занятых кластеров не числящихся в каталогах
-   for(int i=0; i<nZ_FAT; i++)                               //По всем записям FAT
-   {  if(*(FAT_ + i) == 0) continue;                         //Изначально Пустое значение и счетчик не меняется
-//    if(*(FAT_ + i) == 1) continue;                         //Признак, что данный элемент используется
-      numCl_Err++;                                           //Число занятых кластеров без "хозяина"
-      int n = i / NumCl_Bl;                                  //Индекс блока в карте HDD
-      if(*(FAT_ + i) > maxZapFAT1 && *(FAT_ + i) != 0x0FFFFFFF) //Ошибочное значение
-      { numErr++; *(Map + n) = -1; continue; }               //Признак ошибки
-      if(*(Map + n) != -1)                                   //Ошибки в данном блоке ранее необнаружено
-        (*(Map + n))++;                                      //Увеличиваем счетчик
+   numCl_Err = 0;                                            //Р§РёСЃР»Рѕ Р·Р°РЅСЏС‚С‹С… РєР»Р°СЃС‚РµСЂРѕРІ РЅРµ С‡РёСЃР»СЏС‰РёС…СЃСЏ РІ РєР°С‚Р°Р»РѕРіР°С…
+   for(int i=0; i<nZ_FAT; i++)                               //РџРѕ РІСЃРµРј Р·Р°РїРёСЃСЏРј FAT
+   {  if(*(FAT_ + i) == 0) continue;                         //РР·РЅР°С‡Р°Р»СЊРЅРѕ РџСѓСЃС‚РѕРµ Р·РЅР°С‡РµРЅРёРµ Рё СЃС‡РµС‚С‡РёРє РЅРµ РјРµРЅСЏРµС‚СЃСЏ
+//    if(*(FAT_ + i) == 1) continue;                         //РџСЂРёР·РЅР°Рє, С‡С‚Рѕ РґР°РЅРЅС‹Р№ СЌР»РµРјРµРЅС‚ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
+      numCl_Err++;                                           //Р§РёСЃР»Рѕ Р·Р°РЅСЏС‚С‹С… РєР»Р°СЃС‚РµСЂРѕРІ Р±РµР· "С…РѕР·СЏРёРЅР°"
+      int n = i / NumCl_Bl;                                  //РРЅРґРµРєСЃ Р±Р»РѕРєР° РІ РєР°СЂС‚Рµ HDD
+      if(*(FAT_ + i) > maxZapFAT1 && *(FAT_ + i) != 0x0FFFFFFF) //РћС€РёР±РѕС‡РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
+      { numErr++; *(Map + n) = -1; continue; }               //РџСЂРёР·РЅР°Рє РѕС€РёР±РєРё
+      if(*(Map + n) != -1)                                   //РћС€РёР±РєРё РІ РґР°РЅРЅРѕРј Р±Р»РѕРєРµ СЂР°РЅРµРµ РЅРµРѕР±РЅР°СЂСѓР¶РµРЅРѕ
+        (*(Map + n))++;                                      //РЈРІРµР»РёС‡РёРІР°РµРј СЃС‡РµС‚С‡РёРє
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static void Create_MapHDD(HDC DC)                            //Карта занятости HDD
+static void Create_MapHDD(HDC DC)                            //РљР°СЂС‚Р° Р·Р°РЅСЏС‚РѕСЃС‚Рё HDD
 {
-   if(Map == NULL) return;                                   //Нет карты HDD
+   if(Map == NULL) return;                                   //РќРµС‚ РєР°СЂС‚С‹ HDD
    int y = 1;
    int x = 1;
    for(int i=0,j=1; i<numBl; i++,j++)
-   {  COLORREF Col = Col_P;                                  //Цвет частично занятого/свободдного блока
-      if(*(Map + i) == NumCl_Bl) Col = ColFu;                //Цвет полностью занятого блока
-      if(*(Map + i) == 0)        Col = ColFr;                //Цвет полностью свободного блока
-      if(*(Map + i) == -1)       Col = ColEr;                //Цвет блока с ошибкой
-#if defined TEST_FAT1                                        //Проверка FAT1
-      if(*(Map + i) != 0)        Col = ColEr;                //Не нулевой блок это ошибка
+   {  COLORREF Col = Col_P;                                  //Р¦РІРµС‚ С‡Р°СЃС‚РёС‡РЅРѕ Р·Р°РЅСЏС‚РѕРіРѕ/СЃРІРѕР±РѕРґРґРЅРѕРіРѕ Р±Р»РѕРєР°
+      if(*(Map + i) == NumCl_Bl) Col = ColFu;                //Р¦РІРµС‚ РїРѕР»РЅРѕСЃС‚СЊСЋ Р·Р°РЅСЏС‚РѕРіРѕ Р±Р»РѕРєР°
+      if(*(Map + i) == 0)        Col = ColFr;                //Р¦РІРµС‚ РїРѕР»РЅРѕСЃС‚СЊСЋ СЃРІРѕР±РѕРґРЅРѕРіРѕ Р±Р»РѕРєР°
+      if(*(Map + i) == -1)       Col = ColEr;                //Р¦РІРµС‚ Р±Р»РѕРєР° СЃ РѕС€РёР±РєРѕР№
+#if defined TEST_FAT1                                        //РџСЂРѕРІРµСЂРєР° FAT1
+      if(*(Map + i) != 0)        Col = ColEr;                //РќРµ РЅСѓР»РµРІРѕР№ Р±Р»РѕРє СЌС‚Рѕ РѕС€РёР±РєР°
 #endif
       HPEN Pen = CreatePen(PS_SOLID, 1, Col);
       HPEN OldPen = SelectPen(DC, Pen);
       HBRUSH FBrush = CreateSolidBrush(Col);
       HBRUSH OldBrush = SelectBrush(DC, FBrush);
       Rectangle(DC, x, y, x+xM, y+yM);
-      SelectObject(DC, OldBrush);                            //Восстановили старую кисть
-      DeleteObject(FBrush);                                  //Удалили новую кисть
-      SelectPen(DC, OldPen);                                 //Восстановили старое перо
-      DeleteObject(Pen);                                     //Удалили новое перо
+      SelectObject(DC, OldBrush);                            //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё СЃС‚Р°СЂСѓСЋ РєРёСЃС‚СЊ
+      DeleteObject(FBrush);                                  //РЈРґР°Р»РёР»Рё РЅРѕРІСѓСЋ РєРёСЃС‚СЊ
+      SelectPen(DC, OldPen);                                 //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё СЃС‚Р°СЂРѕРµ РїРµСЂРѕ
+      DeleteObject(Pen);                                     //РЈРґР°Р»РёР»Рё РЅРѕРІРѕРµ РїРµСЂРѕ
       x += xM + 1;
       if(j == nG)
       {  j = 0;
@@ -99,19 +99,19 @@ static void Create_MapHDD(HDC DC)                            //Карта занятости H
 
 static void MapHDDWin1_OnPaint(HWND hwnd)
 {
-   PAINTSTRUCT PaintStruct;                                  //Рабочая структура и контекст
+   PAINTSTRUCT PaintStruct;                                  //Р Р°Р±РѕС‡Р°СЏ СЃС‚СЂСѓРєС‚СѓСЂР° Рё РєРѕРЅС‚РµРєСЃС‚
    HDC PaintDC = BeginPaint(hwnd, &PaintStruct);
-   Create_MapHDD(PaintDC);                                   //Карта занятости HDD
+   Create_MapHDD(PaintDC);                                   //РљР°СЂС‚Р° Р·Р°РЅСЏС‚РѕСЃС‚Рё HDD
    EndPaint(hwnd, &PaintStruct);
 }
 
 //------------------------------------------------------------------------------
-
+
 #pragma argsused
 static BOOL MapHDDWinM_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
 {
-   RECT WRect;                                               //Размеры рабочей области окна
-   GetClientRect(hwnd, &WRect);                              //Получили размеры рабочей области окна
+   RECT WRect;                                               //Р Р°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
+   GetClientRect(hwnd, &WRect);                              //РџРѕР»СѓС‡РёР»Рё СЂР°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
    int sw_xs = 4;
    int sw_ys = 4;
    int sw_ls = WRect.right - 2 * sw_xs;
@@ -127,8 +127,8 @@ static BOOL MapHDDWinM_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
                      sw_xs+sw_ls-80, sw_y, 80, 24, hwnd, HMENU(IDOK),
                      MainInst, NULL);
    SendMessage(hClose, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
-#if defined TEST_FAT1_VOST                                 //Проверка и восстановление FAT1 на потерянные кластеры
-   HWND hVost = CreateWindow("button", "Вост.", //(Lan+6)->msg,
+#if defined TEST_FAT1_VOST                                 //РџСЂРѕРІРµСЂРєР° Рё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ FAT1 РЅР° РїРѕС‚РµСЂСЏРЅРЅС‹Рµ РєР»Р°СЃС‚РµСЂС‹
+   HWND hVost = CreateWindow("button", "Р’РѕСЃС‚.", //(Lan+6)->msg,
                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_xs+sw_ls-80-50, sw_y, 40, 24, hwnd, HMENU(IDC_VOST),
                      MainInst, NULL);
@@ -137,86 +137,86 @@ static BOOL MapHDDWinM_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
    if(Init_Map() < 0) return FALSE;
    char s1[200], s2[200], s3[200], s4[200], s5[200];
    SIZE SizeTxt1, SizeTxt2, SizeTxt3, SizeTxt4, SizeTxt5;
-   wsprintf(s1, "%s: %3d", (Lan+136)->msg, NumCl_Bl);        //Число кластеров в одном блоке
-   wsprintf(s2, "   %s   ", (Lan+125)->msg);                 //Занято
-   wsprintf(s3, "   %s / %s   ", (Lan+125)->msg, (Lan+126)->msg); //Занято/Свободно
-   wsprintf(s4, "   %s   ", (Lan+126)->msg);                 //Свободно
-   wsprintf(s5, "   %s = %d  ", (Lan+137)->msg, numErr);     //Ошибки FAT
-#if defined TEST_FAT1                                        //Проверка FAT1
+   wsprintf(s1, "%s: %3d", (Lan+136)->msg, NumCl_Bl);        //Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІ РѕРґРЅРѕРј Р±Р»РѕРєРµ
+   wsprintf(s2, "   %s   ", (Lan+125)->msg);                 //Р—Р°РЅСЏС‚Рѕ
+   wsprintf(s3, "   %s / %s   ", (Lan+125)->msg, (Lan+126)->msg); //Р—Р°РЅСЏС‚Рѕ/РЎРІРѕР±РѕРґРЅРѕ
+   wsprintf(s4, "   %s   ", (Lan+126)->msg);                 //РЎРІРѕР±РѕРґРЅРѕ
+   wsprintf(s5, "   %s = %d  ", (Lan+137)->msg, numErr);     //РћС€РёР±РєРё FAT
+#if defined TEST_FAT1                                        //РџСЂРѕРІРµСЂРєР° FAT1
    char s11[200], s12[200], s13[200];
    SIZE SizeTxt11, SizeTxt12, SizeTxt13;
-   wsprintf(s11, "   %s   ", "Нет ошибок");                  //Нет ошибок
-   wsprintf(s12, "   %s   ", "Потерянные кластеры");         //Потерянные кластеры
+   wsprintf(s11, "   %s   ", "РќРµС‚ РѕС€РёР±РѕРє");                  //РќРµС‚ РѕС€РёР±РѕРє
+   wsprintf(s12, "   %s   ", "РџРѕС‚РµСЂСЏРЅРЅС‹Рµ РєР»Р°СЃС‚РµСЂС‹");         //РџРѕС‚РµСЂСЏРЅРЅС‹Рµ РєР»Р°СЃС‚РµСЂС‹
    double maxSize = double(maxZapFAT1 - 1) /1024.0/1024.0/1024.0 * sCl_B;
 //   double usedSize = double(writeCl) /1024.0/1024.0/1024.0 * sCl_B;
 //   double freeSize = double(max_ZapFAT - 1 - writeCl) /1024.0/1024.0/1024.0 * sCl_B;
 
-//   int lostCl = writeCl+1 - sumClTestFAT1;                   //Если кластеры потеряны в результате сбоев в FAT
+//   int lostCl = writeCl+1 - sumClTestFAT1;                   //Р•СЃР»Рё РєР»Р°СЃС‚РµСЂС‹ РїРѕС‚РµСЂСЏРЅС‹ РІ СЂРµР·СѓР»СЊС‚Р°С‚Рµ СЃР±РѕРµРІ РІ FAT
 //   double lostSize = double(lostCl) /1024.0/1024.0/1024.0 * sCl_B;
-//   sprintf(s13, "   %s: %d (%.2lf Gb) (%.1lf\%)", "Потеряно кластеров", lostCl, lostSize, lostSize/maxSize*100.0);
+//   sprintf(s13, "   %s: %d (%.2lf Gb) (%.1lf\%)", "РџРѕС‚РµСЂСЏРЅРѕ РєР»Р°СЃС‚РµСЂРѕРІ", lostCl, lostSize, lostSize/maxSize*100.0);
 
    double lostSize = double(numCl_Err) /1024.0/1024.0/1024.0 * sCl_B;
-   sprintf(s13, "   %s: %d (%.2lf Gb) (%.1lf\%)", "Потеряно кластеров", numCl_Err, lostSize, lostSize/maxSize*100.0);
+   sprintf(s13, "   %s: %d (%.2lf Gb) (%.1lf\%)", "РџРѕС‚РµСЂСЏРЅРѕ РєР»Р°СЃС‚РµСЂРѕРІ", numCl_Err, lostSize, lostSize/maxSize*100.0);
 #endif
    HDC DC = GetDC(hClose);
-   GetTextExtentPoint32(DC, s1, lstrlen(s1), &SizeTxt1);     //Число кластеров в одном блоке
-   GetTextExtentPoint32(DC, s2, lstrlen(s2), &SizeTxt2);     //Занято
-   GetTextExtentPoint32(DC, s3, lstrlen(s3), &SizeTxt3);     //Занято/Свободно
-   GetTextExtentPoint32(DC, s4, lstrlen(s4), &SizeTxt4);     //Свободно
-   GetTextExtentPoint32(DC, s5, lstrlen(s5), &SizeTxt5);     //Ошибки FAT
-#if defined TEST_FAT1                                        //Проверка FAT1
-   GetTextExtentPoint32(DC, s11, lstrlen(s11), &SizeTxt11);  //Число кластеров в одном блоке
-   GetTextExtentPoint32(DC, s12, lstrlen(s12), &SizeTxt12);  //Занято
-   GetTextExtentPoint32(DC, s13, lstrlen(s13), &SizeTxt13);  //Занято/Свободно
+   GetTextExtentPoint32(DC, s1, lstrlen(s1), &SizeTxt1);     //Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІ РѕРґРЅРѕРј Р±Р»РѕРєРµ
+   GetTextExtentPoint32(DC, s2, lstrlen(s2), &SizeTxt2);     //Р—Р°РЅСЏС‚Рѕ
+   GetTextExtentPoint32(DC, s3, lstrlen(s3), &SizeTxt3);     //Р—Р°РЅСЏС‚Рѕ/РЎРІРѕР±РѕРґРЅРѕ
+   GetTextExtentPoint32(DC, s4, lstrlen(s4), &SizeTxt4);     //РЎРІРѕР±РѕРґРЅРѕ
+   GetTextExtentPoint32(DC, s5, lstrlen(s5), &SizeTxt5);     //РћС€РёР±РєРё FAT
+#if defined TEST_FAT1                                        //РџСЂРѕРІРµСЂРєР° FAT1
+   GetTextExtentPoint32(DC, s11, lstrlen(s11), &SizeTxt11);  //Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РІ РѕРґРЅРѕРј Р±Р»РѕРєРµ
+   GetTextExtentPoint32(DC, s12, lstrlen(s12), &SizeTxt12);  //Р—Р°РЅСЏС‚Рѕ
+   GetTextExtentPoint32(DC, s13, lstrlen(s13), &SizeTxt13);  //Р—Р°РЅСЏС‚Рѕ/РЎРІРѕР±РѕРґРЅРѕ
 #endif
    ReleaseDC(hClose, DC);
    hLegend1 = CreateWindow("static", s1,
-         //          WS_BORDER |                             //Черная рамка толщиной в пиксель
+         //          WS_BORDER |                             //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                      WS_CHILD | WS_VISIBLE,
                      sw_xs, sw_y+4, SizeTxt1.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend1, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
-#if defined TEST_FAT1                                        //Проверка FAT1
+#if defined TEST_FAT1                                        //РџСЂРѕРІРµСЂРєР° FAT1
    hLegend4 = CreateWindow("static", s11,
-              //     WS_BORDER |                             //Черная рамка толщиной в пиксель
+              //     WS_BORDER |                             //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx, sw_y+4, SizeTxt11.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend4, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
    hLegend5 = CreateWindow("static", s12,
-              //     WS_BORDER |                             //Черная рамка толщиной в пиксель
+              //     WS_BORDER |                             //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx+SizeTxt11.cx, sw_y+4, SizeTxt12.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend5, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
    HWND hLostCl = CreateWindow("static", s13,
-            //       WS_BORDER |                             //Черная рамка толщиной в пиксель
+            //       WS_BORDER |                             //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                      WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx+SizeTxt11.cx+SizeTxt12.cx, sw_y+4, SizeTxt13.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLostCl, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 #else
    hLegend2 = CreateWindow("static", s2,
-          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
+          //         WS_BORDER |                             //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx, sw_y+4, SizeTxt2.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend2, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
    hLegend3 = CreateWindow("static", s3,
-          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
+          //         WS_BORDER |                             //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx+SizeTxt2.cx, sw_y+4, SizeTxt3.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend3, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
    hLegend4 = CreateWindow("static", s4,
-          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
+          //         WS_BORDER |                             //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx+SizeTxt2.cx+SizeTxt3.cx, sw_y+4, SizeTxt4.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend4, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
    if(numErr == 0) return TRUE;
    hLegend5 = CreateWindow("static", s5,
-          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
+          //         WS_BORDER |                             //Р§РµСЂРЅР°СЏ СЂР°РјРєР° С‚РѕР»С‰РёРЅРѕР№ РІ РїРёРєСЃРµР»СЊ
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx+SizeTxt2.cx+SizeTxt3.cx+SizeTxt4.cx, sw_y+4, SizeTxt5.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
@@ -232,8 +232,8 @@ static void MapHDDWinM_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT CodeNotif
 {
    switch(id)
    {
-#if defined TEST_FAT1_VOST                                 //Проверка и восстановление FAT1 на потерянные кластеры
-      case IDC_VOST: Vost_FAT1();                          //Чистка FAT1 от потерянных кластеров
+#if defined TEST_FAT1_VOST                                 //РџСЂРѕРІРµСЂРєР° Рё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ FAT1 РЅР° РїРѕС‚РµСЂСЏРЅРЅС‹Рµ РєР»Р°СЃС‚РµСЂС‹
+      case IDC_VOST: Vost_FAT1();                          //Р§РёСЃС‚РєР° FAT1 РѕС‚ РїРѕС‚РµСЂСЏРЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
                      break;
 #endif
       case IDOK:  DestroyWindow(hwnd);
@@ -258,10 +258,10 @@ static LRESULT CALLBACK WndProc_MapHDD_W1(HWND hwnd, UINT Msg, WPARAM wParam, LP
 #pragma argsused
 static void MapHDDWinM_OnDestroy(HWND hwnd)
 {
-#if defined TEST_FAT1                                        //Проверка FAT1
+#if defined TEST_FAT1                                        //РџСЂРѕРІРµСЂРєР° FAT1
    MyFreeMem(&(void*)cTestFAT1);
 #endif
-   MyFreeMem(&(void*)Map);                                   //Память под карту HDD
+   MyFreeMem(&(void*)Map);                                   //РџР°РјСЏС‚СЊ РїРѕРґ РєР°СЂС‚Сѓ HDD
    MapHDD_WinM = NULL;
 }
 
@@ -275,22 +275,22 @@ static LRESULT CALLBACK WndProc_MapHDD_WM(HWND hwnd, UINT Msg, WPARAM wParam, LP
       case WM_CTLCOLORSTATIC:
         if(HWND(lParam) == hLegend2)
         {  SetTextColor((HDC)wParam, RGB(255, 255, 255));
-           SetBkColor((HDC)wParam, ColFu);                   //Цвет полностью занятого блока
+           SetBkColor((HDC)wParam, ColFu);                   //Р¦РІРµС‚ РїРѕР»РЅРѕСЃС‚СЊСЋ Р·Р°РЅСЏС‚РѕРіРѕ Р±Р»РѕРєР°
            return (BOOL)FonBrush;
         }
         if(HWND(lParam) == hLegend3)
         {  //SetTextColor((HDC)wParam, Col4);
-           SetBkColor((HDC)wParam, Col_P);                   //Цвет частично занятого/свободдного блока
+           SetBkColor((HDC)wParam, Col_P);                   //Р¦РІРµС‚ С‡Р°СЃС‚РёС‡РЅРѕ Р·Р°РЅСЏС‚РѕРіРѕ/СЃРІРѕР±РѕРґРґРЅРѕРіРѕ Р±Р»РѕРєР°
            return (BOOL)FonBrush;
         }
         if(HWND(lParam) == hLegend4)
         {  //SetTextColor((HDC)wParam, Col4);
-           SetBkColor((HDC)wParam, ColFr);                   //Цвет полностью свободного блока
+           SetBkColor((HDC)wParam, ColFr);                   //Р¦РІРµС‚ РїРѕР»РЅРѕСЃС‚СЊСЋ СЃРІРѕР±РѕРґРЅРѕРіРѕ Р±Р»РѕРєР°
            return (BOOL)FonBrush;
         }
         if(HWND(lParam) == hLegend5)
         {  SetTextColor((HDC)wParam, RGB(255, 255, 255));
-           SetBkColor((HDC)wParam, ColEr);                   //Цвет блока с ошибкой
+           SetBkColor((HDC)wParam, ColEr);                   //Р¦РІРµС‚ Р±Р»РѕРєР° СЃ РѕС€РёР±РєРѕР№
            return (BOOL)FonBrush;
         }
         return TRUE;
@@ -304,15 +304,15 @@ static LRESULT CALLBACK WndProc_MapHDD_WM(HWND hwnd, UINT Msg, WPARAM wParam, LP
 
 //------------------------------------------------------------------------------
 
-#define sw_ys  24                                            //Позиция верхней границы окна дерева !!! Эта же константа есть в модуле вывода карты
+#define sw_ys  24                                            //РџРѕР·РёС†РёСЏ РІРµСЂС…РЅРµР№ РіСЂР°РЅРёС†С‹ РѕРєРЅР° РґРµСЂРµРІР° !!! Р­С‚Р° Р¶Рµ РєРѕРЅСЃС‚Р°РЅС‚Р° РµСЃС‚СЊ РІ РјРѕРґСѓР»Рµ РІС‹РІРѕРґР° РєР°СЂС‚С‹
 
-HWND Create_MapHDDWin(void)                                  //Создание окна
+HWND Create_MapHDDWin(void)                                  //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
 {
-   RECT WRect;                                               //Размеры рабочей области окна
-   GetWindowRect(MainWin, &WRect);                           //Получили размеры рабочей области окна
-   int STit  = GetSystemMetrics(SM_CYCAPTION);               //Высота заголовка
-   int SizeBordX = GetSystemMetrics(SM_CXFIXEDFRAME);        //Размер бордюра
-   int SizeBordY = GetSystemMetrics(SM_CYFIXEDFRAME);        //Размер бордюра
+   RECT WRect;                                               //Р Р°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
+   GetWindowRect(MainWin, &WRect);                           //РџРѕР»СѓС‡РёР»Рё СЂР°Р·РјРµСЂС‹ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
+   int STit  = GetSystemMetrics(SM_CYCAPTION);               //Р’С‹СЃРѕС‚Р° Р·Р°РіРѕР»РѕРІРєР°
+   int SizeBordX = GetSystemMetrics(SM_CXFIXEDFRAME);        //Р Р°Р·РјРµСЂ Р±РѕСЂРґСЋСЂР°
+   int SizeBordY = GetSystemMetrics(SM_CYFIXEDFRAME);        //Р Р°Р·РјРµСЂ Р±РѕСЂРґСЋСЂР°
    int WinScrS_x = WRect.right - WRect.left - 2 - 2*SizeBordX;
    int WinScrS_y = WRect.bottom - WRect.top - 2 - STit - 2*SizeBordY - sw_ys;
    int Win_ScrSt_x = WRect.left + 1 + SizeBordX;
@@ -326,50 +326,50 @@ HWND Create_MapHDDWin(void)                                  //Создание окна
 
 //------------------------------------------------------------------------------
 
-int  View_Map_HDD(void)                                      //Карта занятости HDD
+int  View_Map_HDD(void)                                      //РљР°СЂС‚Р° Р·Р°РЅСЏС‚РѕСЃС‚Рё HDD
 {
-   if(maxZapFAT1 == 0xFFFFFFFF) return 0;                    //Диск не найден, размеры неизвестны
-   if(MapHDD_WinM != NULL) return 0;                         //Окно уже на экране
-#if defined TEST_FAT1                                        //Проверка FAT1
-   if(Ctrl_FAT1() < 0) return -1;                            //Проверка структуры служебных записей
+   if(maxZapFAT1 == 0xFFFFFFFF) return 0;                    //Р”РёСЃРє РЅРµ РЅР°Р№РґРµРЅ, СЂР°Р·РјРµСЂС‹ РЅРµРёР·РІРµСЃС‚РЅС‹
+   if(MapHDD_WinM != NULL) return 0;                         //РћРєРЅРѕ СѓР¶Рµ РЅР° СЌРєСЂР°РЅРµ
+#if defined TEST_FAT1                                        //РџСЂРѕРІРµСЂРєР° FAT1
+   if(Ctrl_FAT1() < 0) return -1;                            //РџСЂРѕРІРµСЂРєР° СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃР»СѓР¶РµР±РЅС‹С… Р·Р°РїРёСЃРµР№
    int ret = 0;
-   if(Create_MapHDDWin() == NULL) ret = -1;                  //Создание окна
+   if(Create_MapHDDWin() == NULL) ret = -1;                  //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
    return ret;
 #else
-   if(Create_MapHDDWin() == NULL) return -1;                 //Создание окна
+   if(Create_MapHDDWin() == NULL) return -1;                 //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
    return 0;
 #endif
 }
 
 //------------------------------------------------------------------------------
 
-BOOL Register_MapHDDWin(void)                                //Регистрация окна
+BOOL Register_MapHDDWin(void)                                //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 {
    WNDCLASS WndClass;
 
-   WndClass.style         = CS_HREDRAW | CS_VREDRAW;         //Внешний вид окна
-   WndClass.lpfnWndProc   = WndProc_MapHDD_WM;               //Имя оконной процедуры
+   WndClass.style         = CS_HREDRAW | CS_VREDRAW;         //Р’РЅРµС€РЅРёР№ РІРёРґ РѕРєРЅР°
+   WndClass.lpfnWndProc   = WndProc_MapHDD_WM;               //РРјСЏ РѕРєРѕРЅРЅРѕР№ РїСЂРѕС†РµРґСѓСЂС‹
    WndClass.cbClsExtra    = 0;
    WndClass.cbWndExtra    = 0;
    WndClass.hInstance     = MainInst;
    WndClass.hIcon         = NULL;
-   WndClass.hCursor       = LoadCursor(NULL, IDC_ARROW);     //Форма курсора
-   WndClass.hbrBackground = FonBrush;                        //Цвет окна
-   WndClass.lpszMenuName  = NULL;                            //Меню окна
-   WndClass.lpszClassName = MapWM_Name;                      //Имя класа окна
+   WndClass.hCursor       = LoadCursor(NULL, IDC_ARROW);     //Р¤РѕСЂРјР° РєСѓСЂСЃРѕСЂР°
+   WndClass.hbrBackground = FonBrush;                        //Р¦РІРµС‚ РѕРєРЅР°
+   WndClass.lpszMenuName  = NULL;                            //РњРµРЅСЋ РѕРєРЅР°
+   WndClass.lpszClassName = MapWM_Name;                      //РРјСЏ РєР»Р°СЃР° РѕРєРЅР°
    if(!RegisterClass(&WndClass)) return FALSE;
 
-   WndClass.style         = CS_HREDRAW | CS_VREDRAW;         //Внешний вид окна
-   WndClass.lpfnWndProc   = WndProc_MapHDD_W1;               //Имя оконной процедуры
+   WndClass.style         = CS_HREDRAW | CS_VREDRAW;         //Р’РЅРµС€РЅРёР№ РІРёРґ РѕРєРЅР°
+   WndClass.lpfnWndProc   = WndProc_MapHDD_W1;               //РРјСЏ РѕРєРѕРЅРЅРѕР№ РїСЂРѕС†РµРґСѓСЂС‹
    WndClass.cbClsExtra    = 0;
    WndClass.cbWndExtra    = 0;
    WndClass.hInstance     = MainInst;
    WndClass.hIcon         = NULL;
-   WndClass.hCursor       = LoadCursor(NULL, IDC_ARROW);     //Форма курсора
-//   WndClass.hbrBackground = GetStockBrush(WHITE_BRUSH);     //Цвет окна
-   WndClass.hbrBackground = FonBrush;//GetStockBrush(LTGRAY_BRUSH);   //Цвет окна
-   WndClass.lpszMenuName  = NULL;                            //Меню окна
-   WndClass.lpszClassName = MapW1_Name;                      //Имя класа окна
+   WndClass.hCursor       = LoadCursor(NULL, IDC_ARROW);     //Р¤РѕСЂРјР° РєСѓСЂСЃРѕСЂР°
+//   WndClass.hbrBackground = GetStockBrush(WHITE_BRUSH);     //Р¦РІРµС‚ РѕРєРЅР°
+   WndClass.hbrBackground = FonBrush;//GetStockBrush(LTGRAY_BRUSH);   //Р¦РІРµС‚ РѕРєРЅР°
+   WndClass.lpszMenuName  = NULL;                            //РњРµРЅСЋ РѕРєРЅР°
+   WndClass.lpszClassName = MapW1_Name;                      //РРјСЏ РєР»Р°СЃР° РѕРєРЅР°
    return RegisterClass(&WndClass);
 }
 

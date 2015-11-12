@@ -5,38 +5,38 @@
 
 #include "from_hdd_lg_to_pc.h"
 
-#if defined WRITE_YES                                        //Режим записи разрешен
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
 
 //============================ hdd_lg_write_io =================================
-int  GetSpNameInFile(char *Spis, int N, int *sm);            //Ввод списка имен для записи
-int  OpenInFilePC(char *NameF);                              //Открыли входной файл для чтения с компьютера
-int  WriteClast1P(DWORD nClast, BYTE *buff);                 //Запись кластера
-int  Save_FAT1(void);                                        //Сохранение обновленной FAT первого раздела
-void Ansi_To_Unicode(char *inANSI, WCHAR *outUNI, int maxN); //Преобразование строки символов в Unicode
-int  Load_Dir(void);                                         //Загрузка кластера каталога
-int  Change_Dir_For_File(char *NameF);                       //Изменение каталога (внесение нового файла)
-int  Change_Dir_For_Folder(char *NameF);                     //Изменение каталога (внесение новой папки)
-int  Save_Dir(void);                                         //Сохранение кластера каталога
-     DWORD *c_FAT1;                                          //Копия таблицы FAT первого раздела
+int  GetSpNameInFile(char *Spis, int N, int *sm);            //Р’РІРѕРґ СЃРїРёСЃРєР° РёРјРµРЅ РґР»СЏ Р·Р°РїРёСЃРё
+int  OpenInFilePC(char *NameF);                              //РћС‚РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ СЃ РєРѕРјРїСЊСЋС‚РµСЂР°
+int  WriteClast1P(DWORD nClast, BYTE *buff);                 //Р—Р°РїРёСЃСЊ РєР»Р°СЃС‚РµСЂР°
+int  Save_FAT1(void);                                        //РЎРѕС…СЂР°РЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРЅРѕР№ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+void Ansi_To_Unicode(char *inANSI, WCHAR *outUNI, int maxN); //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РІ Unicode
+int  Load_Dir(void);                                         //Р—Р°РіСЂСѓР·РєР° РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+int  Change_Dir_For_File(char *NameF);                       //РР·РјРµРЅРµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (РІРЅРµСЃРµРЅРёРµ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°)
+int  Change_Dir_For_Folder(char *NameF);                     //РР·РјРµРЅРµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (РІРЅРµСЃРµРЅРёРµ РЅРѕРІРѕР№ РїР°РїРєРё)
+int  Save_Dir(void);                                         //РЎРѕС…СЂР°РЅРµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+     DWORD *c_FAT1;                                          //РљРѕРїРёСЏ С‚Р°Р±Р»РёС†С‹ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
      HANDLE inFile;
-     ULARGE_INTEGER Size_inF;                                //Размер файла м.б. > 4 ГБ
-     int nCl_1;                                              //Номер кластера начала файла или новой папки
-     BYTE bufDir[sCl_B];                                     //Память под один кластер
+     ULARGE_INTEGER Size_inF;                                //Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° Рј.Р±. > 4 Р“Р‘
+     int nCl_1;                                              //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РЅР°С‡Р°Р»Р° С„Р°Р№Р»Р° РёР»Рё РЅРѕРІРѕР№ РїР°РїРєРё
+     BYTE bufDir[sCl_B];                                     //РџР°РјСЏС‚СЊ РїРѕРґ РѕРґРёРЅ РєР»Р°СЃС‚РµСЂ
 
-static FILETIME Time_inF;                                    //Дата и время входного файла
-static int ns_Dir;                                           //Номер свободной строки каталога
-static One_Str_Cat *s_Kat;                                   //Каталог
+static FILETIME Time_inF;                                    //Р”Р°С‚Р° Рё РІСЂРµРјСЏ РІС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+static int ns_Dir;                                           //РќРѕРјРµСЂ СЃРІРѕР±РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё РєР°С‚Р°Р»РѕРіР°
+static One_Str_Cat *s_Kat;                                   //РљР°С‚Р°Р»РѕРі
 
 //------------------------------------------------------------------------------
 
-int GetSpNameInFile(char *Spis, int N, int *sm)              //Ввод списка имен для записи
+int GetSpNameInFile(char *Spis, int N, int *sm)              //Р’РІРѕРґ СЃРїРёСЃРєР° РёРјРµРЅ РґР»СЏ Р·Р°РїРёСЃРё
 {
    OPENFILENAME ofn;
-   char DirName[260];                                        //Начальный путь для поиска файлов
-   char FileTitle[256];                                      //Заголовок окна
-   char Filter[256];                                         //Фильтры поиска
+   char DirName[260];                                        //РќР°С‡Р°Р»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+   char FileTitle[256];                                      //Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
+   char Filter[256];                                         //Р¤РёР»СЊС‚СЂС‹ РїРѕРёСЃРєР°
 
-   *DirName = 0;                                             //На случай если имени небыло
+   *DirName = 0;                                             //РќР° СЃР»СѓС‡Р°Р№ РµСЃР»Рё РёРјРµРЅРё РЅРµР±С‹Р»Рѕ
    lstrcpy(Filter, (Lan+43)->msg);
    switch(prFolder)
    {  case 0: lstrcat(Filter, " mp3, wma|*.mp3;*.wma;|");  break;
@@ -44,172 +44,172 @@ int GetSpNameInFile(char *Spis, int N, int *sm)              //Ввод списка имен 
       case 2: //lstrcat(Filter, " avi|*.avi|");  break;
               lstrcat(Filter, " avi, srt, smi, sub, txt, mpg, divx|*.avi;*.srt;*.smi;*.sub;*.txt;*.mpg;*.divx;"); break;
    }
-   for(int i=0; Filter[i]!='\0'; i++)                        //Заменили разделитель 0
+   for(int i=0; Filter[i]!='\0'; i++)                        //Р—Р°РјРµРЅРёР»Рё СЂР°Р·РґРµР»РёС‚РµР»СЊ 0
      if(Filter[i] == '|') Filter[i] = '\0';
-   ZeroMemory(&ofn, sizeof(OPENFILENAME));                   //Заполнили нулями
-   ofn.lStructSize = sizeof(OPENFILENAME);                   //Длина структуры
-   ofn.hwndOwner = MainWin;                                  //Владелец диалога
-   ofn.hInstance = MainInst;                                 //Идентификатор программы владеющая диалогом
-   ofn.lpstrFilter = Filter;                                 //Типы просматриваемых файлов
-// ofn.lpstrCustomFilter                                     //Специальные фильтры
-// ofn.nMaxCustFilter                                        //Длина специального фильтра
-   ofn.nFilterIndex = 1;//prFolder + 1;                      //Индекс для работы с фильтрами
-   ofn.lpstrFile = Spis;                                     //Имя файла в случае успеха
-   ofn.nMaxFile = N;                                         //Длина поля имени файла
-   ofn.lpstrFileTitle = FileTitle;                           //Маршрут и имя файла в случае успеха
-   ofn.nMaxFileTitle = sizeof(FileTitle);                    //Длина поля
-   ofn.lpstrInitialDir = DirName;                            //Начальный каталог файлов
+   ZeroMemory(&ofn, sizeof(OPENFILENAME));                   //Р—Р°РїРѕР»РЅРёР»Рё РЅСѓР»СЏРјРё
+   ofn.lStructSize = sizeof(OPENFILENAME);                   //Р”Р»РёРЅР° СЃС‚СЂСѓРєС‚СѓСЂС‹
+   ofn.hwndOwner = MainWin;                                  //Р’Р»Р°РґРµР»РµС† РґРёР°Р»РѕРіР°
+   ofn.hInstance = MainInst;                                 //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРѕРіСЂР°РјРјС‹ РІР»Р°РґРµСЋС‰Р°СЏ РґРёР°Р»РѕРіРѕРј
+   ofn.lpstrFilter = Filter;                                 //РўРёРїС‹ РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРјС‹С… С„Р°Р№Р»РѕРІ
+// ofn.lpstrCustomFilter                                     //РЎРїРµС†РёР°Р»СЊРЅС‹Рµ С„РёР»СЊС‚СЂС‹
+// ofn.nMaxCustFilter                                        //Р”Р»РёРЅР° СЃРїРµС†РёР°Р»СЊРЅРѕРіРѕ С„РёР»СЊС‚СЂР°
+   ofn.nFilterIndex = 1;//prFolder + 1;                      //РРЅРґРµРєСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„РёР»СЊС‚СЂР°РјРё
+   ofn.lpstrFile = Spis;                                     //РРјСЏ С„Р°Р№Р»Р° РІ СЃР»СѓС‡Р°Рµ СѓСЃРїРµС…Р°
+   ofn.nMaxFile = N;                                         //Р”Р»РёРЅР° РїРѕР»СЏ РёРјРµРЅРё С„Р°Р№Р»Р°
+   ofn.lpstrFileTitle = FileTitle;                           //РњР°СЂС€СЂСѓС‚ Рё РёРјСЏ С„Р°Р№Р»Р° РІ СЃР»СѓС‡Р°Рµ СѓСЃРїРµС…Р°
+   ofn.nMaxFileTitle = sizeof(FileTitle);                    //Р”Р»РёРЅР° РїРѕР»СЏ
+   ofn.lpstrInitialDir = DirName;                            //РќР°С‡Р°Р»СЊРЅС‹Р№ РєР°С‚Р°Р»РѕРі С„Р°Р№Р»РѕРІ
    ofn.lpstrTitle = (Lan+174)->msg;
    ofn.Flags = OFN_ALLOWMULTISELECT |
                OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER;
    if(GetOpenFileName(&ofn) == FALSE) return -1;
    if(*Spis == 0) return -1;
-   *sm = ofn.nFileOffset;                                    //Смещение к имени файла
+   *sm = ofn.nFileOffset;                                    //РЎРјРµС‰РµРЅРёРµ Рє РёРјРµРЅРё С„Р°Р№Р»Р°
    return 0;
 }
 //------------------------------------------------------------------------------
 
-int OpenInFilePC(char *NameF)                                  //Открыли входной файл для чтения с компьютера
+int OpenInFilePC(char *NameF)                                  //РћС‚РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ СЃ РєРѕРјРїСЊСЋС‚РµСЂР°
 {
    Size_inF.QuadPart = 0;
    inFile = CreateFile(NameF, GENERIC_READ, FILE_SHARE_READ, NULL,
                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
    if(inFile == INVALID_HANDLE_VALUE)
-      return ErrorSys2(NameF, (Lan+84)->msg);                //"Ошибка при открытии файла для чтения.");
+      return ErrorSys2(NameF, (Lan+84)->msg);                //"РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р° РґР»СЏ С‡С‚РµРЅРёСЏ.");
    Size_inF.u.LowPart = GetFileSize(inFile, &Size_inF.u.HighPart);
    if(Size_inF.u.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR)
-      return ErrorSys2(NameF, (Lan+85)->msg);                //"Ошибка при запросе размера файла."
+      return ErrorSys2(NameF, (Lan+85)->msg);                //"РћС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ СЂР°Р·РјРµСЂР° С„Р°Р№Р»Р°."
    if(Size_inF.QuadPart == 0)
-      return Error2(NameF, (Lan+86)->msg);                   //"Недопустимо малый размер файла."
-   GetFileTime(inFile, NULL, NULL, &Time_inF);               //Дата последней записи
+      return Error2(NameF, (Lan+86)->msg);                   //"РќРµРґРѕРїСѓСЃС‚РёРјРѕ РјР°Р»С‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р°."
+   GetFileTime(inFile, NULL, NULL, &Time_inF);               //Р”Р°С‚Р° РїРѕСЃР»РµРґРЅРµР№ Р·Р°РїРёСЃРё
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-#if !defined EMULATOR_HDD                                    //НЕТ Режима эмулятора
-int WriteClast1P(DWORD nClast, BYTE *buff)                   //Запись кластера
+#if !defined EMULATOR_HDD                                    //РќР•Рў Р РµР¶РёРјР° СЌРјСѓР»СЏС‚РѕСЂР°
+int WriteClast1P(DWORD nClast, BYTE *buff)                   //Р—Р°РїРёСЃСЊ РєР»Р°СЃС‚РµСЂР°
 {
    DWORD nb;
-   if(MaxClast < nClast) MaxClast = nClast;                  //Номер самого старшего кластера использованного для записи
-   DWORD nSector = Start_SecDir1 + (nClast - 1) * sClSec;    //Номер сектора по номеру кластера
+   if(MaxClast < nClast) MaxClast = nClast;                  //РќРѕРјРµСЂ СЃР°РјРѕРіРѕ СЃС‚Р°СЂС€РµРіРѕ РєР»Р°СЃС‚РµСЂР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРЅРѕРіРѕ РґР»СЏ Р·Р°РїРёСЃРё
+   DWORD nSector = Start_SecDir1 + (nClast - 1) * sClSec;    //РќРѕРјРµСЂ СЃРµРєС‚РѕСЂР° РїРѕ РЅРѕРјРµСЂСѓ РєР»Р°СЃС‚РµСЂР°
    LONGLONG Poz = LONGLONG(sSecB) * nSector;
-   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя на диске
+   if(SetInFilePointer(Poz) < 0) return -1;                  //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РґРёСЃРєРµ
    if(WriteFile(hDrive, buff, sCl_B, &nb, NULL) == FALSE || nb != sCl_B)
-     return ErrorSys1((Lan+175)->msg);                       //"Ошибка при записи кластера."
+     return ErrorSys1((Lan+175)->msg);                       //"РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё РєР»Р°СЃС‚РµСЂР°."
    return 0;
 }
 #endif
 
 //-------------------------------------------------------------------------------
 
-#if !defined EMULATOR_HDD                                    //НЕТ Режима эмулятора
-int Save_FAT1(void)                                          //Сохранение обновленной FAT первого раздела
+#if !defined EMULATOR_HDD                                    //РќР•Рў Р РµР¶РёРјР° СЌРјСѓР»СЏС‚РѕСЂР°
+int Save_FAT1(void)                                          //РЎРѕС…СЂР°РЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРЅРѕР№ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
 {
-   //Возможно лучше менять не всю FAT, а только изменившиеся сектора или один изменившийся кусок FAT (несколько секторов)
-   //Контрольное чтение FAT и сравнение с памятью, повторная запись в случае обнаружения несоответсвия
+   //Р’РѕР·РјРѕР¶РЅРѕ Р»СѓС‡С€Рµ РјРµРЅСЏС‚СЊ РЅРµ РІСЃСЋ FAT, Р° С‚РѕР»СЊРєРѕ РёР·РјРµРЅРёРІС€РёРµСЃСЏ СЃРµРєС‚РѕСЂР° РёР»Рё РѕРґРёРЅ РёР·РјРµРЅРёРІС€РёР№СЃСЏ РєСѓСЃРѕРє FAT (РЅРµСЃРєРѕР»СЊРєРѕ СЃРµРєС‚РѕСЂРѕРІ)
+   //РљРѕРЅС‚СЂРѕР»СЊРЅРѕРµ С‡С‚РµРЅРёРµ FAT Рё СЃСЂР°РІРЅРµРЅРёРµ СЃ РїР°РјСЏС‚СЊСЋ, РїРѕРІС‚РѕСЂРЅР°СЏ Р·Р°РїРёСЃСЊ РІ СЃР»СѓС‡Р°Рµ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ РЅРµСЃРѕРѕС‚РІРµС‚СЃРІРёСЏ
    DWORD nb;
    LONGLONG Poz = LONGLONG(sSecB) * Start_SecFAT1;
-   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
+   if(SetInFilePointer(Poz) < 0) return -1;                  //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ
    if(WriteFile(hDrive, c_FAT1, Size_FAT1, &nb, NULL) == FALSE || nb != Size_FAT1)
-      return ErrorSys1((Lan+176)->msg);                      //"Ошибка при записи FAT."
-   CopyMemory(FAT1, c_FAT1, Size_FAT1);                      //Скопировали содержимое FAT1
+      return ErrorSys1((Lan+176)->msg);                      //"РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё FAT."
+   CopyMemory(FAT1, c_FAT1, Size_FAT1);                      //РЎРєРѕРїРёСЂРѕРІР°Р»Рё СЃРѕРґРµСЂР¶РёРјРѕРµ FAT1
    return 0;
 }
 #endif
 
 //------------------------------------------------------------------------------
 
-void Ansi_To_Unicode(char *inANSI, WCHAR *outUNI, int maxN)  //Преобразование строки символов в Unicode
+void Ansi_To_Unicode(char *inANSI, WCHAR *outUNI, int maxN)  //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РІ Unicode
 {
    int n = lstrlen(inANSI);
    MultiByteToWideChar(CP_ACP, 0, inANSI, n, outUNI, maxN);
-   for(int i=0; i<n; i++) SWAP16((WORD *)(outUNI + i));      //В каталоге байты переставлены
-   for(int i=n; i<maxN; i++) *(WORD *)(outUNI + i) = 0;      //Обнулили хвост
+   for(int i=0; i<n; i++) SWAP16((WORD *)(outUNI + i));      //Р’ РєР°С‚Р°Р»РѕРіРµ Р±Р°Р№С‚С‹ РїРµСЂРµСЃС‚Р°РІР»РµРЅС‹
+   for(int i=n; i<maxN; i++) *(WORD *)(outUNI + i) = 0;      //РћР±РЅСѓР»РёР»Рё С…РІРѕСЃС‚
 }
 
 //------------------------------------------------------------------------------
 
-static void NameToKat(char *NameF, char *ExtF, One_Str_Cat *Kat) //Формирование имени файла
+static void NameToKat(char *NameF, char *ExtF, One_Str_Cat *Kat) //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРјРµРЅРё С„Р°Р№Р»Р°
 {
    int n = lstrlen(NameF);
    if(n > 38)
-   {  *(NameF + 38) = 0;                                     //Отсекли имя
+   {  *(NameF + 38) = 0;                                     //РћС‚СЃРµРєР»Рё РёРјСЏ
        NumMsg38++;
    }
-   Ansi_To_Unicode(NameF, Kat->Name, 40);                    //Преобразовали имя из UNICODE
-   if(*ExtF == '.')                                          //Есть расширение
-      Ansi_To_Unicode(ExtF+1, Kat->Ext, 4);                  //Преобразовали расширение из UNICODE
+   Ansi_To_Unicode(NameF, Kat->Name, 40);                    //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ РёР· UNICODE
+   if(*ExtF == '.')                                          //Р•СЃС‚СЊ СЂР°СЃС€РёСЂРµРЅРёРµ
+      Ansi_To_Unicode(ExtF+1, Kat->Ext, 4);                  //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё СЂР°СЃС€РёСЂРµРЅРёРµ РёР· UNICODE
    else
-      for(int i=0; i<4; i++) *(WORD *)(Kat->Ext + i) = 0;    //Обнулили неиспользуемое
+      for(int i=0; i<4; i++) *(WORD *)(Kat->Ext + i) = 0;    //РћР±РЅСѓР»РёР»Рё РЅРµРёСЃРїРѕР»СЊР·СѓРµРјРѕРµ
 }
 
 //------------------------------------------------------------------------------
 
-static int Add_Item_To_Tree(char *NameF)                     //Добавления строки в дерево
+static int Add_Item_To_Tree(char *NameF)                     //Р”РѕР±Р°РІР»РµРЅРёСЏ СЃС‚СЂРѕРєРё РІ РґРµСЂРµРІРѕ
 {
    char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
 
    fnsplit(NameF, Driv, Dir, Name, Ext);
-   if((s_Kat+ns_Dir)->pf.type == 48)                         //Это папка
-   {  lstrcat(Name, Ext);                                    //У папки расширения нет как такового
+   if((s_Kat+ns_Dir)->pf.type == 48)                         //Р­С‚Рѕ РїР°РїРєР°
+   {  lstrcat(Name, Ext);                                    //РЈ РїР°РїРєРё СЂР°СЃС€РёСЂРµРЅРёСЏ РЅРµС‚ РєР°Рє С‚Р°РєРѕРІРѕРіРѕ
       *Ext = *(Ext+1) = 0;
    }
    int l = lstrlen(Name);
    if(l > 38) *(Name + 38) = 0;
-   return AddItemToTree_forWrite(Name, Ext+1, &((s_Kat+ns_Dir)->pf));//Добавление новой строки в дерево
+   return AddItemToTree_forWrite(Name, Ext+1, &((s_Kat+ns_Dir)->pf));//Р”РѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё РІ РґРµСЂРµРІРѕ
 }
 
 //------------------------------------------------------------------------------
 
-int Load_Dir(void)                                           //Загрузка кластера каталога
+int Load_Dir(void)                                           //Р—Р°РіСЂСѓР·РєР° РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
 {
-   //Чтение кластера каталога (каталога может и не существовать и, в том числе каталога самого верхнего уровня)
-   //Обновление каталога (добавление строки нового файла) и в том числе создание нового каталога
-   DWORD nSector = Start_SecDir1 + (ClStDir - 1) * sClSec;   //Номер сектора по номеру кластера
-   if(ReadClast1_P(nSector, bufDir) < 0) return -1;          //Чтение кластера
+   //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР° (РєР°С‚Р°Р»РѕРіР° РјРѕР¶РµС‚ Рё РЅРµ СЃСѓС‰РµСЃС‚РІРѕРІР°С‚СЊ Рё, РІ С‚РѕРј С‡РёСЃР»Рµ РєР°С‚Р°Р»РѕРіР° СЃР°РјРѕРіРѕ РІРµСЂС…РЅРµРіРѕ СѓСЂРѕРІРЅСЏ)
+   //РћР±РЅРѕРІР»РµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (РґРѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°) Рё РІ С‚РѕРј С‡РёСЃР»Рµ СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РєР°С‚Р°Р»РѕРіР°
+   DWORD nSector = Start_SecDir1 + (ClStDir - 1) * sClSec;   //РќРѕРјРµСЂ СЃРµРєС‚РѕСЂР° РїРѕ РЅРѕРјРµСЂСѓ РєР»Р°СЃС‚РµСЂР°
+   if(ReadClast1_P(nSector, bufDir) < 0) return -1;          //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
    s_Kat = (One_Str_Cat *)bufDir;
-   int prPoint = 0;                                          //Признак наличия каталогов с точкой как признак правильности структуры
-   ns_Dir = 0;                                               //Номер свободной строки каталога
-   for(; ns_Dir<4*sClSec; ns_Dir++)                          //По всем возможным записям в одном кластере каталога (В каждом секторе 4 записи)
-   {  if((s_Kat + ns_Dir)->pf.type == 0) break;              //Конец записей каталога
+   int prPoint = 0;                                          //РџСЂРёР·РЅР°Рє РЅР°Р»РёС‡РёСЏ РєР°С‚Р°Р»РѕРіРѕРІ СЃ С‚РѕС‡РєРѕР№ РєР°Рє РїСЂРёР·РЅР°Рє РїСЂР°РІРёР»СЊРЅРѕСЃС‚Рё СЃС‚СЂСѓРєС‚СѓСЂС‹
+   ns_Dir = 0;                                               //РќРѕРјРµСЂ СЃРІРѕР±РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё РєР°С‚Р°Р»РѕРіР°
+   for(; ns_Dir<4*sClSec; ns_Dir++)                          //РџРѕ РІСЃРµРј РІРѕР·РјРѕР¶РЅС‹Рј Р·Р°РїРёСЃСЏРј РІ РѕРґРЅРѕРј РєР»Р°СЃС‚РµСЂРµ РєР°С‚Р°Р»РѕРіР° (Р’ РєР°Р¶РґРѕРј СЃРµРєС‚РѕСЂРµ 4 Р·Р°РїРёСЃРё)
+   {  if((s_Kat + ns_Dir)->pf.type == 0) break;              //РљРѕРЅРµС† Р·Р°РїРёСЃРµР№ РєР°С‚Р°Р»РѕРіР°
       DWORD NamePoint = *((DWORD*)&(s_Kat + ns_Dir)->Name);
-      if(NamePoint == 0x00002E00)                            //Это одна точка т.е. кластер текущего каталога
+      if(NamePoint == 0x00002E00)                            //Р­С‚Рѕ РѕРґРЅР° С‚РѕС‡РєР° С‚.Рµ. РєР»Р°СЃС‚РµСЂ С‚РµРєСѓС‰РµРіРѕ РєР°С‚Р°Р»РѕРіР°
       { if(ns_Dir == 0) prPoint++; continue; }
-      if(NamePoint == 0x2E002E00)                            //Это две точки т.е. кластер предыдущего каталога
+      if(NamePoint == 0x2E002E00)                            //Р­С‚Рѕ РґРІРµ С‚РѕС‡РєРё С‚.Рµ. РєР»Р°СЃС‚РµСЂ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РєР°С‚Р°Р»РѕРіР°
       { if(ns_Dir == 1) prPoint++; continue; }
       WORD NameDel = *((WORD*)&(s_Kat + ns_Dir)->Name);
-      if(NameDel == 0xE500 && (s_Kat + ns_Dir)->pf.ClSt == 0) break;//Это удаленное имя т.е. свободная строка
+      if(NameDel == 0xE500 && (s_Kat + ns_Dir)->pf.ClSt == 0) break;//Р­С‚Рѕ СѓРґР°Р»РµРЅРЅРѕРµ РёРјСЏ С‚.Рµ. СЃРІРѕР±РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
    }
    if(prPoint != 2)
-      return Error1((Lan+96)->msg);                          //"Нарушена структура каталога."
+      return Error1((Lan+96)->msg);                          //"РќР°СЂСѓС€РµРЅР° СЃС‚СЂСѓРєС‚СѓСЂР° РєР°С‚Р°Р»РѕРіР°."
    if(ns_Dir < 2 || ns_Dir >= 4*sClSec)
-      return Error1((Lan+181)->msg);                         //"В каталоге нет места для новой записи."
+      return Error1((Lan+181)->msg);                         //"Р’ РєР°С‚Р°Р»РѕРіРµ РЅРµС‚ РјРµСЃС‚Р° РґР»СЏ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё."
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int Change_Dir_For_File(char *NameF)                         //Изменение каталога (внесение нового файла)
+int Change_Dir_For_File(char *NameF)                         //РР·РјРµРЅРµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (РІРЅРµСЃРµРЅРёРµ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°)
 {
-   for(; ns_Dir<4*sClSec; ns_Dir++)                          //По всем возможным записям в одном кластере каталога (В каждом секторе 4 записи)
-   {  if((s_Kat + ns_Dir)->pf.type == 0) break;              //Конец записей каталога
+   for(; ns_Dir<4*sClSec; ns_Dir++)                          //РџРѕ РІСЃРµРј РІРѕР·РјРѕР¶РЅС‹Рј Р·Р°РїРёСЃСЏРј РІ РѕРґРЅРѕРј РєР»Р°СЃС‚РµСЂРµ РєР°С‚Р°Р»РѕРіР° (Р’ РєР°Р¶РґРѕРј СЃРµРєС‚РѕСЂРµ 4 Р·Р°РїРёСЃРё)
+   {  if((s_Kat + ns_Dir)->pf.type == 0) break;              //РљРѕРЅРµС† Р·Р°РїРёСЃРµР№ РєР°С‚Р°Р»РѕРіР°
       WORD NameDel = *((WORD*)&(s_Kat + ns_Dir)->Name);
-      if(NameDel == 0xE500 && (s_Kat + ns_Dir)->pf.ClSt == 0) break;//Это удаленное имя т.е. свободная строка
+      if(NameDel == 0xE500 && (s_Kat + ns_Dir)->pf.ClSt == 0) break;//Р­С‚Рѕ СѓРґР°Р»РµРЅРЅРѕРµ РёРјСЏ С‚.Рµ. СЃРІРѕР±РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
    }
    if(ns_Dir >= 4*sClSec)
-      return Error1((Lan+181)->msg);                         //"В каталоге нет места для новой записи."
-   ZeroMemory(s_Kat+ns_Dir, sizeof(One_Str_Cat));            //Все очистили
+      return Error1((Lan+181)->msg);                         //"Р’ РєР°С‚Р°Р»РѕРіРµ РЅРµС‚ РјРµСЃС‚Р° РґР»СЏ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё."
+   ZeroMemory(s_Kat+ns_Dir, sizeof(One_Str_Cat));            //Р’СЃРµ РѕС‡РёСЃС‚РёР»Рё
    char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
 
    fnsplit(NameF, Driv, Dir, Name, Ext);
-   NameToKat(Name, Ext, s_Kat+ns_Dir);                       //Формирование имени файла в Unicode
+   NameToKat(Name, Ext, s_Kat+ns_Dir);                       //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРјРµРЅРё С„Р°Р№Р»Р° РІ Unicode
    SYSTEMTIME sysTime;
-   FILETIME TimeF;                                           //Дата и время входного файла
+   FILETIME TimeF;                                           //Р”Р°С‚Р° Рё РІСЂРµРјСЏ РІС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
    FileTimeToLocalFileTime(&Time_inF, &TimeF);
    FileTimeToSystemTime(&TimeF, &sysTime);
-   (s_Kat+ns_Dir)->pf.type = 32;                             //Тип файл
-   (s_Kat+ns_Dir)->pf.ClSt = nCl_1;                          //Номер кластера начала файла
+   (s_Kat+ns_Dir)->pf.type = 32;                             //РўРёРї С„Р°Р№Р»
+   (s_Kat+ns_Dir)->pf.ClSt = nCl_1;                          //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РЅР°С‡Р°Р»Р° С„Р°Р№Р»Р°
    (s_Kat+ns_Dir)->pf.Sec = sysTime.wSecond;
    (s_Kat+ns_Dir)->pf.Min = sysTime.wMinute;
    (s_Kat+ns_Dir)->pf.Hour = sysTime.wHour;
@@ -217,44 +217,44 @@ int Change_Dir_For_File(char *NameF)                         //Изменение каталог
    (s_Kat+ns_Dir)->pf.Mon = sysTime.wMonth;
    (s_Kat+ns_Dir)->pf.Year = sysTime.wYear;
    (s_Kat+ns_Dir)->pf.SizeF = Size_inF.QuadPart;
-   Add_Item_To_Tree(NameF);                                  //Добавления строки в дерево
+   Add_Item_To_Tree(NameF);                                  //Р”РѕР±Р°РІР»РµРЅРёСЏ СЃС‚СЂРѕРєРё РІ РґРµСЂРµРІРѕ
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int Change_Dir_For_Folder(char *NameF)                       //Изменение каталога (внесение новой папки)
+int Change_Dir_For_Folder(char *NameF)                       //РР·РјРµРЅРµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (РІРЅРµСЃРµРЅРёРµ РЅРѕРІРѕР№ РїР°РїРєРё)
 {
-   for(; ns_Dir<4*sClSec; ns_Dir++)                          //По всем возможным записям в одном кластере каталога (В каждом секторе 4 записи)
-   {  if((s_Kat + ns_Dir)->pf.type == 0) break;              //Конец записей каталога
+   for(; ns_Dir<4*sClSec; ns_Dir++)                          //РџРѕ РІСЃРµРј РІРѕР·РјРѕР¶РЅС‹Рј Р·Р°РїРёСЃСЏРј РІ РѕРґРЅРѕРј РєР»Р°СЃС‚РµСЂРµ РєР°С‚Р°Р»РѕРіР° (Р’ РєР°Р¶РґРѕРј СЃРµРєС‚РѕСЂРµ 4 Р·Р°РїРёСЃРё)
+   {  if((s_Kat + ns_Dir)->pf.type == 0) break;              //РљРѕРЅРµС† Р·Р°РїРёСЃРµР№ РєР°С‚Р°Р»РѕРіР°
       WORD NameDel = *((WORD*)&(s_Kat + ns_Dir)->Name);
-      if(NameDel == 0xE500 && (s_Kat + ns_Dir)->pf.ClSt == 0) break;//Это удаленное имя т.е. свободная строка
+      if(NameDel == 0xE500 && (s_Kat + ns_Dir)->pf.ClSt == 0) break;//Р­С‚Рѕ СѓРґР°Р»РµРЅРЅРѕРµ РёРјСЏ С‚.Рµ. СЃРІРѕР±РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°
    }
    if(ns_Dir >= 4*sClSec)
-      return Error1((Lan+181)->msg);                         //"В каталоге нет места для новой записи."
-   ZeroMemory(s_Kat+ns_Dir, sizeof(One_Str_Cat));            //Все очистили
-   NameToKat(NameF, "", s_Kat+ns_Dir);                       //Формирование имени папки в Unicode
+      return Error1((Lan+181)->msg);                         //"Р’ РєР°С‚Р°Р»РѕРіРµ РЅРµС‚ РјРµСЃС‚Р° РґР»СЏ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё."
+   ZeroMemory(s_Kat+ns_Dir, sizeof(One_Str_Cat));            //Р’СЃРµ РѕС‡РёСЃС‚РёР»Рё
+   NameToKat(NameF, "", s_Kat+ns_Dir);                       //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРјРµРЅРё РїР°РїРєРё РІ Unicode
    SYSTEMTIME sysTime;
    GetLocalTime(&sysTime);
-   (s_Kat+ns_Dir)->pf.type = 48;                             //Тип папка
-   (s_Kat+ns_Dir)->pf.ClSt = nCl_1;                          //Номер кластера начала файла
+   (s_Kat+ns_Dir)->pf.type = 48;                             //РўРёРї РїР°РїРєР°
+   (s_Kat+ns_Dir)->pf.ClSt = nCl_1;                          //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РЅР°С‡Р°Р»Р° С„Р°Р№Р»Р°
    (s_Kat+ns_Dir)->pf.Sec = sysTime.wSecond;
    (s_Kat+ns_Dir)->pf.Min = sysTime.wMinute;
    (s_Kat+ns_Dir)->pf.Hour = sysTime.wHour;
    (s_Kat+ns_Dir)->pf.Day = sysTime.wDay;
    (s_Kat+ns_Dir)->pf.Mon = sysTime.wMonth;
    (s_Kat+ns_Dir)->pf.Year = sysTime.wYear;
-   Add_Item_To_Tree(NameF);                                  //Добавления строки в дерево
+   Add_Item_To_Tree(NameF);                                  //Р”РѕР±Р°РІР»РµРЅРёСЏ СЃС‚СЂРѕРєРё РІ РґРµСЂРµРІРѕ
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-#if !defined EMULATOR_HDD                                    //НЕТ Режима эмулятора
-int Save_Dir(void)                                           //Сохранение кластера каталога
+#if !defined EMULATOR_HDD                                    //РќР•Рў Р РµР¶РёРјР° СЌРјСѓР»СЏС‚РѕСЂР°
+int Save_Dir(void)                                           //РЎРѕС…СЂР°РЅРµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
 {
-   if(WriteClast1P(ClStDir, bufDir) < 0) return -1;          //Запись кластера каталога
-   //Контрольное чтение и сравнения с эталоном, повторная запись в случае обнаружения несоответсвия
+   if(WriteClast1P(ClStDir, bufDir) < 0) return -1;          //Р—Р°РїРёСЃСЊ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
+   //РљРѕРЅС‚СЂРѕР»СЊРЅРѕРµ С‡С‚РµРЅРёРµ Рё СЃСЂР°РІРЅРµРЅРёСЏ СЃ СЌС‚Р°Р»РѕРЅРѕРј, РїРѕРІС‚РѕСЂРЅР°СЏ Р·Р°РїРёСЃСЊ РІ СЃР»СѓС‡Р°Рµ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ РЅРµСЃРѕРѕС‚РІРµС‚СЃРІРёСЏ
    return 0;
 }
 

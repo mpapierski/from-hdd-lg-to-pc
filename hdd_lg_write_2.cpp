@@ -5,18 +5,18 @@
 
 #include "from_hdd_lg_to_pc.h"
 
-#if defined WRITE_YES                                        //Режим записи разрешен
+#if defined WRITE_YES                                        //Р РµР¶РёРј Р·Р°РїРёСЃРё СЂР°Р·СЂРµС€РµРЅ
 
 //============================ hdd_lg_write_2 ==================================
 BOOL CALLBACK Dlg_NewName(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-int  RenameFiFo(HTREEITEM hitem, OneStrTree *aTree);         //Переименование
-int  DeleteFiFo(HTREEITEM hitem, OneStrTree *aTree);         //Удаление
-int  Change_Sec67(int num_Cl);                               //Внесение изменений в содержимое сектора 67
-int  Correct67Sec(void);                                     //Коррекция содержимого 67 сектора
-     char NameFoFi[256];                                     //Имя создаваемой папки
-     DWORD MaxClast;                                         //Номер самого старшего кластера использованного для записи
+int  RenameFiFo(HTREEITEM hitem, OneStrTree *aTree);         //РџРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ
+int  DeleteFiFo(HTREEITEM hitem, OneStrTree *aTree);         //РЈРґР°Р»РµРЅРёРµ
+int  Change_Sec67(int num_Cl);                               //Р’РЅРµСЃРµРЅРёРµ РёР·РјРµРЅРµРЅРёР№ РІ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРµРєС‚РѕСЂР° 67
+int  Correct67Sec(void);                                     //РљРѕСЂСЂРµРєС†РёСЏ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ 67 СЃРµРєС‚РѕСЂР°
+     char NameFoFi[256];                                     //РРјСЏ СЃРѕР·РґР°РІР°РµРјРѕР№ РїР°РїРєРё
+     DWORD MaxClast;                                         //РќРѕРјРµСЂ СЃР°РјРѕРіРѕ СЃС‚Р°СЂС€РµРіРѕ РєР»Р°СЃС‚РµСЂР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРЅРѕРіРѕ РґР»СЏ Р·Р°РїРёСЃРё
 
-static int num_del_Cl;                                       //Число удаленных кластеров
+static int num_del_Cl;                                       //Р§РёСЃР»Рѕ СѓРґР°Р»РµРЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
 
 //------------------------------------------------------------------------------
 
@@ -25,17 +25,17 @@ BOOL CALLBACK Dlg_NewName(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
    switch(uMsg)
    {  case WM_INITDIALOG:
-             SetWindowText(hDlg, (Lan+183)->msg);            //"Укажите имя"
-             SetDlgItemText(hDlg, IDC_STATICTEXT1, (Lan+185)->msg);  //"Не более 38 символов"
-             SetDlgItemText(hDlg, IDOK, (Lan+74)->msg);      //"Сохранить"
-             SetDlgItemText(hDlg, IDCANCEL, (Lan+75)->msg);  //"Закрыть"
+             SetWindowText(hDlg, (Lan+183)->msg);            //"РЈРєР°Р¶РёС‚Рµ РёРјСЏ"
+             SetDlgItemText(hDlg, IDC_STATICTEXT1, (Lan+185)->msg);  //"РќРµ Р±РѕР»РµРµ 38 СЃРёРјРІРѕР»РѕРІ"
+             SetDlgItemText(hDlg, IDOK, (Lan+74)->msg);      //"РЎРѕС…СЂР°РЅРёС‚СЊ"
+             SetDlgItemText(hDlg, IDCANCEL, (Lan+75)->msg);  //"Р—Р°РєСЂС‹С‚СЊ"
              if(lParam != 0)
              {  SetDlgItemText(hDlg, IDC_EDIT1, (char*)lParam);
                 int l = lstrlen((char*)lParam);
-                SendDlgItemMessage(hDlg, IDC_EDIT1, EM_SETSEL, 0, l);   //Сделать текст выделенным и поставить курсор в конец текста
+                SendDlgItemMessage(hDlg, IDC_EDIT1, EM_SETSEL, 0, l);   //РЎРґРµР»Р°С‚СЊ С‚РµРєСЃС‚ РІС‹РґРµР»РµРЅРЅС‹Рј Рё РїРѕСЃС‚Р°РІРёС‚СЊ РєСѓСЂСЃРѕСЂ РІ РєРѕРЅРµС† С‚РµРєСЃС‚Р°
              }
              SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
-             return false;                                   //Для установки фокуса ввода
+             return false;                                   //Р”Р»СЏ СѓСЃС‚Р°РЅРѕРІРєРё С„РѕРєСѓСЃР° РІРІРѕРґР°
       case WM_CTLCOLORSTATIC:
              if(GetDlgCtrlID(HWND(lParam)) == IDC_STATICTEXT1)
              {  SetTextColor((HDC)wParam, RGB(0, 0, 200));
@@ -47,20 +47,20 @@ BOOL CALLBACK Dlg_NewName(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
            switch(LOWORD(wParam))
            {  case IDOK:     GetDlgItemText(hDlg, IDC_EDIT1, NameFoFi, sizeof(NameFoFi)-1);
                              if(*NameFoFi == 0)
-                             {  Error1((Lan+184)->msg);      //"Недопустимое имя"
+                             {  Error1((Lan+184)->msg);      //"РќРµРґРѕРїСѓСЃС‚РёРјРѕРµ РёРјСЏ"
                                 SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
                                 return true;
                              }
                              for(int i=0; *(NameFoFi+i)!=0; i++)
                                for(int j=0; j<sizeof(ndS); j++)
                                  if(*(NameFoFi+i) == *(ndS+j))
-                                 {  Error1((Lan+184)->msg);  //"Недопустимое имя"
+                                 {  Error1((Lan+184)->msg);  //"РќРµРґРѕРїСѓСЃС‚РёРјРѕРµ РёРјСЏ"
                                     SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
                                     return true;
                                  }
-                             *(NameFoFi+38) = 0;             //Если имя большое, то оно отсечется
+                             *(NameFoFi+38) = 0;             //Р•СЃР»Рё РёРјСЏ Р±РѕР»СЊС€РѕРµ, С‚Рѕ РѕРЅРѕ РѕС‚СЃРµС‡РµС‚СЃСЏ
               case IDCANCEL:
-                             EndDialog(hDlg, LOWORD(wParam));//Вернули один из кодов
+                             EndDialog(hDlg, LOWORD(wParam));//Р’РµСЂРЅСѓР»Рё РѕРґРёРЅ РёР· РєРѕРґРѕРІ
                              return true;
            }
    }
@@ -74,12 +74,12 @@ BOOL CALLBACK Dlg_DelName(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
    switch(uMsg)
    {  case WM_INITDIALOG:
-             SetWindowText(hDlg, (Lan+36)->msg);             //"Внимание"
+             SetWindowText(hDlg, (Lan+36)->msg);             //"Р’РЅРёРјР°РЅРёРµ"
              SetDlgItemText(hDlg, IDC_STATICTEXT1, (Lan+191)->msg);
              SetDlgItemText(hDlg, IDC_STATICTEXT2, (char*)lParam);
-             SetDlgItemText(hDlg, IDOK, (Lan+187)->msg);     //"Удалить"
-             SetDlgItemText(hDlg, IDCANCEL, (Lan+75)->msg);  //"Закрыть"
-             return true;                                    //Для установки фокуса ввода
+             SetDlgItemText(hDlg, IDOK, (Lan+187)->msg);     //"РЈРґР°Р»РёС‚СЊ"
+             SetDlgItemText(hDlg, IDCANCEL, (Lan+75)->msg);  //"Р—Р°РєСЂС‹С‚СЊ"
+             return true;                                    //Р”Р»СЏ СѓСЃС‚Р°РЅРѕРІРєРё С„РѕРєСѓСЃР° РІРІРѕРґР°
       case WM_CTLCOLORSTATIC:
              if(GetDlgCtrlID(HWND(lParam)) == IDC_STATICTEXT1)
              {  SetTextColor((HDC)wParam, RGB(0, 0, 200));
@@ -90,7 +90,7 @@ BOOL CALLBACK Dlg_DelName(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
       case WM_COMMAND:
            switch(LOWORD(wParam))
            {  case IDOK:
-              case IDCANCEL: EndDialog(hDlg, LOWORD(wParam));//Вернули один из кодов
+              case IDCANCEL: EndDialog(hDlg, LOWORD(wParam));//Р’РµСЂРЅСѓР»Рё РѕРґРёРЅ РёР· РєРѕРґРѕРІ
                              return true;
            }
    }
@@ -99,84 +99,84 @@ BOOL CALLBACK Dlg_DelName(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 //------------------------------------------------------------------------------
 
-static int GetName_FiFo(OneStrTree *aTree, char *oldName, char *oldExt)//Получение строки каталога с нужным именем
+static int GetName_FiFo(OneStrTree *aTree, char *oldName, char *oldExt)//РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё РєР°С‚Р°Р»РѕРіР° СЃ РЅСѓР¶РЅС‹Рј РёРјРµРЅРµРј
 {
    One_Str_Cat *Kat = (One_Str_Cat *)bufDir;
-   //Чтение кластера каталога (каталога может и не существовать и, в том числе каталога самого верхнего уровня)
-   //Обновление каталога (добавление строки нового файла) и в том числе создание нового каталога
-   DWORD nSector = Start_SecDir1 + (ClStDir - 1) * sClSec;   //Номер сектора по номеру кластера
-   if(ReadClast1_P(nSector, bufDir) < 0) return -1;          //Чтение кластера
-   if(*((DWORD*)&(Kat + 0)->Name) != 0x00002E00)             //Это одна точка т.е. кластер текущего каталога
-      return Error1((Lan+96)->msg);                          //"Нарушена структура каталога."
-   if(*((DWORD*)&(Kat + 1)->Name) != 0x2E002E00)             //Это две точки т.е. кластер предыдущего каталога
-      return Error1((Lan+96)->msg);                          //"Нарушена структура каталога."
-   WCHAR NameU[64], ExtU[8];                                 //Именя в Unicode
+   //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР° (РєР°С‚Р°Р»РѕРіР° РјРѕР¶РµС‚ Рё РЅРµ СЃСѓС‰РµСЃС‚РІРѕРІР°С‚СЊ Рё, РІ С‚РѕРј С‡РёСЃР»Рµ РєР°С‚Р°Р»РѕРіР° СЃР°РјРѕРіРѕ РІРµСЂС…РЅРµРіРѕ СѓСЂРѕРІРЅСЏ)
+   //РћР±РЅРѕРІР»РµРЅРёРµ РєР°С‚Р°Р»РѕРіР° (РґРѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°) Рё РІ С‚РѕРј С‡РёСЃР»Рµ СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РєР°С‚Р°Р»РѕРіР°
+   DWORD nSector = Start_SecDir1 + (ClStDir - 1) * sClSec;   //РќРѕРјРµСЂ СЃРµРєС‚РѕСЂР° РїРѕ РЅРѕРјРµСЂСѓ РєР»Р°СЃС‚РµСЂР°
+   if(ReadClast1_P(nSector, bufDir) < 0) return -1;          //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
+   if(*((DWORD*)&(Kat + 0)->Name) != 0x00002E00)             //Р­С‚Рѕ РѕРґРЅР° С‚РѕС‡РєР° С‚.Рµ. РєР»Р°СЃС‚РµСЂ С‚РµРєСѓС‰РµРіРѕ РєР°С‚Р°Р»РѕРіР°
+      return Error1((Lan+96)->msg);                          //"РќР°СЂСѓС€РµРЅР° СЃС‚СЂСѓРєС‚СѓСЂР° РєР°С‚Р°Р»РѕРіР°."
+   if(*((DWORD*)&(Kat + 1)->Name) != 0x2E002E00)             //Р­С‚Рѕ РґРІРµ С‚РѕС‡РєРё С‚.Рµ. РєР»Р°СЃС‚РµСЂ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РєР°С‚Р°Р»РѕРіР°
+      return Error1((Lan+96)->msg);                          //"РќР°СЂСѓС€РµРЅР° СЃС‚СЂСѓРєС‚СѓСЂР° РєР°С‚Р°Р»РѕРіР°."
+   WCHAR NameU[64], ExtU[8];                                 //РРјРµРЅСЏ РІ Unicode
    lstrcpy(oldName, aTree->NameF);
    *oldExt = 0;
-   if(aTree->pf.type != 48)                                  //Это файл
+   if(aTree->pf.type != 48)                                  //Р­С‚Рѕ С„Р°Р№Р»
    {  char *adr = strrchr(oldName, '.');
       if(adr != NULL)
-      {  *adr = 0;                                           //Отсекли имя
-         lstrcpy(oldExt, adr+1);                             //Выделили расширение
+      {  *adr = 0;                                           //РћС‚СЃРµРєР»Рё РёРјСЏ
+         lstrcpy(oldExt, adr+1);                             //Р’С‹РґРµР»РёР»Рё СЂР°СЃС€РёСЂРµРЅРёРµ
       }
    }
-   Ansi_To_Unicode(oldName, NameU, 40);                      //Преобразовали имя в UNICODE
-   Ansi_To_Unicode(oldExt, ExtU, 4);                         //Преобразовали расширение из UNICODE
+   Ansi_To_Unicode(oldName, NameU, 40);                      //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ РІ UNICODE
+   Ansi_To_Unicode(oldExt, ExtU, 4);                         //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё СЂР°СЃС€РёСЂРµРЅРёРµ РёР· UNICODE
    WORD *nameI = (WORD*)NameU;
    WORD *extI = (WORD*)ExtU;
-   int nsDir = 2;                                            //Номер строки каталога с нужнвм именем
+   int nsDir = 2;                                            //РќРѕРјРµСЂ СЃС‚СЂРѕРєРё РєР°С‚Р°Р»РѕРіР° СЃ РЅСѓР¶РЅРІРј РёРјРµРЅРµРј
    int t1 = 0;
-   for(; nsDir<4*sClSec; nsDir++)                            //По всем возможным записям в одном кластере каталога (В каждом секторе 4 записи)
-   {  if((Kat + nsDir)->pf.type == 0) break;                 //Конец записей каталога
+   for(; nsDir<4*sClSec; nsDir++)                            //РџРѕ РІСЃРµРј РІРѕР·РјРѕР¶РЅС‹Рј Р·Р°РїРёСЃСЏРј РІ РѕРґРЅРѕРј РєР»Р°СЃС‚РµСЂРµ РєР°С‚Р°Р»РѕРіР° (Р’ РєР°Р¶РґРѕРј СЃРµРєС‚РѕСЂРµ 4 Р·Р°РїРёСЃРё)
+   {  if((Kat + nsDir)->pf.type == 0) break;                 //РљРѕРЅРµС† Р·Р°РїРёСЃРµР№ РєР°С‚Р°Р»РѕРіР°
       WORD *nameK = (WORD*)(Kat + nsDir)->Name;
       int t;
-      for(t=0; t<40; t++)                                    //По длине имени
-      { if(*(nameI + t) == 0) break;                         //Входное имя кончилолось
-        if(*(nameK + t) == 0) break;                         //Имя в каталоге кончилолось
-        if(*(nameI + t) != *(nameK + t)) break;              //Несовпадение символов
+      for(t=0; t<40; t++)                                    //РџРѕ РґР»РёРЅРµ РёРјРµРЅРё
+      { if(*(nameI + t) == 0) break;                         //Р’С…РѕРґРЅРѕРµ РёРјСЏ РєРѕРЅС‡РёР»РѕР»РѕСЃСЊ
+        if(*(nameK + t) == 0) break;                         //РРјСЏ РІ РєР°С‚Р°Р»РѕРіРµ РєРѕРЅС‡РёР»РѕР»РѕСЃСЊ
+        if(*(nameI + t) != *(nameK + t)) break;              //РќРµСЃРѕРІРїР°РґРµРЅРёРµ СЃРёРјРІРѕР»РѕРІ
       }
-      if(*(nameI + t) != 0 || *(nameK + t) != 0) continue;   //Не дошли до конца обоих имен
-      if(!(t >= 40 || *(nameI + t) == 0)) continue;          //Либо прошли все возможные по числу символы либо не дошли до конца имени
-      if(aTree->pf.type != 48)                               //Это файл
+      if(*(nameI + t) != 0 || *(nameK + t) != 0) continue;   //РќРµ РґРѕС€Р»Рё РґРѕ РєРѕРЅС†Р° РѕР±РѕРёС… РёРјРµРЅ
+      if(!(t >= 40 || *(nameI + t) == 0)) continue;          //Р›РёР±Рѕ РїСЂРѕС€Р»Рё РІСЃРµ РІРѕР·РјРѕР¶РЅС‹Рµ РїРѕ С‡РёСЃР»Сѓ СЃРёРјРІРѕР»С‹ Р»РёР±Рѕ РЅРµ РґРѕС€Р»Рё РґРѕ РєРѕРЅС†Р° РёРјРµРЅРё
+      if(aTree->pf.type != 48)                               //Р­С‚Рѕ С„Р°Р№Р»
       {  WORD *extK = (WORD*)(Kat + nsDir)->Ext;
          int t;
-         for(t=0; t<4; t++)                                  //По длине имени
+         for(t=0; t<4; t++)                                  //РџРѕ РґР»РёРЅРµ РёРјРµРЅРё
            if(*(extI+t) == *(extK + t)) continue;
-         if(!(t >= 4 || *(extI+t) == 0)) continue;           //Либо прошли все возсодные символы либо дошли  до конца имени
+         if(!(t >= 4 || *(extI+t) == 0)) continue;           //Р›РёР±Рѕ РїСЂРѕС€Р»Рё РІСЃРµ РІРѕР·СЃРѕРґРЅС‹Рµ СЃРёРјРІРѕР»С‹ Р»РёР±Рѕ РґРѕС€Р»Рё  РґРѕ РєРѕРЅС†Р° РёРјРµРЅРё
       }
-      t1 = 1;                                                //Найдено имя в каталоге
-      break;                                                 //Просмотр прекращаем
+      t1 = 1;                                                //РќР°Р№РґРµРЅРѕ РёРјСЏ РІ РєР°С‚Р°Р»РѕРіРµ
+      break;                                                 //РџСЂРѕСЃРјРѕС‚СЂ РїСЂРµРєСЂР°С‰Р°РµРј
    }
    if(t1 == 0)
-      return Error1((Lan+188)->msg);                         //"В каталоге не найдено указанное имя."
+      return Error1((Lan+188)->msg);                         //"Р’ РєР°С‚Р°Р»РѕРіРµ РЅРµ РЅР°Р№РґРµРЅРѕ СѓРєР°Р·Р°РЅРЅРѕРµ РёРјСЏ."
    return nsDir;
 }
 
 //------------------------------------------------------------------------------
 
-int  RenameFiFo(HTREEITEM hitem, OneStrTree *aTree)          //Переименование
+int  RenameFiFo(HTREEITEM hitem, OneStrTree *aTree)          //РџРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ
 {
    char oldName[80], oldExt[8];
    One_Str_Cat *Kat = (One_Str_Cat *)bufDir;
-   int nsDir = GetName_FiFo(aTree, oldName, oldExt);         //Получение строки каталога с нужным именем
+   int nsDir = GetName_FiFo(aTree, oldName, oldExt);         //РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё РєР°С‚Р°Р»РѕРіР° СЃ РЅСѓР¶РЅС‹Рј РёРјРµРЅРµРј
    if(nsDir < 0) return -1;
 // lstrcat(oldName, ".");
 // lstrcat(oldName, oldExt);
    if(DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_NAME),
                 MainWin, Dlg_NewName, LPARAM(oldName)) == IDCANCEL) return -1;
-   Ansi_To_Unicode(NameFoFi, (Kat + nsDir)->Name, 40);       //Преобразовали имя из UNICODE и внесли в каталог
-#if !defined EMULATOR_HDD                                    //Режим эмулятора
-   if(Save_Dir() < 0) return -1;                             //Сохранение кластера каталога
+   Ansi_To_Unicode(NameFoFi, (Kat + nsDir)->Name, 40);       //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ РёР· UNICODE Рё РІРЅРµСЃР»Рё РІ РєР°С‚Р°Р»РѕРі
+#if !defined EMULATOR_HDD                                    //Р РµР¶РёРј СЌРјСѓР»СЏС‚РѕСЂР°
+   if(Save_Dir() < 0) return -1;                             //РЎРѕС…СЂР°РЅРµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
 #endif
    char NewStr[256];
-   if(MakeOneStrForTree(NewStr, NameFoFi, oldExt, &((Kat + nsDir)->pf)) == 1) return 0;//Создание строки символов для отражения в дереве
-   TV_ITEM item;                                             //Строка дерева
-   item.mask = TVIF_TEXT;                                    //Меняем только текст
+   if(MakeOneStrForTree(NewStr, NameFoFi, oldExt, &((Kat + nsDir)->pf)) == 1) return 0;//РЎРѕР·РґР°РЅРёРµ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РґР»СЏ РѕС‚СЂР°Р¶РµРЅРёСЏ РІ РґРµСЂРµРІРµ
+   TV_ITEM item;                                             //РЎС‚СЂРѕРєР° РґРµСЂРµРІР°
+   item.mask = TVIF_TEXT;                                    //РњРµРЅСЏРµРј С‚РѕР»СЊРєРѕ С‚РµРєСЃС‚
    item.hItem = hitem;
    item.pszText = NewStr;
    item.cchTextMax = 256;
-   if(TreeView_SetItem(hwndTree, &item) == FALSE)            //Взяли текущий элемент дерева
-      return Error1((Lan+33)->msg);                          //"Ошибка при запросе информации об элементе дерева."
+   if(TreeView_SetItem(hwndTree, &item) == FALSE)            //Р’Р·СЏР»Рё С‚РµРєСѓС‰РёР№ СЌР»РµРјРµРЅС‚ РґРµСЂРµРІР°
+      return Error1((Lan+33)->msg);                          //"РћС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ РёРЅС„РѕСЂРјР°С†РёРё РѕР± СЌР»РµРјРµРЅС‚Рµ РґРµСЂРµРІР°."
    TreeView_EnsureVisible(hwndTree, hitem);
    lstrcpy(aTree->NameF, NameFoFi);
 //   lstrcat(aTree->NameF, ".");
@@ -186,68 +186,68 @@ int  RenameFiFo(HTREEITEM hitem, OneStrTree *aTree)          //Переименование
 
 //------------------------------------------------------------------------------
 
-static int Del_OneFileFAT(OneStrTree *aTree)                 //Удаление одного файла из FAT (отметка места как незанятого)
+static int Del_OneFileFAT(OneStrTree *aTree)                 //РЈРґР°Р»РµРЅРёРµ РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р° РёР· FAT (РѕС‚РјРµС‚РєР° РјРµСЃС‚Р° РєР°Рє РЅРµР·Р°РЅСЏС‚РѕРіРѕ)
 {
-   DWORD nCl = aTree->pf.ClSt;                               //Текущий номер кластера равен первому кластеру файла
-   DWORD numCl = DWORD((aTree->pf.SizeF + sCl_B - 1) / sCl_B);//Число кластеров необходимое для размещения файла данного размера
-   for(DWORD i=0; i<numCl; i++)                              //По числу кластеров
-   {  if(nCl == 0x0FFFFFFF)                                  //Признак конца цепочки
-        return Error1((Lan+12)->msg);                        //return Error1("Неожиданно найден признак конца цепочки FAT.");
-      if(*(FAT1 + nCl) == 0)                                 //Ненормальная ситуация
-        return Error1((Lan+11)->msg);                        //return Error1("Обнаружено несоответствие значения FAT и ссылки на кластер файла.");
-      *(c_FAT1 + nCl) = 0;                                   //Освободили кластер
-      nCl = *(FAT1 + nCl);                                   //Номер следующего кластера
+   DWORD nCl = aTree->pf.ClSt;                               //РўРµРєСѓС‰РёР№ РЅРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° СЂР°РІРµРЅ РїРµСЂРІРѕРјСѓ РєР»Р°СЃС‚РµСЂСѓ С„Р°Р№Р»Р°
+   DWORD numCl = DWORD((aTree->pf.SizeF + sCl_B - 1) / sCl_B);//Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РЅРµРѕР±С…РѕРґРёРјРѕРµ РґР»СЏ СЂР°Р·РјРµС‰РµРЅРёСЏ С„Р°Р№Р»Р° РґР°РЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР°
+   for(DWORD i=0; i<numCl; i++)                              //РџРѕ С‡РёСЃР»Сѓ РєР»Р°СЃС‚РµСЂРѕРІ
+   {  if(nCl == 0x0FFFFFFF)                                  //РџСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё
+        return Error1((Lan+12)->msg);                        //return Error1("РќРµРѕР¶РёРґР°РЅРЅРѕ РЅР°Р№РґРµРЅ РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё FAT.");
+      if(*(FAT1 + nCl) == 0)                                 //РќРµРЅРѕСЂРјР°Р»СЊРЅР°СЏ СЃРёС‚СѓР°С†РёСЏ
+        return Error1((Lan+11)->msg);                        //return Error1("РћР±РЅР°СЂСѓР¶РµРЅРѕ РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ Р·РЅР°С‡РµРЅРёСЏ FAT Рё СЃСЃС‹Р»РєРё РЅР° РєР»Р°СЃС‚РµСЂ С„Р°Р№Р»Р°.");
+      *(c_FAT1 + nCl) = 0;                                   //РћСЃРІРѕР±РѕРґРёР»Рё РєР»Р°СЃС‚РµСЂ
+      nCl = *(FAT1 + nCl);                                   //РќРѕРјРµСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ РєР»Р°СЃС‚РµСЂР°
       if(nCl > maxZapFAT1 && nCl != 0x0FFFFFFF)
-        return Error1((Lan+13)->msg);                        //"Номер кластера превышает допустимое значение."
+        return Error1((Lan+13)->msg);                        //"РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РїСЂРµРІС‹С€Р°РµС‚ РґРѕРїСѓСЃС‚РёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ."
    }
-   num_del_Cl += numCl;                                      //Число удаленных кластеров
+   num_del_Cl += numCl;                                      //Р§РёСЃР»Рѕ СѓРґР°Р»РµРЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Del_DirFAT(OneStrTree *aTree)                     //Удаление каталога из FAT (отметка места как незанятого)
+static int Del_DirFAT(OneStrTree *aTree)                     //РЈРґР°Р»РµРЅРёРµ РєР°С‚Р°Р»РѕРіР° РёР· FAT (РѕС‚РјРµС‚РєР° РјРµСЃС‚Р° РєР°Рє РЅРµР·Р°РЅСЏС‚РѕРіРѕ)
 {
-   DWORD nCl = aTree->pf.ClSt;                               //Текущий номер кластера равен первому кластеру файла
-   if(*(FAT1 + nCl) != 0x0FFFFFFF)                           //Признак конца цепочки
-      return Error1((Lan+18)->msg);                          //Обнаружено несоответствие FAT и указателя на кластер каталога.
-   *(c_FAT1 + nCl) = 0;                                      //Освободили кластер
-   num_del_Cl++;                                             //Число удаленных кластеров
+   DWORD nCl = aTree->pf.ClSt;                               //РўРµРєСѓС‰РёР№ РЅРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° СЂР°РІРµРЅ РїРµСЂРІРѕРјСѓ РєР»Р°СЃС‚РµСЂСѓ С„Р°Р№Р»Р°
+   if(*(FAT1 + nCl) != 0x0FFFFFFF)                           //РџСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё
+      return Error1((Lan+18)->msg);                          //РћР±РЅР°СЂСѓР¶РµРЅРѕ РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ FAT Рё СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РєР»Р°СЃС‚РµСЂ РєР°С‚Р°Р»РѕРіР°.
+   *(c_FAT1 + nCl) = 0;                                      //РћСЃРІРѕР±РѕРґРёР»Рё РєР»Р°СЃС‚РµСЂ
+   num_del_Cl++;                                             //Р§РёСЃР»Рѕ СѓРґР°Р»РµРЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Del_Folder(HTREEITEM hitem, OneStrTree *aTreeDir) //Удаление папки
+static int Del_Folder(HTREEITEM hitem, OneStrTree *aTreeDir) //РЈРґР°Р»РµРЅРёРµ РїР°РїРєРё
 {
-   if(Del_DirFAT(aTreeDir) < 0) return -1;                   //Удаление каталога из FAT (отметка места как незанятого)
+   if(Del_DirFAT(aTreeDir) < 0) return -1;                   //РЈРґР°Р»РµРЅРёРµ РєР°С‚Р°Р»РѕРіР° РёР· FAT (РѕС‚РјРµС‚РєР° РјРµСЃС‚Р° РєР°Рє РЅРµР·Р°РЅСЏС‚РѕРіРѕ)
 
-   HTREEITEM ind = TreeView_GetChild(hwndTree, hitem);       //Вошли во внутренний уровень дерева
-   if(ind == NULL) return 0;                                 //Нет внутреннего уровня, т.е. папка пустая
-   for(;;)                                                   //Просмотр всего дерева от текущей папки
+   HTREEITEM ind = TreeView_GetChild(hwndTree, hitem);       //Р’РѕС€Р»Рё РІРѕ РІРЅСѓС‚СЂРµРЅРЅРёР№ СѓСЂРѕРІРµРЅСЊ РґРµСЂРµРІР°
+   if(ind == NULL) return 0;                                 //РќРµС‚ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ СѓСЂРѕРІРЅСЏ, С‚.Рµ. РїР°РїРєР° РїСѓСЃС‚Р°СЏ
+   for(;;)                                                   //РџСЂРѕСЃРјРѕС‚СЂ РІСЃРµРіРѕ РґРµСЂРµРІР° РѕС‚ С‚РµРєСѓС‰РµР№ РїР°РїРєРё
    {  TV_ITEM item;
       item.mask = TVIF_PARAM;
       item.hItem = ind;
       if(TreeView_GetItem(hwndTree, &item) == FALSE)
-        return Error1((Lan+33)->msg);                        //return Error1("Ошибка при запросе информации об элементе дерева.");
-      if((aTree + item.lParam)->pf.type == 48)               //Очередное имя это папка
-      {   if(Del_Folder(ind, aTree + item.lParam) < 0) return -1; } //Удаление папки
-      else                                                   //Очередное имя это файл
-          Del_OneFileFAT(aTree + item.lParam);               //Удаление одного файла из FAT (отметка места как незанятого)
-      ind = TreeView_GetNextSibling(hwndTree, ind);          //Следующая запись на том же уровне дерева
-      if(ind == NULL) break;                                 //Больше записей данного уровня нет
+        return Error1((Lan+33)->msg);                        //return Error1("РћС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ РёРЅС„РѕСЂРјР°С†РёРё РѕР± СЌР»РµРјРµРЅС‚Рµ РґРµСЂРµРІР°.");
+      if((aTree + item.lParam)->pf.type == 48)               //РћС‡РµСЂРµРґРЅРѕРµ РёРјСЏ СЌС‚Рѕ РїР°РїРєР°
+      {   if(Del_Folder(ind, aTree + item.lParam) < 0) return -1; } //РЈРґР°Р»РµРЅРёРµ РїР°РїРєРё
+      else                                                   //РћС‡РµСЂРµРґРЅРѕРµ РёРјСЏ СЌС‚Рѕ С„Р°Р№Р»
+          Del_OneFileFAT(aTree + item.lParam);               //РЈРґР°Р»РµРЅРёРµ РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р° РёР· FAT (РѕС‚РјРµС‚РєР° РјРµСЃС‚Р° РєР°Рє РЅРµР·Р°РЅСЏС‚РѕРіРѕ)
+      ind = TreeView_GetNextSibling(hwndTree, ind);          //РЎР»РµРґСѓСЋС‰Р°СЏ Р·Р°РїРёСЃСЊ РЅР° С‚РѕРј Р¶Рµ СѓСЂРѕРІРЅРµ РґРµСЂРµРІР°
+      if(ind == NULL) break;                                 //Р‘РѕР»СЊС€Рµ Р·Р°РїРёСЃРµР№ РґР°РЅРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ РЅРµС‚
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int  DeleteFiFo(HTREEITEM hitem, OneStrTree *aTree)          //Удаление файла или каталога
+int  DeleteFiFo(HTREEITEM hitem, OneStrTree *aTree)          //РЈРґР°Р»РµРЅРёРµ С„Р°Р№Р»Р° РёР»Рё РєР°С‚Р°Р»РѕРіР°
 {
    char oldName[80], oldExt[8];
 
    One_Str_Cat *Kat = (One_Str_Cat *)bufDir;
-   int nsDir = GetName_FiFo(aTree, oldName, oldExt);         //Получение строки каталога с нужным именем
+   int nsDir = GetName_FiFo(aTree, oldName, oldExt);         //РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё РєР°С‚Р°Р»РѕРіР° СЃ РЅСѓР¶РЅС‹Рј РёРјРµРЅРµРј
    if(nsDir < 0) return -1;
    if(*oldExt != 0)
    {  lstrcat(oldName, ".");
@@ -255,76 +255,76 @@ int  DeleteFiFo(HTREEITEM hitem, OneStrTree *aTree)          //Удаление файла ил
    }
    if(DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_DEL_NAME),
                 MainWin, Dlg_DelName, LPARAM(oldName)) == IDCANCEL) return -1;
-   c_FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                  //Память под FAT
+   c_FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                  //РџР°РјСЏС‚СЊ РїРѕРґ FAT
    if(c_FAT1 == NULL)  return -1;
-   CopyMemory(c_FAT1, FAT1, Size_FAT1);                      //Скопировали содержимое FAT1
+   CopyMemory(c_FAT1, FAT1, Size_FAT1);                      //РЎРєРѕРїРёСЂРѕРІР°Р»Рё СЃРѕРґРµСЂР¶РёРјРѕРµ FAT1
 
-   *((WORD*)&(Kat + nsDir)->Name) = 0xE500;                  //Затерли строку с именем в каталоге
-   (Kat + nsDir)->pf.ClSt = 0;                               //Второй признак удаленной записи
-#if !defined EMULATOR_HDD                                    //Режим эмулятора
-   if(Save_Dir() < 0) return -1;                             //Сохранение кластера каталога
+   *((WORD*)&(Kat + nsDir)->Name) = 0xE500;                  //Р—Р°С‚РµСЂР»Рё СЃС‚СЂРѕРєСѓ СЃ РёРјРµРЅРµРј РІ РєР°С‚Р°Р»РѕРіРµ
+   (Kat + nsDir)->pf.ClSt = 0;                               //Р’С‚РѕСЂРѕР№ РїСЂРёР·РЅР°Рє СѓРґР°Р»РµРЅРЅРѕР№ Р·Р°РїРёСЃРё
+#if !defined EMULATOR_HDD                                    //Р РµР¶РёРј СЌРјСѓР»СЏС‚РѕСЂР°
+   if(Save_Dir() < 0) return -1;                             //РЎРѕС…СЂР°РЅРµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РєР°С‚Р°Р»РѕРіР°
 #endif
-   num_del_Cl = 0;                                           //Число удаленных кластеров
-   int ret = (aTree->pf.type == 48) ?                        //Текущий выбор это папка
-       Del_Folder(hitem, aTree) :                            //Удаление папки
-       Del_OneFileFAT(aTree);                                //Удаление одного файла из FAT
+   num_del_Cl = 0;                                           //Р§РёСЃР»Рѕ СѓРґР°Р»РµРЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+   int ret = (aTree->pf.type == 48) ?                        //РўРµРєСѓС‰РёР№ РІС‹Р±РѕСЂ СЌС‚Рѕ РїР°РїРєР°
+       Del_Folder(hitem, aTree) :                            //РЈРґР°Р»РµРЅРёРµ РїР°РїРєРё
+       Del_OneFileFAT(aTree);                                //РЈРґР°Р»РµРЅРёРµ РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р° РёР· FAT
    if(ret < 0) return -1;
-   TreeView_DeleteItem(hwndTree, hitem);                     //Удаление имени в дереве после удаления всего вложенного
-// Надо бы еще удалить имя в моем массиве дерева aTree, хотя возможно это не имеет значения
-#if !defined EMULATOR_HDD                                    //Режим эмулятора
-   if(Save_FAT1() < 0) return -1;                            //Сохранение обновленной FAT первого раздела
-   if(Change_Sec67(num_del_Cl) < 0) return -1;               //Внесение изменений в содержимое сектора 67
+   TreeView_DeleteItem(hwndTree, hitem);                     //РЈРґР°Р»РµРЅРёРµ РёРјРµРЅРё РІ РґРµСЂРµРІРµ РїРѕСЃР»Рµ СѓРґР°Р»РµРЅРёСЏ РІСЃРµРіРѕ РІР»РѕР¶РµРЅРЅРѕРіРѕ
+// РќР°РґРѕ Р±С‹ РµС‰Рµ СѓРґР°Р»РёС‚СЊ РёРјСЏ РІ РјРѕРµРј РјР°СЃСЃРёРІРµ РґРµСЂРµРІР° aTree, С…РѕС‚СЏ РІРѕР·РјРѕР¶РЅРѕ СЌС‚Рѕ РЅРµ РёРјРµРµС‚ Р·РЅР°С‡РµРЅРёСЏ
+#if !defined EMULATOR_HDD                                    //Р РµР¶РёРј СЌРјСѓР»СЏС‚РѕСЂР°
+   if(Save_FAT1() < 0) return -1;                            //РЎРѕС…СЂР°РЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРЅРѕР№ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+   if(Change_Sec67(num_del_Cl) < 0) return -1;               //Р’РЅРµСЃРµРЅРёРµ РёР·РјРµРЅРµРЅРёР№ РІ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРµРєС‚РѕСЂР° 67
 #endif
-   writeCl -= num_del_Cl;                                    //Число записанных кластеров
-   ViewSize();                                               //Показа дискового пространства
+   writeCl -= num_del_Cl;                                    //Р§РёСЃР»Рѕ Р·Р°РїРёСЃР°РЅРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+   ViewSize();                                               //РџРѕРєР°Р·Р° РґРёСЃРєРѕРІРѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР°
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-#if !defined EMULATOR_HDD                                    //НЕТ Режима эмулятора
-int WriteSec(BYTE *buff)                                     //Запись сектора
+#if !defined EMULATOR_HDD                                    //РќР•Рў Р РµР¶РёРјР° СЌРјСѓР»СЏС‚РѕСЂР°
+int WriteSec(BYTE *buff)                                     //Р—Р°РїРёСЃСЊ СЃРµРєС‚РѕСЂР°
 {
    DWORD nb;
    if(WriteFile(hDrive, buff, sSecB, &nb, NULL) == FALSE || nb != sSecB)
-      return ErrorSys1((Lan+175)->msg);                      //Ошибка при записи кластера. (хотя правильно: Ошибка при записи сектора.)
+      return ErrorSys1((Lan+175)->msg);                      //РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё РєР»Р°СЃС‚РµСЂР°. (С…РѕС‚СЏ РїСЂР°РІРёР»СЊРЅРѕ: РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё СЃРµРєС‚РѕСЂР°.)
    return 0;
 }
 #endif
 
 //------------------------------------------------------------------------------
 
-#if !defined EMULATOR_HDD                                    //НЕТ Режима эмулятора
-int Change_Sec67(int num_Cl)                                 //Внесение изменений в содержимое сектора 67
+#if !defined EMULATOR_HDD                                    //РќР•Рў Р РµР¶РёРјР° СЌРјСѓР»СЏС‚РѕСЂР°
+int Change_Sec67(int num_Cl)                                 //Р’РЅРµСЃРµРЅРёРµ РёР·РјРµРЅРµРЅРёР№ РІ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРµРєС‚РѕСЂР° 67
 {
    SEC_67 Sec67;
    LONGLONG Poz = LONGLONG(sSecB) * 67;
-   SetInFilePointer(Poz);                                    //Встали в начало 67 сектора
-   ReadSec((BYTE *)&Sec67);                                  //Чтение 67 сектора
-   Sec67.FreeCl += num_Cl;                                   //Изменили число свободных кластеров
-   if(MaxClast+1 > Sec67.LastCl) Sec67.LastCl = MaxClast+1;  //Номер самого старшего свободного кластера
-   SetInFilePointer(Poz);                                    //Встали в начало 67 сектора
-   return WriteSec((BYTE *)&Sec67);                          //Запись сектора
+   SetInFilePointer(Poz);                                    //Р’СЃС‚Р°Р»Рё РІ РЅР°С‡Р°Р»Рѕ 67 СЃРµРєС‚РѕСЂР°
+   ReadSec((BYTE *)&Sec67);                                  //Р§С‚РµРЅРёРµ 67 СЃРµРєС‚РѕСЂР°
+   Sec67.FreeCl += num_Cl;                                   //РР·РјРµРЅРёР»Рё С‡РёСЃР»Рѕ СЃРІРѕР±РѕРґРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+   if(MaxClast+1 > Sec67.LastCl) Sec67.LastCl = MaxClast+1;  //РќРѕРјРµСЂ СЃР°РјРѕРіРѕ СЃС‚Р°СЂС€РµРіРѕ СЃРІРѕР±РѕРґРЅРѕРіРѕ РєР»Р°СЃС‚РµСЂР°
+   SetInFilePointer(Poz);                                    //Р’СЃС‚Р°Р»Рё РІ РЅР°С‡Р°Р»Рѕ 67 СЃРµРєС‚РѕСЂР°
+   return WriteSec((BYTE *)&Sec67);                          //Р—Р°РїРёСЃСЊ СЃРµРєС‚РѕСЂР°
 }
 #endif
 
 //------------------------------------------------------------------------------
 
-int  Correct67Sec(void)                                      //Коррекция содержимого 67 сектора
+int  Correct67Sec(void)                                      //РљРѕСЂСЂРµРєС†РёСЏ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ 67 СЃРµРєС‚РѕСЂР°
 {
    int n;
    for(n=maxZapFAT1-1; n>1; n--)
      if(*(FAT1+n) != 0) break;
-   int FreeFat = maxZapFAT1 - 2;                             //Число свободных кластеров
-   for(int i=2; i<n; i++)                                    //n+1 - Первый кластер неиспользуемой области FAT
+   int FreeFat = maxZapFAT1 - 2;                             //Р§РёСЃР»Рѕ СЃРІРѕР±РѕРґРЅС‹С… РєР»Р°СЃС‚РµСЂРѕРІ
+   for(int i=2; i<n; i++)                                    //n+1 - РџРµСЂРІС‹Р№ РєР»Р°СЃС‚РµСЂ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјРѕР№ РѕР±Р»Р°СЃС‚Рё FAT
      if(*(FAT1+i) != 0)  FreeFat--;
    SEC_67 Sec67;
    LONGLONG Poz = LONGLONG(sSecB) * 67;
-   SetInFilePointer(Poz);                                    //Встали в начало 67 сектора
-   ReadSec((BYTE *)&Sec67);                                  //Чтение 67 сектора
+   SetInFilePointer(Poz);                                    //Р’СЃС‚Р°Р»Рё РІ РЅР°С‡Р°Р»Рѕ 67 СЃРµРєС‚РѕСЂР°
+   ReadSec((BYTE *)&Sec67);                                  //Р§С‚РµРЅРёРµ 67 СЃРµРєС‚РѕСЂР°
 // char ss1[300], ss2[300];
-// sprintf(ss1, "Вычислено: Свободно - %8d,  Первый неиспользуемый - %8d", FreeFat, n+1);
-// sprintf(ss2, "Записано:  Свободно - %8d,  Первый неиспользуемый - %8d", Sec67.FreeCl, Sec67.LastCl);
+// sprintf(ss1, "Р’С‹С‡РёСЃР»РµРЅРѕ: РЎРІРѕР±РѕРґРЅРѕ - %8d,  РџРµСЂРІС‹Р№ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ - %8d", FreeFat, n+1);
+// sprintf(ss2, "Р—Р°РїРёСЃР°РЅРѕ:  РЎРІРѕР±РѕРґРЅРѕ - %8d,  РџРµСЂРІС‹Р№ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ - %8d", Sec67.FreeCl, Sec67.LastCl);
 // Message2(ss1, ss2);
    if(DWORD(FreeFat) == Sec67.FreeCl && DWORD(n+1) >= Sec67.LastCl)
    {   Message1((Lan+194)->msg);
@@ -333,8 +333,8 @@ int  Correct67Sec(void)                                      //Коррекция содержи
    Sec67.FreeCl = FreeFat;
    if(DWORD(n+1) > Sec67.LastCl)
       Sec67.LastCl = n + 1;
-   SetInFilePointer(Poz);                                    //Встали в начало 67 сектора
-   if(WriteSec((BYTE *)&Sec67) != -1)                        //Запись сектора
+   SetInFilePointer(Poz);                                    //Р’СЃС‚Р°Р»Рё РІ РЅР°С‡Р°Р»Рѕ 67 СЃРµРєС‚РѕСЂР°
+   if(WriteSec((BYTE *)&Sec67) != -1)                        //Р—Р°РїРёСЃСЊ СЃРµРєС‚РѕСЂР°
       Message1((Lan+195)->msg);
    return 0;
 }

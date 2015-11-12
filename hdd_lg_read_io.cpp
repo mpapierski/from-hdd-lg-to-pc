@@ -6,24 +6,24 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_read_io ==================================
-int  ReadSec(BYTE *buff);                                    //Чтение сектора
-int  ReadClast1(BYTE *buff);                                 //Чтение кластера первого раздела начиная с текущего сектора
-int  ReadClast1_P(DWORD nSector, BYTE *buff);                //Чтение кластера первого раздела начиная с указанного сектора
-int  ReadClast2(BYTE *buff);                                 //Чтение кластера второго раздела начиная с текущего сектора
-int  ReadClast2_P(DWORD nSector, BYTE *buff);                //Чтение кластера второго раздела начиная с указанного сектора
-int  Load_FAT1(void);                                         //Загрузка FAT первого раздела
-int  Load_FAT2(void);                                        //Загрузка FAT второго раздела
-int  FindHDD_LG(void);                                       //Поиск диска из рекордера LG
-     DWORD stCl_Media2;                                      //Кластер начала второй части папки MEDIA
+int  ReadSec(BYTE *buff);                                    //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
+int  ReadClast1(BYTE *buff);                                 //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р° РЅР°С‡РёРЅР°СЏ СЃ С‚РµРєСѓС‰РµРіРѕ СЃРµРєС‚РѕСЂР°
+int  ReadClast1_P(DWORD nSector, BYTE *buff);                //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р° РЅР°С‡РёРЅР°СЏ СЃ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЃРµРєС‚РѕСЂР°
+int  ReadClast2(BYTE *buff);                                 //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° РЅР°С‡РёРЅР°СЏ СЃ С‚РµРєСѓС‰РµРіРѕ СЃРµРєС‚РѕСЂР°
+int  ReadClast2_P(DWORD nSector, BYTE *buff);                //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° РЅР°С‡РёРЅР°СЏ СЃ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЃРµРєС‚РѕСЂР°
+int  Load_FAT1(void);                                         //Р—Р°РіСЂСѓР·РєР° FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+int  Load_FAT2(void);                                        //Р—Р°РіСЂСѓР·РєР° FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
+int  FindHDD_LG(void);                                       //РџРѕРёСЃРє РґРёСЃРєР° РёР· СЂРµРєРѕСЂРґРµСЂР° LG
+     DWORD stCl_Media2;                                      //РљР»Р°СЃС‚РµСЂ РЅР°С‡Р°Р»Р° РІС‚РѕСЂРѕР№ С‡Р°СЃС‚Рё РїР°РїРєРё MEDIA
 
 //------------------------------------------------------------------------------
 
-int ReadSec(BYTE *buff)                                      //Чтение сектора
+int ReadSec(BYTE *buff)                                      //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
 {
    DWORD nb;
    if(ReadFile(hDrive, buff, sSecB, &nb, NULL) == FALSE || nb != sSecB)
-   {  ErrorSys1((Lan+9)->msg);                               //Ошибка при чтении сектора.
-      CloseFile(&hDrive);                                    //Закрыли входной файл
+   {  ErrorSys1((Lan+9)->msg);                               //РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё СЃРµРєС‚РѕСЂР°.
+      CloseFile(&hDrive);                                    //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
       return -1;
    }
    return 0;
@@ -31,12 +31,12 @@ int ReadSec(BYTE *buff)                                      //Чтение сектора
 
 //------------------------------------------------------------------------------
 
-int ReadClast1(BYTE *buff)                                   //Чтение кластера
+int ReadClast1(BYTE *buff)                                   //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
 {
    DWORD nb;
    if(ReadFile(hDrive, buff, sCl_B, &nb, NULL) == FALSE || nb != sCl_B)
-   {  ErrorSys1((Lan+10)->msg);                              //ErrorSys1("Ошибка при чтении кластера.");
-      CloseFile(&hDrive);                                    //Закрыли входной файл
+   {  ErrorSys1((Lan+10)->msg);                              //ErrorSys1("РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё РєР»Р°СЃС‚РµСЂР°.");
+      CloseFile(&hDrive);                                    //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
       return -1;
    }
    return 0;
@@ -44,26 +44,26 @@ int ReadClast1(BYTE *buff)                                   //Чтение кластера
 
 //------------------------------------------------------------------------------
 
-int  ReadClast1_P(DWORD nSector, BYTE *buff)                 //Чтение кластера
+int  ReadClast1_P(DWORD nSector, BYTE *buff)                 //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
 {
    LONGLONG Poz = LONGLONG(sSecB) * nSector;
 #if defined EMULATOR_HDD
-   if(ReadClastEmul(Poz, buff) < 0) return -1;               //Чтение кластера эмулятором
+   if(ReadClastEmul(Poz, buff) < 0) return -1;               //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° СЌРјСѓР»СЏС‚РѕСЂРѕРј
 #else
-   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   if(ReadClast1(buff) < 0) return -1;                       //Чтение кластера
+   if(SetInFilePointer(Poz) < 0) return -1;                  //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ
+   if(ReadClast1(buff) < 0) return -1;                       //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
 #endif
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int ReadClast2(BYTE *buff)                                   //Чтение кластера второго раздела
+int ReadClast2(BYTE *buff)                                   //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
 {
    DWORD nb;
    if(ReadFile(hDrive, buff, sCl2_B, &nb, NULL) == FALSE || nb != sCl2_B)
-   {  ErrorSys1((Lan+10)->msg);                              //ErrorSys1("Ошибка при чтении кластера.");
-      CloseFile(&hDrive);                                    //Закрыли входной файл
+   {  ErrorSys1((Lan+10)->msg);                              //ErrorSys1("РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё РєР»Р°СЃС‚РµСЂР°.");
+      CloseFile(&hDrive);                                    //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
       return -1;
    }
    return 0;
@@ -71,38 +71,38 @@ int ReadClast2(BYTE *buff)                                   //Чтение кластера в
 
 //------------------------------------------------------------------------------
 
-int  ReadClast2_P(DWORD nSector, BYTE *buff)                 //Чтение кластера
+int  ReadClast2_P(DWORD nSector, BYTE *buff)                 //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
 {
    LONGLONG Poz = LONGLONG(sSecB) * nSector;
 #if defined EMULATOR_HDD
-   if(ReadClast2Emul(Poz, buff) < 0) return -1;              //Чтение кластера эмулятором
+   if(ReadClast2Emul(Poz, buff) < 0) return -1;              //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР° СЌРјСѓР»СЏС‚РѕСЂРѕРј
 #else
-   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   if(ReadClast2(buff) < 0) return -1;                       //Чтение кластера
+   if(SetInFilePointer(Poz) < 0) return -1;                  //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ
+   if(ReadClast2(buff) < 0) return -1;                       //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
 #endif
    return 0;
 }
 
 //------------------------------------------------------------------------------
 /*
-static int Ctrl_FAT_For_File(DWORD clSt, LONGLONG SizeF)     //Проверка соответствия длины файла и FAT
+static int Ctrl_FAT_For_File(DWORD clSt, LONGLONG SizeF)     //РџСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РґР»РёРЅС‹ С„Р°Р№Р»Р° Рё FAT
 {
-   DWORD nCl = clSt;                                         //Текущий номер кластера равен первому кластеру файла
-   DWORD wSizeB = sCl_B;                                     //Число записываемых байт равно числу байт в кластере
-   LONGLONG SizeToEnd = SizeF;                               //Число байт которые осталось в цепочке
-   DWORD numCl = DWORD((SizeF + sCl_B - 1) / sCl_B);         //Число кластеров необходимое для размещения файла данного размера
-   for(DWORD i=0; i<numCl; i++)                              //По числу кластеров которые нужны для данного файла
+   DWORD nCl = clSt;                                         //РўРµРєСѓС‰РёР№ РЅРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° СЂР°РІРµРЅ РїРµСЂРІРѕРјСѓ РєР»Р°СЃС‚РµСЂСѓ С„Р°Р№Р»Р°
+   DWORD wSizeB = sCl_B;                                     //Р§РёСЃР»Рѕ Р·Р°РїРёСЃС‹РІР°РµРјС‹С… Р±Р°Р№С‚ СЂР°РІРЅРѕ С‡РёСЃР»Сѓ Р±Р°Р№С‚ РІ РєР»Р°СЃС‚РµСЂРµ
+   LONGLONG SizeToEnd = SizeF;                               //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РєРѕС‚РѕСЂС‹Рµ РѕСЃС‚Р°Р»РѕСЃСЊ РІ С†РµРїРѕС‡РєРµ
+   DWORD numCl = DWORD((SizeF + sCl_B - 1) / sCl_B);         //Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РЅРµРѕР±С…РѕРґРёРјРѕРµ РґР»СЏ СЂР°Р·РјРµС‰РµРЅРёСЏ С„Р°Р№Р»Р° РґР°РЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР°
+   for(DWORD i=0; i<numCl; i++)                              //РџРѕ С‡РёСЃР»Сѓ РєР»Р°СЃС‚РµСЂРѕРІ РєРѕС‚РѕСЂС‹Рµ РЅСѓР¶РЅС‹ РґР»СЏ РґР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°
    {  if(nCl == 0x0FFFFFFF)
-        return Error1((Lan+12)->msg);                        //return Error1("Неожиданно найден признак конца цепочки FAT.");
+        return Error1((Lan+12)->msg);                        //return Error1("РќРµРѕР¶РёРґР°РЅРЅРѕ РЅР°Р№РґРµРЅ РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё FAT.");
       if(*(FAT + nCl) == 0)
-        return Error1((Lan+11)->msg);                        //return Error1("Обнаружено несоответствие значения FAT и ссылки на кластер файла.");
-      if(wSizeB > SizeToEnd) wSizeB = DWORD(SizeToEnd);      //Размер остатка записи меньше размера кластера
-      SizeToEnd -= wSizeB;                                   //Число байт которые осталось записать
-      nCl = *(FAT + nCl);                                    //Номер следующего кластера
+        return Error1((Lan+11)->msg);                        //return Error1("РћР±РЅР°СЂСѓР¶РµРЅРѕ РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ Р·РЅР°С‡РµРЅРёСЏ FAT Рё СЃСЃС‹Р»РєРё РЅР° РєР»Р°СЃС‚РµСЂ С„Р°Р№Р»Р°.");
+      if(wSizeB > SizeToEnd) wSizeB = DWORD(SizeToEnd);      //Р Р°Р·РјРµСЂ РѕСЃС‚Р°С‚РєР° Р·Р°РїРёСЃРё РјРµРЅСЊС€Рµ СЂР°Р·РјРµСЂР° РєР»Р°СЃС‚РµСЂР°
+      SizeToEnd -= wSizeB;                                   //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РєРѕС‚РѕСЂС‹Рµ РѕСЃС‚Р°Р»РѕСЃСЊ Р·Р°РїРёСЃР°С‚СЊ
+      nCl = *(FAT + nCl);                                    //РќРѕРјРµСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ РєР»Р°СЃС‚РµСЂР°
       if(nCl > num_ZapFAT && nCl != 0x0FFFFFFF)
-        return Error1((Lan+13)->msg);                        //return Error2("Номер кластера в цепочке FAT", "превышает допустимое значение.");
+        return Error1((Lan+13)->msg);                        //return Error2("РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РІ С†РµРїРѕС‡РєРµ FAT", "РїСЂРµРІС‹С€Р°РµС‚ РґРѕРїСѓСЃС‚РёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ.");
       if(SizeToEnd == 0 && nCl != 0x0FFFFFFF)
-        return Error1((Lan+14)->msg);                        //return Error2("Нужное число кластеров пройдено,", "а признак конца цепочки FAT не найден.");
+        return Error1((Lan+14)->msg);                        //return Error2("РќСѓР¶РЅРѕРµ С‡РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РїСЂРѕР№РґРµРЅРѕ,", "Р° РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё FAT РЅРµ РЅР°Р№РґРµРЅ.");
    }
    return 0;
 }
@@ -110,12 +110,12 @@ static int Ctrl_FAT_For_File(DWORD clSt, LONGLONG SizeF)     //Проверка соответс
 
 //------------------------------------------------------------------------------
 
-static int ReadFAT1(void)                                    //Чтение FAT первого раздела
+static int ReadFAT1(void)                                    //Р§С‚РµРЅРёРµ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
 {
    DWORD nb;
    if(ReadFile(hDrive, FAT1, Size_FAT1, &nb, NULL) == FALSE || nb != Size_FAT1)
-   {   ErrorSys1((Lan+22)->msg);                             //ErrorSys1("Ошибка при чтении FAT.");
-       CloseFile(&hDrive);                                   //Закрыли входной файл
+   {   ErrorSys1((Lan+22)->msg);                             //ErrorSys1("РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё FAT.");
+       CloseFile(&hDrive);                                   //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
        return -1;
    }
    return 0;
@@ -123,12 +123,12 @@ static int ReadFAT1(void)                                    //Чтение FAT первог
 
 //------------------------------------------------------------------------------
 
-static int ReadFAT2(void)                                    //Чтение FAT второго раздела
+static int ReadFAT2(void)                                    //Р§С‚РµРЅРёРµ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
 {
    DWORD nb;
    if(ReadFile(hDrive, FAT2, Size_FAT2, &nb, NULL) == FALSE || nb != Size_FAT2)
-   {   ErrorSys1((Lan+22)->msg);                             //ErrorSys1("Ошибка при чтении FAT.");
-       CloseFile(&hDrive);                                   //Закрыли входной файл
+   {   ErrorSys1((Lan+22)->msg);                             //ErrorSys1("РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё FAT.");
+       CloseFile(&hDrive);                                   //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
        return -1;
    }
    return 0;
@@ -136,39 +136,39 @@ static int ReadFAT2(void)                                    //Чтение FAT второг
 
 //-------------------------------------------------------------------------------
 
-int Load_FAT1(void)                                          //Загрузка FAT первого раздела
+int Load_FAT1(void)                                          //Р—Р°РіСЂСѓР·РєР° FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
 {
 #if defined OUT_TEST
    char Ss[300];
    wsprintf(Ss, "Load FAT 1 (sector %d, size (sectors) %d)", Start_SecFAT1, num_SecFAT1);
    Add_SpecSpis(Ss);
 #endif
-   FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                    //Память под FAT
+   FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                    //РџР°РјСЏС‚СЊ РїРѕРґ FAT
    if(FAT1 == NULL)  return -1;
    LONGLONG Poz = LONGLONG(sSecB) * Start_SecFAT1;
 #if defined EMULATOR_HDD
-   if(ReadFATEmul(Poz) < 0) return -1;                       //Чтение FAT эмулятором
+   if(ReadFATEmul(Poz) < 0) return -1;                       //Р§С‚РµРЅРёРµ FAT СЌРјСѓР»СЏС‚РѕСЂРѕРј
 #else
-   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   if(ReadFAT1() < 0) return -1;                             //Чтение FAT
+   if(SetInFilePointer(Poz) < 0) return -1;                  //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ
+   if(ReadFAT1() < 0) return -1;                             //Р§С‚РµРЅРёРµ FAT
 #endif
 #if defined OUT_TEST
    View_HEX_Any((BYTE*)FAT1, Size_FAT1);
 #endif
    if(*(FAT1 + 0) != 0x00FFFFF8)
-      return Error1((Lan+23)->msg);                          //return Error1("Неожиданное начало FAT.");
-   stCl_Media2 = *(FAT1 + 1);                                //Кластер начала второй части папки MEDIA
-   //Продолжений может быть до 5, т.е. максимум 6 кластеров
-   //Нужен цикл по обработке еще возможных четырех кластеров
-   if(stCl_Media2 == 0x0FFFFFFF) stCl_Media2 = 0;            //Вторая часть была, но потом стала не нужной
-   if(stCl_Media2 == 0xFFFFFFFF) stCl_Media2 = 0;            //Обработка странного дампа
+      return Error1((Lan+23)->msg);                          //return Error1("РќРµРѕР¶РёРґР°РЅРЅРѕРµ РЅР°С‡Р°Р»Рѕ FAT.");
+   stCl_Media2 = *(FAT1 + 1);                                //РљР»Р°СЃС‚РµСЂ РЅР°С‡Р°Р»Р° РІС‚РѕСЂРѕР№ С‡Р°СЃС‚Рё РїР°РїРєРё MEDIA
+   //РџСЂРѕРґРѕР»Р¶РµРЅРёР№ РјРѕР¶РµС‚ Р±С‹С‚СЊ РґРѕ 5, С‚.Рµ. РјР°РєСЃРёРјСѓРј 6 РєР»Р°СЃС‚РµСЂРѕРІ
+   //РќСѓР¶РµРЅ С†РёРєР» РїРѕ РѕР±СЂР°Р±РѕС‚РєРµ РµС‰Рµ РІРѕР·РјРѕР¶РЅС‹С… С‡РµС‚С‹СЂРµС… РєР»Р°СЃС‚РµСЂРѕРІ
+   if(stCl_Media2 == 0x0FFFFFFF) stCl_Media2 = 0;            //Р’С‚РѕСЂР°СЏ С‡Р°СЃС‚СЊ Р±С‹Р»Р°, РЅРѕ РїРѕС‚РѕРј СЃС‚Р°Р»Р° РЅРµ РЅСѓР¶РЅРѕР№
+   if(stCl_Media2 == 0xFFFFFFFF) stCl_Media2 = 0;            //РћР±СЂР°Р±РѕС‚РєР° СЃС‚СЂР°РЅРЅРѕРіРѕ РґР°РјРїР°
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
 #if defined OUT_TEST
-static int Find_FAT2(void)                                   //Поиск и Чтение FAT второго раздела
+static int Find_FAT2(void)                                   //РџРѕРёСЃРє Рё Р§С‚РµРЅРёРµ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
 {
    char Ss[300];
    sprintf(Ss, "Not found FAT2 in sector %d", Start_SecFAT2);
@@ -178,21 +178,21 @@ static int Find_FAT2(void)                                   //Поиск и Чтение FA
    InitProgressBar = InitProgressBar1;
    ProgressBar = ProgressBar1;
    Close_ProgressBar = Close_ProgressBar1;
-   int numTestSec = Start_SecDir1 - Start_SecFAT1 - num_SecFAT1 - num_SecFAT2; //Число секторов которое надо проанализировать
-   DWORD Sec[128];                                           //Размер одного сектора
+   int numTestSec = Start_SecDir1 - Start_SecFAT1 - num_SecFAT1 - num_SecFAT2; //Р§РёСЃР»Рѕ СЃРµРєС‚РѕСЂРѕРІ РєРѕС‚РѕСЂРѕРµ РЅР°РґРѕ РїСЂРѕР°РЅР°Р»РёР·РёСЂРѕРІР°С‚СЊ
+   DWORD Sec[128];                                           //Р Р°Р·РјРµСЂ РѕРґРЅРѕРіРѕ СЃРµРєС‚РѕСЂР°
    int pr = -1;
-   LONGLONG Poz = LONGLONG(sSecB) * (Start_SecFAT1 + num_SecFAT1); //Сразу за концом FAT первого раздела
-   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   InitProgressBar(numTestSec, (Lan+21)->msg);               //InitProgressBar(nCycl, "Чтение служебной информации");
+   LONGLONG Poz = LONGLONG(sSecB) * (Start_SecFAT1 + num_SecFAT1); //РЎСЂР°Р·Сѓ Р·Р° РєРѕРЅС†РѕРј FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+   if(SetInFilePointer(Poz) < 0) return -1;                  //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ
+   InitProgressBar(numTestSec, (Lan+21)->msg);               //InitProgressBar(nCycl, "Р§С‚РµРЅРёРµ СЃР»СѓР¶РµР±РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё");
    for(int i=0; i<numTestSec; i++)
    {  if(ReadFile(hDrive, &Sec, sSecB, &nb, NULL) == FALSE || nb != sSecB)
-      {  ErrorSys1((Lan+22)->msg);                           //ErrorSys1("Ошибка при чтении FAT.");
-         CloseFile(&hDrive);                                 //Закрыли входной файл
+      {  ErrorSys1((Lan+22)->msg);                           //ErrorSys1("РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё FAT.");
+         CloseFile(&hDrive);                                 //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
          return -1;
       }
-      if(ProgressBar(sSecB) < 0)                             //Оператор нажал кнопку Прервать
+      if(ProgressBar(sSecB) < 0)                             //РћРїРµСЂР°С‚РѕСЂ РЅР°Р¶Р°Р» РєРЅРѕРїРєСѓ РџСЂРµСЂРІР°С‚СЊ
       {  Close_ProgressBar();  return -1;   }
-      if(*(Sec + 0) != 0x00FFFFF8 || *(Sec + 1) != 0) continue; //Этот сектор не является началом FAT2
+      if(*(Sec + 0) != 0x00FFFFF8 || *(Sec + 1) != 0) continue; //Р­С‚РѕС‚ СЃРµРєС‚РѕСЂ РЅРµ СЏРІР»СЏРµС‚СЃСЏ РЅР°С‡Р°Р»РѕРј FAT2
       pr = i;
       break;
    }
@@ -200,8 +200,8 @@ static int Find_FAT2(void)                                   //Поиск и Чтение FA
    if(pr == -1) return -1;
    DWORD stSec_FAT2 = pr + Start_SecFAT1 + num_SecFAT1;
    LONGLONG Poz_St = LONGLONG(sSecB) * stSec_FAT2;
-   if(SetInFilePointer(Poz_St) < 0) return -1;               //Изменение позиции указателя в файле
-   if(ReadFAT2() < 0) return -1;                             //Чтение FAT второго раздела
+   if(SetInFilePointer(Poz_St) < 0) return -1;               //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ
+   if(ReadFAT2() < 0) return -1;                             //Р§С‚РµРЅРёРµ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
    wsprintf(Ss, "Load FAT 2 (sector %d, size (sectors) %d)", stSec_FAT2, num_SecFAT2);
    Add_SpecSpis(Ss);
    return 0;
@@ -210,45 +210,45 @@ static int Find_FAT2(void)                                   //Поиск и Чтение FA
 
 //-------------------------------------------------------------------------------
 
-int Load_FAT2(void)                                          //Загрузка FAT второго раздела
+int Load_FAT2(void)                                          //Р—Р°РіСЂСѓР·РєР° FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
 {
 #if defined OUT_TEST
    char Ss[300];
    wsprintf(Ss, "Load FAT 2 (sector %d, size (sectors) %d)", Start_SecFAT2, num_SecFAT2);
    Add_SpecSpis(Ss);
 #endif
-   FAT2 = (DWORD *)MyAllocMem(Size_FAT2);                     //Память под FAT
+   FAT2 = (DWORD *)MyAllocMem(Size_FAT2);                     //РџР°РјСЏС‚СЊ РїРѕРґ FAT
    if(FAT2 == NULL)  return -1;
    LONGLONG Poz = LONGLONG(sSecB) * Start_SecFAT2;
 #if defined EMULATOR_HDD
-   if(ReadFAT2Emul(Poz) < 0) return -1;                      //Чтение FAT эмулятором
+   if(ReadFAT2Emul(Poz) < 0) return -1;                      //Р§С‚РµРЅРёРµ FAT СЌРјСѓР»СЏС‚РѕСЂРѕРј
 #else
    if(Start_SecFAT2 < Start_SecFAT1 + num_SecFAT1 ||
       Start_SecFAT2 >  Start_SecDir1)
   #if defined OUT_TEST
-      if(Find_FAT2() < 0) return -1;                         //Поиск и Чтение FAT второго раздела
+      if(Find_FAT2() < 0) return -1;                         //РџРѕРёСЃРє Рё Р§С‚РµРЅРёРµ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
   #else
-      return Error1((Lan+135)->msg);                         //return Error1("Недопустимый номер сектора начала FAT2.");
+      return Error1((Lan+135)->msg);                         //return Error1("РќРµРґРѕРїСѓСЃС‚РёРјС‹Р№ РЅРѕРјРµСЂ СЃРµРєС‚РѕСЂР° РЅР°С‡Р°Р»Р° FAT2.");
   #endif
-   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   if(ReadFAT2() < 0) return -1;                             //Чтение FAT второго раздела
+   if(SetInFilePointer(Poz) < 0) return -1;                  //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ
+   if(ReadFAT2() < 0) return -1;                             //Р§С‚РµРЅРёРµ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
 #endif
 #if defined OUT_TEST
-   if(*(FAT2 + 0) != 0x00FFFFF8 || *(FAT2 + 1) != 0)         //Если FAT второго раздела не найден
-      if(Find_FAT2() < 0) return -1;                         //Поиск и Чтение FAT второго раздела
+   if(*(FAT2 + 0) != 0x00FFFFF8 || *(FAT2 + 1) != 0)         //Р•СЃР»Рё FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° РЅРµ РЅР°Р№РґРµРЅ
+      if(Find_FAT2() < 0) return -1;                         //РџРѕРёСЃРє Рё Р§С‚РµРЅРёРµ FAT РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
    View_HEX_Any((BYTE*)FAT2, Size_FAT2);
    if(*(FAT2 + 0) != 0x00FFFFF8 || *(FAT2 + 1) != 0)
-      Error1((Lan+23)->msg);                                 //return Error1("Неожиданное начало FAT.");
+      Error1((Lan+23)->msg);                                 //return Error1("РќРµРѕР¶РёРґР°РЅРЅРѕРµ РЅР°С‡Р°Р»Рѕ FAT.");
 #else
    if(*(FAT2 + 0) != 0x00FFFFF8 || *(FAT2 + 1) != 0)
-      return Error1((Lan+23)->msg);                          //return Error1("Неожиданное начало FAT.");
+      return Error1((Lan+23)->msg);                          //return Error1("РќРµРѕР¶РёРґР°РЅРЅРѕРµ РЅР°С‡Р°Р»Рѕ FAT.");
 #endif
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-#define MAX_CHAR 40                                          //Примерная длина строки
+#define MAX_CHAR 40                                          //РџСЂРёРјРµСЂРЅР°СЏ РґР»РёРЅР° СЃС‚СЂРѕРєРё
 
 static int ErrorSys1_New(char *Msg, DWORD Code)
 {
@@ -257,13 +257,13 @@ static int ErrorSys1_New(char *Msg, DWORD Code)
    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, Code,
                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                  MsgErr, 512, NULL);
-   int n = lstrlen(MsgErr);                                  //Число символов в системном сообщении
-   int m = MAX_CHAR;                                         //Длина строки
+   int n = lstrlen(MsgErr);                                  //Р§РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ СЃРёСЃС‚РµРјРЅРѕРј СЃРѕРѕР±С‰РµРЅРёРё
+   int m = MAX_CHAR;                                         //Р”Р»РёРЅР° СЃС‚СЂРѕРєРё
    if(n > m)
    {  for(;;)
       { int i;
-        for(i=m; i<n; i++)                                   //Делим фразу на несколько строк
-          if(*(MsgErr+i) == ' ')                             //Делим строку по пробелам
+        for(i=m; i<n; i++)                                   //Р”РµР»РёРј С„СЂР°Р·Сѓ РЅР° РЅРµСЃРєРѕР»СЊРєРѕ СЃС‚СЂРѕРє
+          if(*(MsgErr+i) == ' ')                             //Р”РµР»РёРј СЃС‚СЂРѕРєСѓ РїРѕ РїСЂРѕР±РµР»Р°Рј
           {  *(MsgErr+i) = '\n';
              m = i + MAX_CHAR + 1;
              break;
@@ -271,8 +271,8 @@ static int ErrorSys1_New(char *Msg, DWORD Code)
         if(n - m < MAX_CHAR || i >= n) break;
       }
    }
-   wsprintf(Ss, "%s\n\n%s:\n%s", Msg, (Lan+37)->msg, MsgErr);               //wsprintf(Ss, "%s\n\nСистемное сообщение:\n%s", Msg, MsgErr);
-   MessageBox(MainWin, Ss, (Lan+35)->msg, MB_TOPMOST | MB_OK | MB_ICONSTOP);//MessageBox(MainWin, Ss, "Ошибка", MB_TOPMOST | MB_OK | MB_ICONSTOP);
+   wsprintf(Ss, "%s\n\n%s:\n%s", Msg, (Lan+37)->msg, MsgErr);               //wsprintf(Ss, "%s\n\nРЎРёСЃС‚РµРјРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ:\n%s", Msg, MsgErr);
+   MessageBox(MainWin, Ss, (Lan+35)->msg, MB_TOPMOST | MB_OK | MB_ICONSTOP);//MessageBox(MainWin, Ss, "РћС€РёР±РєР°", MB_TOPMOST | MB_OK | MB_ICONSTOP);
 #if defined OUT_TEST
    Add_SpecSpis(Ss);
 #endif
@@ -281,18 +281,18 @@ static int ErrorSys1_New(char *Msg, DWORD Code)
 
 //------------------------------------------------------------------------------
 
-static int ReadSec0(BYTE *buff)                              //Чтение сектора
+static int ReadSec0(BYTE *buff)                              //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
 {
    DWORD nb;
    if(ReadFile(hDrive, buff, sSecB, &nb, NULL) == FALSE || nb != sSecB)
    {  DWORD Code = GetLastError();
       if(Code != ERROR_NOT_READY)
-         ErrorSys1_New((Lan+9)->msg, Code);                  //Ошибка при чтении сектора
+         ErrorSys1_New((Lan+9)->msg, Code);                  //РћС€РёР±РєР° РїСЂРё С‡С‚РµРЅРёРё СЃРµРєС‚РѕСЂР°
 #if defined OUT_TEST
-      else                                                   //Устройство не откликнулось
+      else                                                   //РЈСЃС‚СЂРѕР№СЃС‚РІРѕ РЅРµ РѕС‚РєР»РёРєРЅСѓР»РѕСЃСЊ
          Add_SpecSpis("The device is not ready. ");
 #endif
-      CloseFile(&hDrive);                                    //Закрыли входной файл
+      CloseFile(&hDrive);                                    //Р—Р°РєСЂС‹Р»Рё РІС…РѕРґРЅРѕР№ С„Р°Р№Р»
       return -1;
    }
    return 0;
@@ -306,18 +306,18 @@ static void ReadAnySec(void)
    SEC_0 anySec;
    LONGLONG Poz = LONGLONG(sSecB) * 67;
    SetInFilePointer(Poz);
-   ReadSec((BYTE *)&anySec);                                 //Чтение сектора
+   ReadSec((BYTE *)&anySec);                                 //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
    Add_SpecSpis("Sector 67");
    View_HEX_Any((BYTE *)&anySec, 512);
-   ReadSec((BYTE *)&anySec);                                 //Чтение сектора
+   ReadSec((BYTE *)&anySec);                                 //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
    Add_SpecSpis("Sector 68");
    View_HEX_Any((BYTE *)&anySec, 512);
    Poz = LONGLONG(sSecB) * 70;
    SetInFilePointer(Poz);
-   ReadSec((BYTE *)&anySec);                                 //Чтение сектора
+   ReadSec((BYTE *)&anySec);                                 //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
    Add_SpecSpis("Sector 70");
    View_HEX_Any((BYTE *)&anySec, 512);
-   ReadSec((BYTE *)&anySec);                                 //Чтение сектора
+   ReadSec((BYTE *)&anySec);                                 //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
    Add_SpecSpis("Sector 71");
    View_HEX_Any((BYTE *)&anySec, 512);
 }
@@ -325,18 +325,18 @@ static void ReadAnySec(void)
 
 //-------------------------------------------------------------------------------
 
-int FindHDD_LG(void)                                         //Поиск диска из рекордера LG
+int FindHDD_LG(void)                                         //РџРѕРёСЃРє РґРёСЃРєР° РёР· СЂРµРєРѕСЂРґРµСЂР° LG
 {
    hDrive = NULL;
 #if defined OUT_TEST
    Add_SpecSpis("Find HDD from LG");
 #endif
 #if defined HDD_LG
-   for(int drive=HDD_LG; drive<32; drive++)                  //По всем возможным физическим устройствам начиная с указанного
+   for(int drive=HDD_LG; drive<32; drive++)                  //РџРѕ РІСЃРµРј РІРѕР·РјРѕР¶РЅС‹Рј С„РёР·РёС‡РµСЃРєРёРј СѓСЃС‚СЂРѕР№СЃС‚РІР°Рј РЅР°С‡РёРЅР°СЏ СЃ СѓРєР°Р·Р°РЅРЅРѕРіРѕ
 #else
-   for(int drive=0; drive<32; drive++)                       //По всем возможным физическим устройствам
+   for(int drive=0; drive<32; drive++)                       //РџРѕ РІСЃРµРј РІРѕР·РјРѕР¶РЅС‹Рј С„РёР·РёС‡РµСЃРєРёРј СѓСЃС‚СЂРѕР№СЃС‚РІР°Рј
 #endif
-   {  char driveName[256];                                   //Имя физического устройства
+   {  char driveName[256];                                   //РРјСЏ С„РёР·РёС‡РµСЃРєРѕРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР°
       sprintf(driveName, "\\\\.\\PhysicalDrive%d", drive);
 #if defined OUT_TEST
       Add_SpecSpis(driveName);
@@ -346,17 +346,17 @@ int FindHDD_LG(void)                                         //Поиск диска из ре
 //                        FILE_FLAG_NO_BUFFERING |
                           0, NULL);
 #if defined OUT_TEST
-      if(hDrive == INVALID_HANDLE_VALUE)                     //Устройство не откликнулось
+      if(hDrive == INVALID_HANDLE_VALUE)                     //РЈСЃС‚СЂРѕР№СЃС‚РІРѕ РЅРµ РѕС‚РєР»РёРєРЅСѓР»РѕСЃСЊ
          Add_SpecSpis("Error Drive");
 #endif
-      if(hDrive == INVALID_HANDLE_VALUE) continue;           //Устройство не откликнулось
+      if(hDrive == INVALID_HANDLE_VALUE) continue;           //РЈСЃС‚СЂРѕР№СЃС‚РІРѕ РЅРµ РѕС‚РєР»РёРєРЅСѓР»РѕСЃСЊ
       SEC_0 Sec0;
-      if(ReadSec0((BYTE*)&Sec0) < 0) continue;               //Чтение сектора, если сектор не читается, то на продолжение поиска
+      if(ReadSec0((BYTE*)&Sec0) < 0) continue;               //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°, РµСЃР»Рё СЃРµРєС‚РѕСЂ РЅРµ С‡РёС‚Р°РµС‚СЃСЏ, С‚Рѕ РЅР° РїСЂРѕРґРѕР»Р¶РµРЅРёРµ РїРѕРёСЃРєР°
       SEC_63 Sec63, Sec64;
       LONGLONG Poz = LONGLONG(sSecB) * 63;
-      if(SetInFilePointer(Poz) < 0)  //return -1;            //Изменение позиции указателя в файле
-      {  CloseFile(&hDrive);  continue;  }                   //Почему-то не сработало
-      if(ReadSec((BYTE *)&Sec63) < 0) continue;              //Чтение сектора
+      if(SetInFilePointer(Poz) < 0)  //return -1;            //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ
+      {  CloseFile(&hDrive);  continue;  }                   //РџРѕС‡РµРјСѓ-С‚Рѕ РЅРµ СЃСЂР°Р±РѕС‚Р°Р»Рѕ
+      if(ReadSec((BYTE *)&Sec63) < 0) continue;              //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
       if(strncmp(Sec63.Met, "LGEINC  ", 8) != 0 ||
          strncmp(Sec63.Name, "VOLUMELABE FAT32   ", 19) != 0)
 #if defined OUT_TEST
@@ -372,17 +372,17 @@ int FindHDD_LG(void)                                         //Поиск диска из ре
 #endif
       if(Sec63.nf != 1 || Sec63.F8 != 0xF8 || Sec63.SecPerCl != sClSec)
 #if defined OUT_TEST
-        Error1((Lan+19)->msg);                               //Error1("Найден жесткий диск только частично похожий на то, что он из рекордера LG.");
+        Error1((Lan+19)->msg);                               //Error1("РќР°Р№РґРµРЅ Р¶РµСЃС‚РєРёР№ РґРёСЃРє С‚РѕР»СЊРєРѕ С‡Р°СЃС‚РёС‡РЅРѕ РїРѕС…РѕР¶РёР№ РЅР° С‚Рѕ, С‡С‚Рѕ РѕРЅ РёР· СЂРµРєРѕСЂРґРµСЂР° LG.");
 #else
-        return Error1((Lan+19)->msg);                        //return Error1("Найден жесткий диск только частично похожий на то, что он из рекордера LG.");
+        return Error1((Lan+19)->msg);                        //return Error1("РќР°Р№РґРµРЅ Р¶РµСЃС‚РєРёР№ РґРёСЃРє С‚РѕР»СЊРєРѕ С‡Р°СЃС‚РёС‡РЅРѕ РїРѕС…РѕР¶РёР№ РЅР° С‚Рѕ, С‡С‚Рѕ РѕРЅ РёР· СЂРµРєРѕСЂРґРµСЂР° LG.");
 #endif
-      Start_SecFAT1 = 63 + Sec63.numRezSec;                  //Позиция начала таблицы FAT первого раздела
-      Start_SecDir1 = Start_SecFAT1 + Sec63.nSecDir;         //Позиция начала первого каталога
-      num_SecFAT1 = Sec63.numSecFAT;                         //Число секторов в FAT
-      Size_FAT1 = num_SecFAT1 * sSecB;                       //Число байт в FAT
-//??  maxZapFAT1 = sSecB / 4 * num_SecFAT1;                  //Максимальное число записей в FAT (по 4 байта)
-      maxZapFAT1 = Sec63.numSecPart / sClSec;                //Максимальное число записей в FAT (по 4 байта)
-      if(ReadSec((BYTE *)&Sec64) < 0) return -1;             //Чтение сектора
+      Start_SecFAT1 = 63 + Sec63.numRezSec;                  //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° С‚Р°Р±Р»РёС†С‹ FAT РїРµСЂРІРѕРіРѕ СЂР°Р·РґРµР»Р°
+      Start_SecDir1 = Start_SecFAT1 + Sec63.nSecDir;         //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РїРµСЂРІРѕРіРѕ РєР°С‚Р°Р»РѕРіР°
+      num_SecFAT1 = Sec63.numSecFAT;                         //Р§РёСЃР»Рѕ СЃРµРєС‚РѕСЂРѕРІ РІ FAT
+      Size_FAT1 = num_SecFAT1 * sSecB;                       //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ FAT
+//??  maxZapFAT1 = sSecB / 4 * num_SecFAT1;                  //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ Р·Р°РїРёСЃРµР№ РІ FAT (РїРѕ 4 Р±Р°Р№С‚Р°)
+      maxZapFAT1 = Sec63.numSecPart / sClSec;                //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ Р·Р°РїРёСЃРµР№ РІ FAT (РїРѕ 4 Р±Р°Р№С‚Р°)
+      if(ReadSec((BYTE *)&Sec64) < 0) return -1;             //Р§С‚РµРЅРёРµ СЃРµРєС‚РѕСЂР°
 #if defined OUT_TEST
       Add_SpecSpis("Sector 64");
       View_HEX_Any((BYTE *)&Sec64, 512);
@@ -391,14 +391,14 @@ int FindHDD_LG(void)                                         //Поиск диска из ре
          strncmp(Sec64.Name, "VOLUMELABE FAT32   ", 19) != 0)
       {  CloseFile(&hDrive);  continue;  }
       if(Sec64.nf != 1 || Sec64.F8 != 0xF8 || Sec64.SecPerCl != sClSec2)
-        Error1((Lan+19)->msg);                               //return Error1("Найден жесткий диск только частично похожий на то, что он из рекордера LG.");
-      Start_SecDir2 = Sec63.numSecPart + 63 + Sec64.numRezSec + Sec64.nSecDir; //Номер сектора начала каталога во втором разделе
-      num_SecFAT2 = Sec64.numSecFAT;                         //Число секторов в FAT
-      Size_FAT2 = num_SecFAT2 * sSecB;                       //Число байт в FAT
-      maxZapFAT2 = sSecB / 4 * num_SecFAT2;                  //Максимальное число записей в FAT2 (по 4 байта)
-      Start_SecFAT2 = Start_SecFAT1 + Sec0.numClP1;          //Позиция начала таблицы FAT2
-//Для проверки наличия BIG LBA здесь можно прочитать сектор с номером 268435456+64 (0x10000000+64)
-//и сравнить прочитанное по содержимому с сектором 64
+        Error1((Lan+19)->msg);                               //return Error1("РќР°Р№РґРµРЅ Р¶РµСЃС‚РєРёР№ РґРёСЃРє С‚РѕР»СЊРєРѕ С‡Р°СЃС‚РёС‡РЅРѕ РїРѕС…РѕР¶РёР№ РЅР° С‚Рѕ, С‡С‚Рѕ РѕРЅ РёР· СЂРµРєРѕСЂРґРµСЂР° LG.");
+      Start_SecDir2 = Sec63.numSecPart + 63 + Sec64.numRezSec + Sec64.nSecDir; //РќРѕРјРµСЂ СЃРµРєС‚РѕСЂР° РЅР°С‡Р°Р»Р° РєР°С‚Р°Р»РѕРіР° РІРѕ РІС‚РѕСЂРѕРј СЂР°Р·РґРµР»Рµ
+      num_SecFAT2 = Sec64.numSecFAT;                         //Р§РёСЃР»Рѕ СЃРµРєС‚РѕСЂРѕРІ РІ FAT
+      Size_FAT2 = num_SecFAT2 * sSecB;                       //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ FAT
+      maxZapFAT2 = sSecB / 4 * num_SecFAT2;                  //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ Р·Р°РїРёСЃРµР№ РІ FAT2 (РїРѕ 4 Р±Р°Р№С‚Р°)
+      Start_SecFAT2 = Start_SecFAT1 + Sec0.numClP1;          //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° С‚Р°Р±Р»РёС†С‹ FAT2
+//Р”Р»СЏ РїСЂРѕРІРµСЂРєРё РЅР°Р»РёС‡РёСЏ BIG LBA Р·РґРµСЃСЊ РјРѕР¶РЅРѕ РїСЂРѕС‡РёС‚Р°С‚СЊ СЃРµРєС‚РѕСЂ СЃ РЅРѕРјРµСЂРѕРј 268435456+64 (0x10000000+64)
+//Рё СЃСЂР°РІРЅРёС‚СЊ РїСЂРѕС‡РёС‚Р°РЅРЅРѕРµ РїРѕ СЃРѕРґРµСЂР¶РёРјРѕРјСѓ СЃ СЃРµРєС‚РѕСЂРѕРј 64
 #if defined OUT_TEST
       Add_SpecSpis("Sector 0");
       View_HEX_Any((BYTE *)&Sec0, 512);
@@ -407,7 +407,7 @@ int FindHDD_LG(void)                                         //Поиск диска из ре
       break;
    }
    if(hDrive == NULL || hDrive == INVALID_HANDLE_VALUE)
-      return Error1((Lan+20)->msg);                          //return Error1("Не найден жесткий диск из рекордера LG.");
+      return Error1((Lan+20)->msg);                          //return Error1("РќРµ РЅР°Р№РґРµРЅ Р¶РµСЃС‚РєРёР№ РґРёСЃРє РёР· СЂРµРєРѕСЂРґРµСЂР° LG.");
    return 0;
 }
 

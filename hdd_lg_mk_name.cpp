@@ -6,121 +6,121 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_mk_name ==================================
-int  MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf);//Создание строки символов для отражения в дереве
-int  ViewAbsendName(void);                                   //Показ имен присутствующих в файле MME.DB, но отсутствующих в каталоге
+int  MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf);//РЎРѕР·РґР°РЅРёРµ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РґР»СЏ РѕС‚СЂР°Р¶РµРЅРёСЏ РІ РґРµСЂРµРІРµ
+int  ViewAbsendName(void);                                   //РџРѕРєР°Р· РёРјРµРЅ РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РІ С„Р°Р№Р»Рµ MME.DB, РЅРѕ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РІ РєР°С‚Р°Р»РѕРіРµ
 
-static int nErr1 = 0, nErr2 = 0, nErr3 = 0, nErr4 = 0;       //Для ограничения числа сообщений об ошибке
+static int nErr1 = 0, nErr2 = 0, nErr3 = 0, nErr4 = 0;       //Р”Р»СЏ РѕРіСЂР°РЅРёС‡РµРЅРёСЏ С‡РёСЃР»Р° СЃРѕРѕР±С‰РµРЅРёР№ РѕР± РѕС€РёР±РєРµ
 static char *strSize[] = { "", "Kb", "Mb", "Gb" };
 
 //------------------------------------------------------------------------------
 
-static int Ctrl_Get_Size_From_FAT(DWORD clSt, LONGLONG *SizeFromFAT)//Вычисление максимальной длины файла по FAT
+static int Ctrl_Get_Size_From_FAT(DWORD clSt, LONGLONG *SizeFromFAT)//Р’С‹С‡РёСЃР»РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РґР»РёРЅС‹ С„Р°Р№Р»Р° РїРѕ FAT
 {
-   DWORD nCl = clSt;                                         //Текущий номер кластера равен первому кластеру файла
-   DWORD numCl = 0;                                          //Число кластеров прописанное в FAT для данного файла
+   DWORD nCl = clSt;                                         //РўРµРєСѓС‰РёР№ РЅРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° СЂР°РІРµРЅ РїРµСЂРІРѕРјСѓ РєР»Р°СЃС‚РµСЂСѓ С„Р°Р№Р»Р°
+   DWORD numCl = 0;                                          //Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РїСЂРѕРїРёСЃР°РЅРЅРѕРµ РІ FAT РґР»СЏ РґР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°
 /*
-   for(;; numCl++)                                           //Идем по цепочке кластеров
-   {  if(nCl == 0x0FFFFFFF) break;                           //Найден признак конца цепочки FAT
-      if(*(FAT + nCl) == 0) return -1;                       //Обрыв цепочки кластеров
-      nCl = *(FAT + nCl);                                    //Номер следующего кластера
-      if(nCl > max_ZapFAT && nCl != 0x0FFFFFFF) return -2;   //Номер кластера в цепочке FAT превышает допустимое значение
+   for(;; numCl++)                                           //РРґРµРј РїРѕ С†РµРїРѕС‡РєРµ РєР»Р°СЃС‚РµСЂРѕРІ
+   {  if(nCl == 0x0FFFFFFF) break;                           //РќР°Р№РґРµРЅ РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё FAT
+      if(*(FAT + nCl) == 0) return -1;                       //РћР±СЂС‹РІ С†РµРїРѕС‡РєРё РєР»Р°СЃС‚РµСЂРѕРІ
+      nCl = *(FAT + nCl);                                    //РќРѕРјРµСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ РєР»Р°СЃС‚РµСЂР°
+      if(nCl > max_ZapFAT && nCl != 0x0FFFFFFF) return -2;   //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РІ С†РµРїРѕС‡РєРµ FAT РїСЂРµРІС‹С€Р°РµС‚ РґРѕРїСѓСЃС‚РёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ
    }
-   *SizeFromFAT =  LONGLONG(numCl) * sCl_B;                  //Максимально возможный размер файла для данного числа кластеров
+   *SizeFromFAT =  LONGLONG(numCl) * sCl_B;                  //РњР°РєСЃРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅС‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р° РґР»СЏ РґР°РЅРЅРѕРіРѕ С‡РёСЃР»Р° РєР»Р°СЃС‚РµСЂРѕРІ
    return 0;
 */
-   for(;; numCl++)                                           //Идем по цепочке кластеров
-   {  if(nCl == 0x0FFFFFFF) break;                           //Найден признак конца цепочки FAT
-      if(*(FAT1 + nCl) == 0) return -1;                      //Обрыв цепочки кластеров
-      nCl = *(FAT1 + nCl);                                   //Номер следующего кластера
-      if(nCl > maxZapFAT1 && nCl != 0x0FFFFFFF) return -2;   //Номер кластера в цепочке FAT превышает допустимое значение
-     *SizeFromFAT =  LONGLONG(numCl) * sCl_B;                //Максимально возможный размер файла для данного числа кластеров
+   for(;; numCl++)                                           //РРґРµРј РїРѕ С†РµРїРѕС‡РєРµ РєР»Р°СЃС‚РµСЂРѕРІ
+   {  if(nCl == 0x0FFFFFFF) break;                           //РќР°Р№РґРµРЅ РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё FAT
+      if(*(FAT1 + nCl) == 0) return -1;                      //РћР±СЂС‹РІ С†РµРїРѕС‡РєРё РєР»Р°СЃС‚РµСЂРѕРІ
+      nCl = *(FAT1 + nCl);                                   //РќРѕРјРµСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ РєР»Р°СЃС‚РµСЂР°
+      if(nCl > maxZapFAT1 && nCl != 0x0FFFFFFF) return -2;   //РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РІ С†РµРїРѕС‡РєРµ FAT РїСЂРµРІС‹С€Р°РµС‚ РґРѕРїСѓСЃС‚РёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ
+     *SizeFromFAT =  LONGLONG(numCl) * sCl_B;                //РњР°РєСЃРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅС‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р° РґР»СЏ РґР°РЅРЅРѕРіРѕ С‡РёСЃР»Р° РєР»Р°СЃС‚РµСЂРѕРІ
    }
-   *SizeFromFAT =  LONGLONG(numCl+1) * sCl_B;                //Максимально возможный размер файла для данного числа кластеров
+   *SizeFromFAT =  LONGLONG(numCl+1) * sCl_B;                //РњР°РєСЃРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅС‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р° РґР»СЏ РґР°РЅРЅРѕРіРѕ С‡РёСЃР»Р° РєР»Р°СЃС‚РµСЂРѕРІ
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int ChangeNameInMEDIA(char *nam, char *ext, PAR_FILE *pf)//Изменние имени в папке MEDIA
+static int ChangeNameInMEDIA(char *nam, char *ext, PAR_FILE *pf)//РР·РјРµРЅРЅРёРµ РёРјРµРЅРё РІ РїР°РїРєРµ MEDIA
 {
-   int prF = -1;                                             //Тип файла
+   int prF = -1;                                             //РўРёРї С„Р°Р№Р»Р°
    if(lstrcmp(ext, "idx") == 0) prF = 0;
    if(lstrcmp(ext, "str") == 0) prF = 1;                     //
-   if((Conf.altName == 0 || Conf.ViewIDX == 0) && prF == 0) return 1; //Не показывать файлы  *.idx
-   if((Conf.altName == 0 || Conf.Ren_STR == 0) && prF == 1)  //Менять расширение файлов *.str
+   if((Conf.altName == 0 || Conf.ViewIDX == 0) && prF == 0) return 1; //РќРµ РїРѕРєР°Р·С‹РІР°С‚СЊ С„Р°Р№Р»С‹  *.idx
+   if((Conf.altName == 0 || Conf.Ren_STR == 0) && prF == 1)  //РњРµРЅСЏС‚СЊ СЂР°СЃС€РёСЂРµРЅРёРµ С„Р°Р№Р»РѕРІ *.str
        lstrcpy(ext, "vro");
-   (aTree + numEl_Tree)->numPart = 0;                        //Номер части многофайлового Title
+   (aTree + numEl_Tree)->numPart = 0;                        //РќРѕРјРµСЂ С‡Р°СЃС‚Рё РјРЅРѕРіРѕС„Р°Р№Р»РѕРІРѕРіРѕ Title
    (aTree + numEl_Tree)->indTitle = 0xFFFF;
-   (aTree + numEl_Tree)->indFolder = 0;                      //Ссылка на имя папки
-   (aTree + numEl_Tree)->numCopy = 0;                        //Счетчик скопированных частей
-   (aTree + numEl_Tree)->prSel = 0;                          //Признак выбора данного файла(0-не выбран)
+   (aTree + numEl_Tree)->indFolder = 0;                      //РЎСЃС‹Р»РєР° РЅР° РёРјСЏ РїР°РїРєРё
+   (aTree + numEl_Tree)->numCopy = 0;                        //РЎС‡РµС‚С‡РёРє СЃРєРѕРїРёСЂРѕРІР°РЅРЅС‹С… С‡Р°СЃС‚РµР№
+   (aTree + numEl_Tree)->prSel = 0;                          //РџСЂРёР·РЅР°Рє РІС‹Р±РѕСЂР° РґР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°(0-РЅРµ РІС‹Р±СЂР°РЅ)
 
-   indTabMME = -1;                                           //Индекс в таблице MME.DB для текущего файла в папке MEDIA
-   if(Conf.altName == 0 && tabMME != NULL)                   //Вывод информативного имени и есть таблица имен из MME.DB
-   {  for(DWORD n=0; n<numNam; n++)                          //По числу имен в таблице по MME.DB
-        if(lstrcmp(nam, (tabMME + n)->NameF) == 0)           //Сравнение имен из каталога и из файла базы. Имена совпали
-        {  (aTree + numEl_Tree)->numPart = (tabMME + n)->numPart;//Номер части многофайлового Title
+   indTabMME = -1;                                           //РРЅРґРµРєСЃ РІ С‚Р°Р±Р»РёС†Рµ MME.DB РґР»СЏ С‚РµРєСѓС‰РµРіРѕ С„Р°Р№Р»Р° РІ РїР°РїРєРµ MEDIA
+   if(Conf.altName == 0 && tabMME != NULL)                   //Р’С‹РІРѕРґ РёРЅС„РѕСЂРјР°С‚РёРІРЅРѕРіРѕ РёРјРµРЅРё Рё РµСЃС‚СЊ С‚Р°Р±Р»РёС†Р° РёРјРµРЅ РёР· MME.DB
+   {  for(DWORD n=0; n<numNam; n++)                          //РџРѕ С‡РёСЃР»Сѓ РёРјРµРЅ РІ С‚Р°Р±Р»РёС†Рµ РїРѕ MME.DB
+        if(lstrcmp(nam, (tabMME + n)->NameF) == 0)           //РЎСЂР°РІРЅРµРЅРёРµ РёРјРµРЅ РёР· РєР°С‚Р°Р»РѕРіР° Рё РёР· С„Р°Р№Р»Р° Р±Р°Р·С‹. РРјРµРЅР° СЃРѕРІРїР°Р»Рё
+        {  (aTree + numEl_Tree)->numPart = (tabMME + n)->numPart;//РќРѕРјРµСЂ С‡Р°СЃС‚Рё РјРЅРѕРіРѕС„Р°Р№Р»РѕРІРѕРіРѕ Title
            (aTree + numEl_Tree)->indTitle = (tabMME + n)->indTitle;
-           if(pf->SizeF == (tabMME + n)->SizeF)              //Сверить длины файлов
-           {  indTabMME = n;                                 //Индекс в таблице по MME.DB для текущего файла в папке MEDIA
-              (tabMME + n)->prYes = 1;                       //Признак, что имя парное (1 - есть и в MME.DB и в каталоге)
-              return 0;                                      //Файл найден
+           if(pf->SizeF == (tabMME + n)->SizeF)              //РЎРІРµСЂРёС‚СЊ РґР»РёРЅС‹ С„Р°Р№Р»РѕРІ
+           {  indTabMME = n;                                 //РРЅРґРµРєСЃ РІ С‚Р°Р±Р»РёС†Рµ РїРѕ MME.DB РґР»СЏ С‚РµРєСѓС‰РµРіРѕ С„Р°Р№Р»Р° РІ РїР°РїРєРµ MEDIA
+              (tabMME + n)->prYes = 1;                       //РџСЂРёР·РЅР°Рє, С‡С‚Рѕ РёРјСЏ РїР°СЂРЅРѕРµ (1 - РµСЃС‚СЊ Рё РІ MME.DB Рё РІ РєР°С‚Р°Р»РѕРіРµ)
+              return 0;                                      //Р¤Р°Р№Р» РЅР°Р№РґРµРЅ
            }
-           else                                              //Имя нашли, но длины файлов отличаются
+           else                                              //РРјСЏ РЅР°С€Р»Рё, РЅРѕ РґР»РёРЅС‹ С„Р°Р№Р»РѕРІ РѕС‚Р»РёС‡Р°СЋС‚СЃСЏ
            {  LONGLONG SizeFromFAT;
-              if(Ctrl_Get_Size_From_FAT(pf->ClSt, &SizeFromFAT) < 0 ||//Вычисление максимальной длины файла по FAT
+              if(Ctrl_Get_Size_From_FAT(pf->ClSt, &SizeFromFAT) < 0 ||//Р’С‹С‡РёСЃР»РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РґР»РёРЅС‹ С„Р°Р№Р»Р° РїРѕ FAT
                  pf->SizeF > SizeFromFAT)
-              {  pf->SizeF = SizeFromFAT;//0;                //У файлов с нарушениями в FAT принимаем длину == 0
-                 if(nErr2 == 0)                              //Сообщения об ошибке еще небыло
+              {  pf->SizeF = SizeFromFAT;//0;                //РЈ С„Р°Р№Р»РѕРІ СЃ РЅР°СЂСѓС€РµРЅРёСЏРјРё РІ FAT РїСЂРёРЅРёРјР°РµРј РґР»РёРЅСѓ == 0
+                 if(nErr2 == 0)                              //РЎРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ РµС‰Рµ РЅРµР±С‹Р»Рѕ
                    Error3((Lan+138)->msg, (Lan+139)->msg, (Lan+152)->msg);
-                 nErr2++;                                    //Чтобы не дублировать сообщения
-                 pf->type = 34;                              //Признак для показа специальной иконки E2
+                 nErr2++;                                    //Р§С‚РѕР±С‹ РЅРµ РґСѓР±Р»РёСЂРѕРІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ
+                 pf->type = 34;                              //РџСЂРёР·РЅР°Рє РґР»СЏ РїРѕРєР°Р·Р° СЃРїРµС†РёР°Р»СЊРЅРѕР№ РёРєРѕРЅРєРё E2
               }
               else
-              {  if(nErr3 == 0)                              //Сообщения об ошибке еще небыло
+              {  if(nErr3 == 0)                              //РЎРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ РµС‰Рµ РЅРµР±С‹Р»Рѕ
                    Error3((Lan+141)->msg, (Lan+142)->msg, (Lan+143)->msg);
-                 nErr3++;                                    //Чтобы не дублировать сообщения
-                 pf->type = 33;                              //Признак для показа специальной иконки e1
+                 nErr3++;                                    //Р§С‚РѕР±С‹ РЅРµ РґСѓР±Р»РёСЂРѕРІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ
+                 pf->type = 33;                              //РџСЂРёР·РЅР°Рє РґР»СЏ РїРѕРєР°Р·Р° СЃРїРµС†РёР°Р»СЊРЅРѕР№ РёРєРѕРЅРєРё e1
               }
-              indTabMME = n;                                 //Индекс в таблице MME.DB для текущего файла в папке MEDIA
-              (tabMME + n)->prYes = 1;                       //Признак, что имя парное (1 - есть и в MME.DB и в каталоге)
+              indTabMME = n;                                 //РРЅРґРµРєСЃ РІ С‚Р°Р±Р»РёС†Рµ MME.DB РґР»СЏ С‚РµРєСѓС‰РµРіРѕ С„Р°Р№Р»Р° РІ РїР°РїРєРµ MEDIA
+              (tabMME + n)->prYes = 1;                       //РџСЂРёР·РЅР°Рє, С‡С‚Рѕ РёРјСЏ РїР°СЂРЅРѕРµ (1 - РµСЃС‚СЊ Рё РІ MME.DB Рё РІ РєР°С‚Р°Р»РѕРіРµ)
               return 0;
            }
         }
-      //Прошли все и вышли из цикла и этого недолжно быть
-      if(nErr1 == 0)                                         //Сообщения об ошибке еще небыло
+      //РџСЂРѕС€Р»Рё РІСЃРµ Рё РІС‹С€Р»Рё РёР· С†РёРєР»Р° Рё СЌС‚РѕРіРѕ РЅРµРґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ
+      if(nErr1 == 0)                                         //РЎРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ РµС‰Рµ РЅРµР±С‹Р»Рѕ
         Error4((Lan+108)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg);
-      nErr1++;                                               //Чтобы не дублировать сообщения
+      nErr1++;                                               //Р§С‚РѕР±С‹ РЅРµ РґСѓР±Р»РёСЂРѕРІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ
    }
-   //Если нет файла MME.DB или его использование отключено (признак в конфиге)
-   if(Conf.SwapNPart == 0)                                   //Включена перестановка номера части в конец имени файла
+   //Р•СЃР»Рё РЅРµС‚ С„Р°Р№Р»Р° MME.DB РёР»Рё РµРіРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ РѕС‚РєР»СЋС‡РµРЅРѕ (РїСЂРёР·РЅР°Рє РІ РєРѕРЅС„РёРіРµ)
+   if(Conf.SwapNPart == 0)                                   //Р’РєР»СЋС‡РµРЅР° РїРµСЂРµСЃС‚Р°РЅРѕРІРєР° РЅРѕРјРµСЂР° С‡Р°СЃС‚Рё РІ РєРѕРЅРµС† РёРјРµРЅРё С„Р°Р№Р»Р°
    {  char nPart[8];
       int iPart;
-      MoveMemory(nPart, nam, 4);                             //Переслали символы счетчика
+      MoveMemory(nPart, nam, 4);                             //РџРµСЂРµСЃР»Р°Р»Рё СЃРёРјРІРѕР»С‹ СЃС‡РµС‚С‡РёРєР°
       *(nPart + 4) = 0;
       sscanf(nPart, "%X", &iPart);
-      strncpy(nam, nam + 4, 42);                             //Переслали (сдвинули) имя файла без счетчика (предельная длина)
-      if(Conf.ChangeNul == 0)// && prF == 1)                 //Включена замена 0 на _ в счетчике частей
+      strncpy(nam, nam + 4, 42);                             //РџРµСЂРµСЃР»Р°Р»Рё (СЃРґРІРёРЅСѓР»Рё) РёРјСЏ С„Р°Р№Р»Р° Р±РµР· СЃС‡РµС‚С‡РёРєР° (РїСЂРµРґРµР»СЊРЅР°СЏ РґР»РёРЅР°)
+      if(Conf.ChangeNul == 0)// && prF == 1)                 //Р’РєР»СЋС‡РµРЅР° Р·Р°РјРµРЅР° 0 РЅР° _ РІ СЃС‡РµС‚С‡РёРєРµ С‡Р°СЃС‚РµР№
       {  for(int i=0; i<4; i++)
-         {  if(*(nPart + i) != '0') break;                   //Встретили номер
+         {  if(*(nPart + i) != '0') break;                   //Р’СЃС‚СЂРµС‚РёР»Рё РЅРѕРјРµСЂ
             if(*(nPart + i) == '0') *(nPart + i) = '_';
          }
-         if(pf->lL2 != 0 && *(nPart + 3) == '_') *(nPart + 3) = '0'; //Восстановили 0 для первой части если их много
+         if(pf->lL2 != 0 && *(nPart + 3) == '_') *(nPart + 3) = '0'; //Р’РѕСЃСЃС‚Р°РЅРѕРІРёР»Рё 0 РґР»СЏ РїРµСЂРІРѕР№ С‡Р°СЃС‚Рё РµСЃР»Рё РёС… РјРЅРѕРіРѕ
       }
-      if(!(Conf.NoViewOnePart == 0 && pf->lL2 == 0) ||       //0-не показыватьномер для одной части
-         prF == 0 ||                                         //Это не файл *.std (*.vro)
-         iPart != 0)                                         //Есть номер части
-      {  lstrcat(nam, ".");                                  //Добавили точку к имени
-         strncat(nam, nPart, 4);                             //Добавили номер части
+      if(!(Conf.NoViewOnePart == 0 && pf->lL2 == 0) ||       //0-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊРЅРѕРјРµСЂ РґР»СЏ РѕРґРЅРѕР№ С‡Р°СЃС‚Рё
+         prF == 0 ||                                         //Р­С‚Рѕ РЅРµ С„Р°Р№Р» *.std (*.vro)
+         iPart != 0)                                         //Р•СЃС‚СЊ РЅРѕРјРµСЂ С‡Р°СЃС‚Рё
+      {  lstrcat(nam, ".");                                  //Р”РѕР±Р°РІРёР»Рё С‚РѕС‡РєСѓ Рє РёРјРµРЅРё
+         strncat(nam, nPart, 4);                             //Р”РѕР±Р°РІРёР»Рё РЅРѕРјРµСЂ С‡Р°СЃС‚Рё
       }
       LONGLONG SizeFromFAT;
-      if(Ctrl_Get_Size_From_FAT(pf->ClSt, &SizeFromFAT) < 0 ||//Вычисление максимальной длины файла по FAT
+      if(Ctrl_Get_Size_From_FAT(pf->ClSt, &SizeFromFAT) < 0 ||//Р’С‹С‡РёСЃР»РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РґР»РёРЅС‹ С„Р°Р№Р»Р° РїРѕ FAT
          pf->SizeF > SizeFromFAT)
-      {  pf->SizeF = SizeFromFAT;//0;                        //У файлов с нарушениями в FAT принимаем длину == 0
-         if(nErr2 == 0)                                      //Сообщения об ошибке еще небыло
+      {  pf->SizeF = SizeFromFAT;//0;                        //РЈ С„Р°Р№Р»РѕРІ СЃ РЅР°СЂСѓС€РµРЅРёСЏРјРё РІ FAT РїСЂРёРЅРёРјР°РµРј РґР»РёРЅСѓ == 0
+         if(nErr2 == 0)                                      //РЎРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ РµС‰Рµ РЅРµР±С‹Р»Рѕ
            Error3((Lan+138)->msg, (Lan+139)->msg, (Lan+152)->msg);
-         nErr2++;                                            //Чтобы не дублировать сообщения
-         pf->type = 34;                                      //Признак для показа специальной иконки E2
+         nErr2++;                                            //Р§С‚РѕР±С‹ РЅРµ РґСѓР±Р»РёСЂРѕРІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ
+         pf->type = 34;                                      //РџСЂРёР·РЅР°Рє РґР»СЏ РїРѕРєР°Р·Р° СЃРїРµС†РёР°Р»СЊРЅРѕР№ РёРєРѕРЅРєРё E2
       }
    }
    return 0;
@@ -130,47 +130,47 @@ static char *strSize[] = { "", "Kb", "Mb", "Gb" };
 
 static void MkInformName(char *Name, char *Ext)
 {
-   if(indTabMME < 0) return;                                 //Не найдено соответствие имен
-   TABL_MME *tMME = tabMME + indTabMME;                      //Строка таблицы относящяеся к данному имени
+   if(indTabMME < 0) return;                                 //РќРµ РЅР°Р№РґРµРЅРѕ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РёРјРµРЅ
+   TABL_MME *tMME = tabMME + indTabMME;                      //РЎС‚СЂРѕРєР° С‚Р°Р±Р»РёС†С‹ РѕС‚РЅРѕСЃСЏС‰СЏРµСЃСЏ Рє РґР°РЅРЅРѕРјСѓ РёРјРµРЅРё
    int l = wsprintf(Name, "%s", tMME->aName);
-   if(Conf.poz_In == 1)                                      //Источник записи: 0-в колонке, 1-в имени, 2-не показывать
+   if(Conf.poz_In == 1)                                      //РСЃС‚РѕС‡РЅРёРє Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
      l += wsprintf(Name + l, ".%s", tMME->nameIn);
-   if(Conf.poz_Ql == 1)                                      //Качество записи: 0-в колонке, 1-в имени, 2-не показывать
+   if(Conf.poz_Ql == 1)                                      //РљР°С‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
      l += wsprintf(Name + l, ".%s", tMME->Qual);
-   if(tMME->numPart > 0)                                     //Если больше одной части
-     sprintf(Name + l, ".%03d", tMME->numPart);              //Добавили номер части
+   if(tMME->numPart > 0)                                     //Р•СЃР»Рё Р±РѕР»СЊС€Рµ РѕРґРЅРѕР№ С‡Р°СЃС‚Рё
+     sprintf(Name + l, ".%03d", tMME->numPart);              //Р”РѕР±Р°РІРёР»Рё РЅРѕРјРµСЂ С‡Р°СЃС‚Рё
    lstrcpy(Ext, "vro");
 }
 
 //------------------------------------------------------------------------------
 
-int MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf)//Создание строки символов для отражения в дереве
+int MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf)//РЎРѕР·РґР°РЅРёРµ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РґР»СЏ РѕС‚СЂР°Р¶РµРЅРёСЏ РІ РґРµСЂРµРІРµ
 {
    char size[32], *as;
-   if(pf->type == 48)                                        //Это имя папки
-   {  sprintf(oneStr, "%s", Name);                           //Для папки ничего не меняем
+   if(pf->type == 48)                                        //Р­С‚Рѕ РёРјСЏ РїР°РїРєРё
+   {  sprintf(oneStr, "%s", Name);                           //Р”Р»СЏ РїР°РїРєРё РЅРёС‡РµРіРѕ РЅРµ РјРµРЅСЏРµРј
       return 0;
    }
-   if(prMEDIA == 1)                                          //Папка MEDIA
-      if(ChangeNameInMEDIA(Name, Ext, pf) == 1) return 1;    //Изменние имени в папке MEDIA
+   if(prMEDIA == 1)                                          //РџР°РїРєР° MEDIA
+      if(ChangeNameInMEDIA(Name, Ext, pf) == 1) return 1;    //РР·РјРµРЅРЅРёРµ РёРјРµРЅРё РІ РїР°РїРєРµ MEDIA
    if(prMEDIA == 1 && Conf.altName == 0 && tabMME != NULL)
-      MkInformName(Name, Ext);                               //Формирование информативного имени
-   if(*Ext != 0)                                             //Добавили расширение если оно есть
+      MkInformName(Name, Ext);                               //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРЅС„РѕСЂРјР°С‚РёРІРЅРѕРіРѕ РёРјРµРЅРё
+   if(*Ext != 0)                                             //Р”РѕР±Р°РІРёР»Рё СЂР°СЃС€РёСЂРµРЅРёРµ РµСЃР»Рё РѕРЅРѕ РµСЃС‚СЊ
    {  lstrcat(Name, ".");
       lstrcat(Name, Ext);
    }
    int l = sprintf(oneStr, "  %s", Name);
-   for(int i=l; i<256; i++)                                  //Заполнили хвост строки пробелами
+   for(int i=l; i<256; i++)                                  //Р—Р°РїРѕР»РЅРёР»Рё С…РІРѕСЃС‚ СЃС‚СЂРѕРєРё РїСЂРѕР±РµР»Р°РјРё
        *(oneStr + i) = ' ';
-   switch(Conf.typeSize)                                     //0-байты, 1-Кбайты, 2-Мбайты, 3-ГБайты
+   switch(Conf.typeSize)                                     //0-Р±Р°Р№С‚С‹, 1-РљР±Р°Р№С‚С‹, 2-РњР±Р°Р№С‚С‹, 3-Р“Р‘Р°Р№С‚С‹
    {  case 0: sprintf(size, "%12.0lf", double(pf->SizeF));
-              as = Char_Dig_p(size, 15);  break;             //Преобразование символьного числа в разрядку
+              as = Char_Dig_p(size, 15);  break;             //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
       case 1: sprintf(size, "%11.1lf", double(pf->SizeF)/1024.0);
-              as = Char_Dig_p_n(size, 12, 1);  break;        //Преобразование символьного числа в разрядку
+              as = Char_Dig_p_n(size, 12, 1);  break;        //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
       case 2: sprintf(size, "%9.2lf", double(pf->SizeF)/1024.0/1024.0);
-              as = Char_Dig_p_n(size, 9, 2);  break;         //Преобразование символьного числа в разрядку
+              as = Char_Dig_p_n(size, 9, 2);  break;         //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
       case 3: sprintf(size, "%7.3lf", double(pf->SizeF)/1024.0/1024.0/1024.0);
-              as = Char_Dig_p_n(size, 6, 3);  break;         //Преобразование символьного числа в разрядку
+              as = Char_Dig_p_n(size, 6, 3);  break;         //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
    }
 /*
    if(prMEDIA == 1 && Conf.altName == 0 && tabMME != NULL)
@@ -182,24 +182,24 @@ int MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf)//Создан
         (tabMME + indTabMME)->dt.sec  !=  pf.Sec)
      {
         char sf[260], sb[260], ss[260];
-        wsprintf(sf, "В файле: %02d.%02d.%04d  %02d:%02d:%02d", pf.Day, pf.Mon, pf.Year, pf.Hour, pf.Min, pf.Sec);
-        wsprintf(sb, "В базе:    %02d.%02d.%04d  %02d:%02d:%02d",
+        wsprintf(sf, "Р’ С„Р°Р№Р»Рµ: %02d.%02d.%04d  %02d:%02d:%02d", pf.Day, pf.Mon, pf.Year, pf.Hour, pf.Min, pf.Sec);
+        wsprintf(sb, "Р’ Р±Р°Р·Рµ:    %02d.%02d.%04d  %02d:%02d:%02d",
                     (tabMME + indTabMME)->dt.day, (tabMME + indTabMME)->dt.mon, (tabMME + indTabMME)->dt.year,
                     (tabMME + indTabMME)->dt.hour, (tabMME + indTabMME)->dt.min, (tabMME + indTabMME)->dt.sec);
         WORD wHour = WORD((tabMME + indTabMME)->timeLong / 3600);
         int M1 = (tabMME + indTabMME)->timeLong - wHour * 3600;
         WORD wMinute = WORD(M1 / 60);
         WORD wSecond = WORD(M1 - wMinute * 60);
-        wsprintf(ss, "Длительность: %02d:%02d:%02d", wHour, wMinute, wSecond);
-        Error4("Несовпадение дат:", ss, sb, sf);
+        wsprintf(ss, "Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ: %02d:%02d:%02d", wHour, wMinute, wSecond);
+        Error4("РќРµСЃРѕРІРїР°РґРµРЅРёРµ РґР°С‚:", ss, sb, sf);
      }
 */
    char sDate[64], sTime[64], Pr = ' ';
    SYSTEMTIME sysTime;
-   if(prMEDIA == 1 && Conf.altName == 0 &&                   //Это папка MEDIA и есть признак информативного имени
-      tabMME != NULL && *(DWORD*)Ext == 0x006F7276 &&        //Есть массив MME и файл с расширением *.vro
-      Conf.typeTime == 0 &&                                  //0-показывать время начала записи, 1-время создания файла
-      indTabMME != -1)                                       //Не найдено соответствие имен
+   if(prMEDIA == 1 && Conf.altName == 0 &&                   //Р­С‚Рѕ РїР°РїРєР° MEDIA Рё РµСЃС‚СЊ РїСЂРёР·РЅР°Рє РёРЅС„РѕСЂРјР°С‚РёРІРЅРѕРіРѕ РёРјРµРЅРё
+      tabMME != NULL && *(DWORD*)Ext == 0x006F7276 &&        //Р•СЃС‚СЊ РјР°СЃСЃРёРІ MME Рё С„Р°Р№Р» СЃ СЂР°СЃС€РёСЂРµРЅРёРµРј *.vro
+      Conf.typeTime == 0 &&                                  //0-РїРѕРєР°Р·С‹РІР°С‚СЊ РІСЂРµРјСЏ РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРё, 1-РІСЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р°
+      indTabMME != -1)                                       //РќРµ РЅР°Р№РґРµРЅРѕ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РёРјРµРЅ
    {  pf->Year = (tabMME + indTabMME)->dt.year;
 	  pf->Mon = BYTE((tabMME + indTabMME)->dt.mon);
 	  pf->Day = BYTE((tabMME + indTabMME)->dt.day);
@@ -220,10 +220,10 @@ int MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf)//Создан
    GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &sysTime, NULL, sDate, 64);
    GetTimeFormat(LOCALE_USER_DEFAULT, TIME_FORCE24HOURFORMAT | LOCALE_NOUSEROVERRIDE, &sysTime, NULL, sTime, 64);
 /*
-   int prNoDT = 0;                                           //Признак отсутствия даты/времени (часы не установлены)
+   int prNoDT = 0;                                           //РџСЂРёР·РЅР°Рє РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РґР°С‚С‹/РІСЂРµРјРµРЅРё (С‡Р°СЃС‹ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅС‹)
    if((sysTime.wYear == 2004 && sysTime.wMonth == 1 && sysTime.wDay == 1) ||
-       sysTime.wYear >= 2055 || sysTime.wYear < 2004) prNoDT = 1;                 //Признак отсутствия даты/времени (часы не установлены)
-   if(prNoDT == 1)                                           //Признак отсутствия даты/времени (часы не установлены)
+       sysTime.wYear >= 2055 || sysTime.wYear < 2004) prNoDT = 1;                 //РџСЂРёР·РЅР°Рє РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РґР°С‚С‹/РІСЂРµРјРµРЅРё (С‡Р°СЃС‹ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅС‹)
+   if(prNoDT == 1)                                           //РџСЂРёР·РЅР°Рє РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РґР°С‚С‹/РІСЂРµРјРµРЅРё (С‡Р°СЃС‹ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅС‹)
    {  for(int i=0; i<sizeof(sDate); i++)
       {  if(*(sDate+i) == 0)  break;
          if(*(sDate+i) >= '0' && *(sDate+i) <= '9') *(sDate+i) = '-';
@@ -234,9 +234,9 @@ int MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf)//Создан
       }
    }
 */
-   if(prMEDIA == 1 && Conf.altName == 0 &&                   //Это папка MEDIA и есть признак информативного имени
-      tabMME != NULL && *(DWORD*)Ext == 0x006F7276 &&        //Есть массив MME и файл с расширением *.vro
-      indTabMME != -1)                                       //Не найдено соответствие имен
+   if(prMEDIA == 1 && Conf.altName == 0 &&                   //Р­С‚Рѕ РїР°РїРєР° MEDIA Рё РµСЃС‚СЊ РїСЂРёР·РЅР°Рє РёРЅС„РѕСЂРјР°С‚РёРІРЅРѕРіРѕ РёРјРµРЅРё
+      tabMME != NULL && *(DWORD*)Ext == 0x006F7276 &&        //Р•СЃС‚СЊ РјР°СЃСЃРёРІ MME Рё С„Р°Р№Р» СЃ СЂР°СЃС€РёСЂРµРЅРёРµРј *.vro
+      indTabMME != -1)                                       //РќРµ РЅР°Р№РґРµРЅРѕ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РёРјРµРЅ
    {  sysTime.wHour = WORD((tabMME + indTabMME)->timeLong / 3600);
       int M1 = (tabMME + indTabMME)->timeLong - sysTime.wHour * 3600;
       sysTime.wMinute = WORD(M1 / 60);
@@ -244,13 +244,13 @@ int MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf)//Создан
       sysTime.wMilliseconds = 0;
       char sLTime[64];
       GetTimeFormat(LOCALE_USER_DEFAULT, TIME_FORCE24HOURFORMAT | LOCALE_NOUSEROVERRIDE, &sysTime, NULL, sLTime, 64);
-      if(Conf.ViewVRO == 1)                                  //0-показыват расширение *.vro, 1-не показывать
-         for(int i=l-4; i<l; i++)                            //Стерли расширение .vro и точку
+      if(Conf.ViewVRO == 1)                                  //0-РїРѕРєР°Р·С‹РІР°С‚ СЂР°СЃС€РёСЂРµРЅРёРµ *.vro, 1-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
+         for(int i=l-4; i<l; i++)                            //РЎС‚РµСЂР»Рё СЂР°СЃС€РёСЂРµРЅРёРµ .vro Рё С‚РѕС‡РєСѓ
              *(oneStr + i) = ' ';
       int n = (Conf.poz_Ql == 0) ? 59 : 63;
-      if(Conf.poz_In == 0)                                   //Источник записи: 0-в колонке, 1-в имени, 2-не показывать
+      if(Conf.poz_In == 0)                                   //РСЃС‚РѕС‡РЅРёРє Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
          sprintf(oneStr + n,  "%s        ", (tabMME + indTabMME)->nameIn);
-      if(Conf.poz_Ql == 0)                                   //Качество записи: 0-в колонке, 1-в имени, 2-не показывать
+      if(Conf.poz_Ql == 0)                                   //РљР°С‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
          sprintf(oneStr + 66, "%s        ", (tabMME + indTabMME)->Qual);
       sprintf(oneStr+70, "%s %s  [%8s]  %c %10s  %8s", as, strSize[Conf.typeSize], sLTime, Pr, sDate, sTime);
    }
@@ -260,27 +260,27 @@ int MakeOneStrForTree(char *oneStr, char *Name, char *Ext, PAR_FILE *pf)//Создан
 
 //------------------------------------------------------------------------------
 
-static int MkAbsendName(char *oneStr, char *Name, PAR_FILE *pf)//Создание строки символов для отражения в дереве для отсуттвующего имени
+static int MkAbsendName(char *oneStr, char *Name, PAR_FILE *pf)//РЎРѕР·РґР°РЅРёРµ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РґР»СЏ РѕС‚СЂР°Р¶РµРЅРёСЏ РІ РґРµСЂРµРІРµ РґР»СЏ РѕС‚СЃСѓС‚С‚РІСѓСЋС‰РµРіРѕ РёРјРµРЅРё
 {
    char size[32], *as;
-   if(pf->type == 48)                                        //Это имя папки
-   {  sprintf(oneStr, "%s", Name);                           //Для папки ничего не меняем
+   if(pf->type == 48)                                        //Р­С‚Рѕ РёРјСЏ РїР°РїРєРё
+   {  sprintf(oneStr, "%s", Name);                           //Р”Р»СЏ РїР°РїРєРё РЅРёС‡РµРіРѕ РЅРµ РјРµРЅСЏРµРј
       return 0;
    }
    char Ext[8];
-   MkInformName(Name, Ext);                                  //Формирование информативного имени
+   MkInformName(Name, Ext);                                  //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРЅС„РѕСЂРјР°С‚РёРІРЅРѕРіРѕ РёРјРµРЅРё
    int l = sprintf(oneStr, "  %s", Name);
-   for(int i=l; i<256; i++)                                  //Заполнили хвост строки пробелами
+   for(int i=l; i<256; i++)                                  //Р—Р°РїРѕР»РЅРёР»Рё С…РІРѕСЃС‚ СЃС‚СЂРѕРєРё РїСЂРѕР±РµР»Р°РјРё
        *(oneStr + i) = ' ';
-   switch(Conf.typeSize)                                     //0-байты, 1-Кбайты, 2-Мбайты, 3-ГБайты
+   switch(Conf.typeSize)                                     //0-Р±Р°Р№С‚С‹, 1-РљР±Р°Р№С‚С‹, 2-РњР±Р°Р№С‚С‹, 3-Р“Р‘Р°Р№С‚С‹
    {  case 0: sprintf(size, "%12.0lf", double(pf->SizeF));
-              as = Char_Dig_p(size, 15);  break;             //Преобразование символьного числа в разрядку
+              as = Char_Dig_p(size, 15);  break;             //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
       case 1: sprintf(size, "%11.1lf", double(pf->SizeF)/1024.0);
-              as = Char_Dig_p_n(size, 12, 1);  break;        //Преобразование символьного числа в разрядку
+              as = Char_Dig_p_n(size, 12, 1);  break;        //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
       case 2: sprintf(size, "%9.2lf", double(pf->SizeF)/1024.0/1024.0);
-              as = Char_Dig_p_n(size, 9, 2);  break;         //Преобразование символьного числа в разрядку
+              as = Char_Dig_p_n(size, 9, 2);  break;         //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
       case 3: sprintf(size, "%7.3lf", double(pf->SizeF)/1024.0/1024.0/1024.0);
-              as = Char_Dig_p_n(size, 6, 3);  break;         //Преобразование символьного числа в разрядку
+              as = Char_Dig_p_n(size, 6, 3);  break;         //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
    }
    char sDate[64], sTime[64], Pr = 'R';
    SYSTEMTIME sysTime;
@@ -309,9 +309,9 @@ static int MkAbsendName(char *oneStr, char *Name, PAR_FILE *pf)//Создание строки
    char sLTime[64];
    GetTimeFormat(LOCALE_USER_DEFAULT, TIME_FORCE24HOURFORMAT | LOCALE_NOUSEROVERRIDE, &sysTime, NULL, sLTime, 64);
    int n = (Conf.poz_Ql == 0) ? 59 : 63;
-   if(Conf.poz_In == 0)                                   //Источник записи: 0-в колонке, 1-в имени, 2-не показывать
+   if(Conf.poz_In == 0)                                   //РСЃС‚РѕС‡РЅРёРє Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
       sprintf(oneStr + n,  "%s        ", (tabMME + indTabMME)->nameIn);
-   if(Conf.poz_Ql == 0)                                   //Качество записи: 0-в колонке, 1-в имени, 2-не показывать
+   if(Conf.poz_Ql == 0)                                   //РљР°С‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРё: 0-РІ РєРѕР»РѕРЅРєРµ, 1-РІ РёРјРµРЅРё, 2-РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ
       sprintf(oneStr + 66, "%s        ", (tabMME + indTabMME)->Qual);
    sprintf(oneStr+70, "%s %s  [%8s]  %c %10s  %8s", as, strSize[Conf.typeSize], sLTime, Pr, sDate, sTime);
    return 0;
@@ -319,26 +319,26 @@ static int MkAbsendName(char *oneStr, char *Name, PAR_FILE *pf)//Создание строки
 
 //------------------------------------------------------------------------------
 
-static int AddAbsendNameToTree(PAR_FILE *pf, int Level)      //Добавление новой строки в дерево
+static int AddAbsendNameToTree(PAR_FILE *pf, int Level)      //Р”РѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё РІ РґРµСЂРµРІРѕ
 {
    TV_INSERTSTRUCT tvins;
    char oneStr[256], Name[256];
 
-   MkAbsendName(oneStr, Name, pf);                           //Создание строки символов для отражения в дереве для отсуттвующего имени
+   MkAbsendName(oneStr, Name, pf);                           //РЎРѕР·РґР°РЅРёРµ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РґР»СЏ РѕС‚СЂР°Р¶РµРЅРёСЏ РІ РґРµСЂРµРІРµ РґР»СЏ РѕС‚СЃСѓС‚С‚РІСѓСЋС‰РµРіРѕ РёРјРµРЅРё
 
    lstrcpy((aTree + numEl_Tree)->NameF, Name);
    (aTree + numEl_Tree)->pf = *pf;
-   (aTree + numEl_Tree)->numPart = 0;                        //Номер части многофайлового Title
+   (aTree + numEl_Tree)->numPart = 0;                        //РќРѕРјРµСЂ С‡Р°СЃС‚Рё РјРЅРѕРіРѕС„Р°Р№Р»РѕРІРѕРіРѕ Title
    (aTree + numEl_Tree)->indTitle = 0xFFFF;
-   (aTree + numEl_Tree)->indFolder = 0;                      //Ссылка на имя папки
-   (aTree + numEl_Tree)->numCopy = 0;                        //Счетчик скопированных частей
-   (aTree + numEl_Tree)->prSel = 0;                          //Признак выбора данного файла(0-не выбран)
+   (aTree + numEl_Tree)->indFolder = 0;                      //РЎСЃС‹Р»РєР° РЅР° РёРјСЏ РїР°РїРєРё
+   (aTree + numEl_Tree)->numCopy = 0;                        //РЎС‡РµС‚С‡РёРє СЃРєРѕРїРёСЂРѕРІР°РЅРЅС‹С… С‡Р°СЃС‚РµР№
+   (aTree + numEl_Tree)->prSel = 0;                          //РџСЂРёР·РЅР°Рє РІС‹Р±РѕСЂР° РґР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°(0-РЅРµ РІС‹Р±СЂР°РЅ)
 
    tvins.item.mask = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
    tvins.item.pszText = oneStr;
    tvins.item.lParam = numEl_Tree;
-   tvins.item.iImage = tvins.item.iSelectedImage = 9;        //Индекс иконки
-   if(Conf.PrSort == 0)                                      //0-сортировка по имени, 1-без сортировки
+   tvins.item.iImage = tvins.item.iSelectedImage = 9;        //РРЅРґРµРєСЃ РёРєРѕРЅРєРё
+   if(Conf.PrSort == 0)                                      //0-СЃРѕСЂС‚РёСЂРѕРІРєР° РїРѕ РёРјРµРЅРё, 1-Р±РµР· СЃРѕСЂС‚РёСЂРѕРІРєРё
       tvins.hInsertAfter = TVI_SORT;
    else
       tvins.hInsertAfter = TVI_LAST;
@@ -346,27 +346,27 @@ static int AddAbsendNameToTree(PAR_FILE *pf, int Level)      //Добавление новой 
    else tvins.hParent = hPrev[Level-1];
    hPrev[Level] = TreeView_InsertItem(hwndTree, &tvins);
    if(++numEl_Tree > MAX_NAME)
-      return Error1((Lan+31)->msg);                          //return Error2("Суммарное число имен папок и файлов превышает возможности программы.");
+      return Error1((Lan+31)->msg);                          //return Error2("РЎСѓРјРјР°СЂРЅРѕРµ С‡РёСЃР»Рѕ РёРјРµРЅ РїР°РїРѕРє Рё С„Р°Р№Р»РѕРІ РїСЂРµРІС‹С€Р°РµС‚ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РїСЂРѕРіСЂР°РјРјС‹.");
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int  ViewAbsendName(void)                                    //Показ имен присутствующих в файле MME.DB, но отсутствующих в каталоге
+int  ViewAbsendName(void)                                    //РџРѕРєР°Р· РёРјРµРЅ РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РІ С„Р°Р№Р»Рµ MME.DB, РЅРѕ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РІ РєР°С‚Р°Р»РѕРіРµ
 {
    PAR_FILE pf;
 
-   if(tabMME == NULL) return 0;                              //Таблица отсутствует
-   indTabMME = -1;                                           //Индекс в таблице MME.DB для текущего файла в папке MEDIA
-   for(DWORD n=0; n<numNam; n++)                             //По числу имен в таблице MME
-   {   if((tabMME + n)->prYes == 1) continue;                //Признак, что имя парное (1 - есть и в mme.db и в каталоге)
-       if(nErr4 == 0)                                        //Сообщения об ошибке еще небыло
+   if(tabMME == NULL) return 0;                              //РўР°Р±Р»РёС†Р° РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
+   indTabMME = -1;                                           //РРЅРґРµРєСЃ РІ С‚Р°Р±Р»РёС†Рµ MME.DB РґР»СЏ С‚РµРєСѓС‰РµРіРѕ С„Р°Р№Р»Р° РІ РїР°РїРєРµ MEDIA
+   for(DWORD n=0; n<numNam; n++)                             //РџРѕ С‡РёСЃР»Сѓ РёРјРµРЅ РІ С‚Р°Р±Р»РёС†Рµ MME
+   {   if((tabMME + n)->prYes == 1) continue;                //РџСЂРёР·РЅР°Рє, С‡С‚Рѕ РёРјСЏ РїР°СЂРЅРѕРµ (1 - РµСЃС‚СЊ Рё РІ mme.db Рё РІ РєР°С‚Р°Р»РѕРіРµ)
+       if(nErr4 == 0)                                        //РЎРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ РµС‰Рµ РЅРµР±С‹Р»Рѕ
            Error3((Lan+144)->msg, (Lan+145)->msg, (Lan+140)->msg);
-       nErr4++;                                              //Чтобы не дублировать сообщения
+       nErr4++;                                              //Р§С‚РѕР±С‹ РЅРµ РґСѓР±Р»РёСЂРѕРІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ
        indTabMME = n;
-       pf.type = 35;                                         //Признак специальной иконки  (e3)
+       pf.type = 35;                                         //РџСЂРёР·РЅР°Рє СЃРїРµС†РёР°Р»СЊРЅРѕР№ РёРєРѕРЅРєРё  (e3)
        pf.SizeF = 0;
-       AddAbsendNameToTree(&pf, 2);                          //Добавление новой строки в дерево
+       AddAbsendNameToTree(&pf, 2);                          //Р”РѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё РІ РґРµСЂРµРІРѕ
    }
    return 0;
 }

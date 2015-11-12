@@ -6,13 +6,13 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_func_io_1 ================================
-//11int  OpenOutFile(char *Name, LONGLONG Size, HANDLE *File);   //Открытие выходного файла
-void Ctrl_Name_Ch(char *Name);                               //Проверка имени на недопустимые символы и замена недопустимых символов
-int  OpenOutFileName_New(char *Name, LONGLONG Size, HANDLE *File);//Открытие выходного файла
-int  OpenOutFileName_Yes(char *Name, LONGLONG Size, HANDLE *File);//Открытие выходного файла
-     int prCopy;                                             //Признак действия при групповом копировании
-     char ndS[9] = { "/\\:*?\"<>|" };                        //Перечень недопустимых символов
-//   int  pr_ndS;                                            //Признак выполненной замены недопустимого символа. 1-была замена
+//11int  OpenOutFile(char *Name, LONGLONG Size, HANDLE *File);   //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+void Ctrl_Name_Ch(char *Name);                               //РџСЂРѕРІРµСЂРєР° РёРјРµРЅРё РЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹ Рё Р·Р°РјРµРЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
+int  OpenOutFileName_New(char *Name, LONGLONG Size, HANDLE *File);//РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+int  OpenOutFileName_Yes(char *Name, LONGLONG Size, HANDLE *File);//РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+     int prCopy;                                             //РџСЂРёР·РЅР°Рє РґРµР№СЃС‚РІРёСЏ РїСЂРё РіСЂСѓРїРїРѕРІРѕРј РєРѕРїРёСЂРѕРІР°РЅРёРё
+     char ndS[9] = { "/\\:*?\"<>|" };                        //РџРµСЂРµС‡РµРЅСЊ РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
+//   int  pr_ndS;                                            //РџСЂРёР·РЅР°Рє РІС‹РїРѕР»РЅРµРЅРЅРѕР№ Р·Р°РјРµРЅС‹ РЅРµРґРѕРїСѓСЃС‚РёРјРѕРіРѕ СЃРёРјРІРѕР»Р°. 1-Р±С‹Р»Р° Р·Р°РјРµРЅР°
 
 //------------------------------------------------------------------------------
 
@@ -22,9 +22,9 @@ static BOOL CALLBACK Dlg_Warning(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
    switch(Message)
    {
       case WM_INITDIALOG:
-             CenterDlg(hDlg, -80);                           //Центрирование окна диалога в главном окне
-             SetWindowText(hDlg, (Lan+36)->msg);             //Вывели новый заголовок
-             OutNameDlg(hDlg, IDC_STATICTEXT1, LPSTR(lParam));     //Усечение имени файла
+             CenterDlg(hDlg, -80);                           //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РґРёР°Р»РѕРіР° РІ РіР»Р°РІРЅРѕРј РѕРєРЅРµ
+             SetWindowText(hDlg, (Lan+36)->msg);             //Р’С‹РІРµР»Рё РЅРѕРІС‹Р№ Р·Р°РіРѕР»РѕРІРѕРє
+             OutNameDlg(hDlg, IDC_STATICTEXT1, LPSTR(lParam));     //РЈСЃРµС‡РµРЅРёРµ РёРјРµРЅРё С„Р°Р№Р»Р°
              SetDlgItemText(hDlg, IDC_STATICTEXT2, (Lan+65)->msg);
              SetDlgItemText(hDlg, IDC_REWRITE, (Lan+66)->msg);
              SetDlgItemText(hDlg, IDC_NEW, (Lan+67)->msg);
@@ -41,7 +41,7 @@ static BOOL CALLBACK Dlg_Warning(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
            switch(LOWORD(wParam))
            {  case IDC_REWRITE:
               case IDC_NEW:
-              case IDCANCEL:    EndDialog(hDlg, LOWORD(wParam));  //Вернули один из трех кодов
+              case IDCANCEL:    EndDialog(hDlg, LOWORD(wParam));  //Р’РµСЂРЅСѓР»Рё РѕРґРёРЅ РёР· С‚СЂРµС… РєРѕРґРѕРІ
                                 return TRUE;
            }
            break;
@@ -51,20 +51,20 @@ static BOOL CALLBACK Dlg_Warning(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 
 //------------------------------------------------------------------------------
 
-static int Ctrl1FileYes(char *NameF)                         //Проверка наличия файла
+static int Ctrl1FileYes(char *NameF)                         //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р°
 {
-   if(CtrlFileYesNo(NameF) == 0) return 0;                   //Файла нет - Проверка наличия файла
+   if(CtrlFileYesNo(NameF) == 0) return 0;                   //Р¤Р°Р№Р»Р° РЅРµС‚ - РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р°
    int ret = DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_F_YESNO),
                    MainWin, Dlg_Warning, LPARAM(NameF));
-   if(ret == IDCANCEL) { *NameF = 0;  return -1; }           //Отмена режима
-   if(ret == IDC_NEW) return 1;                              //Нажата кнопка Ввод нового имени файла
+   if(ret == IDCANCEL) { *NameF = 0;  return -1; }           //РћС‚РјРµРЅР° СЂРµР¶РёРјР°
+   if(ret == IDC_NEW) return 1;                              //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° Р’РІРѕРґ РЅРѕРІРѕРіРѕ РёРјРµРЅРё С„Р°Р№Р»Р°
    if(DeleteFile(NameF) != 0) return 0;
-   return ErrorSys2((Lan+56)->msg, NameF);                   //"Ошибка при удалении файла"
+   return ErrorSys2((Lan+56)->msg, NameF);                   //"РћС€РёР±РєР° РїСЂРё СѓРґР°Р»РµРЅРёРё С„Р°Р№Р»Р°"
 }
 
 //------------------------------------------------------------------------------
 
-static void TimeFileCopy(SYSTEMTIME *sysTime)                //Время нового файла
+static void TimeFileCopy(SYSTEMTIME *sysTime)                //Р’СЂРµРјСЏ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°
 {
    sysTime->wYear = (aTree+indF)->pf.Year;
    sysTime->wMonth = (aTree+indF)->pf.Mon;
@@ -78,19 +78,19 @@ static void TimeFileCopy(SYSTEMTIME *sysTime)                //Время нового файл
 
 //------------------------------------------------------------------------------
 
-static int Comp_TimeF(void)                                  //Сравнение времени создания файлов
+static int Comp_TimeF(void)                                  //РЎСЂР°РІРЅРµРЅРёРµ РІСЂРµРјРµРЅРё СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»РѕРІ
 {
    SYSTEMTIME sysTime;
    FILETIME fTime, flTime;
-   TimeFileCopy(&sysTime);                                   //Время нового файла
-   SystemTimeToFileTime(&sysTime, &flTime);                  //Преобразовали время
+   TimeFileCopy(&sysTime);                                   //Р’СЂРµРјСЏ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°
+   SystemTimeToFileTime(&sysTime, &flTime);                  //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РІСЂРµРјСЏ
    LocalFileTimeToFileTime(&flTime, &fTime);
-   return (CompareFileTime(&DataF.ftLastWriteTime, &fTime) == -1) ? IDOK : IDC_SCIP; //Действие в зависимости от времени записи файла
+   return (CompareFileTime(&DataF.ftLastWriteTime, &fTime) == -1) ? IDOK : IDC_SCIP; //Р”РµР№СЃС‚РІРёРµ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РІСЂРµРјРµРЅРё Р·Р°РїРёСЃРё С„Р°Р№Р»Р°
 }
 
 //------------------------------------------------------------------------------
 
-static int Mk_NewName(char *NameF)                           //Автоматическое формирование нового имени
+static int Mk_NewName(char *NameF)                           //РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РЅРѕРІРѕРіРѕ РёРјРµРЅРё
 {
    char Driv[MAXDRIVE+3], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
    fnsplit(NameF, Driv, Dir, Name, Ext);
@@ -98,7 +98,7 @@ static int Mk_NewName(char *NameF)                           //Автоматическое фо
    for(DWORD i=1; i<0xFFFFFFFF; i++)
    {  sprintf(Name+l, ".%03d", i);
       fnmerge(NameF, Driv, Dir, Name, Ext);
-      if(CtrlFileYesNo(NameF) == 0) return 0;                //Файла нет - Проверка наличия файла
+      if(CtrlFileYesNo(NameF) == 0) return 0;                //Р¤Р°Р№Р»Р° РЅРµС‚ - РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р°
   }
   return 0;
 }
@@ -120,7 +120,7 @@ static void View_FilePar(HWND hDlg, SYSTEMTIME *sysTime, DWORDLONG SizeF, int ID
 
 //------------------------------------------------------------------------------
 
-static void ViewOldFilePar(HWND hDlg)                        //Параметры старого файла
+static void ViewOldFilePar(HWND hDlg)                        //РџР°СЂР°РјРµС‚СЂС‹ СЃС‚Р°СЂРѕРіРѕ С„Р°Р№Р»Р°
 {
    FILETIME TimeFile;
    ULARGE_INTEGER SizeFile;
@@ -134,10 +134,10 @@ static void ViewOldFilePar(HWND hDlg)                        //Параметры старого
 
 //------------------------------------------------------------------------------
 
-static void ViewNewFilePar(HWND hDlg)                        //Параметры нового файла
+static void ViewNewFilePar(HWND hDlg)                        //РџР°СЂР°РјРµС‚СЂС‹ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°
 {
    SYSTEMTIME sysTime;
-   TimeFileCopy(&sysTime);                                   //Время нового файла
+   TimeFileCopy(&sysTime);                                   //Р’СЂРµРјСЏ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°
    View_FilePar(hDlg, &sysTime, (aTree+indF)->pf.SizeF, IDC_STATICTEXT8, IDC_STATICTEXT10);
 }
 
@@ -148,9 +148,9 @@ static BOOL CALLBACK Dlg_FileYes(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 {
    switch(Message)
    {  case WM_INITDIALOG:
-             CenterDlg(hDlg, 0);                             //Центрирование окна диалога в главном окне
-             SetWindowText(hDlg, (Lan+36)->msg);             //Вывели новый заголовок
-             OutNameDlg(hDlg, IDC_STATICTEXT1, LPSTR(lParam)); //Усечение имени файла
+             CenterDlg(hDlg, 0);                             //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РґРёР°Р»РѕРіР° РІ РіР»Р°РІРЅРѕРј РѕРєРЅРµ
+             SetWindowText(hDlg, (Lan+36)->msg);             //Р’С‹РІРµР»Рё РЅРѕРІС‹Р№ Р·Р°РіРѕР»РѕРІРѕРє
+             OutNameDlg(hDlg, IDC_STATICTEXT1, LPSTR(lParam)); //РЈСЃРµС‡РµРЅРёРµ РёРјРµРЅРё С„Р°Р№Р»Р°
              SetDlgItemText(hDlg, IDC_STATICTEXT2, (Lan+65)->msg);
              SetDlgItemText(hDlg, IDC_STATICTEXT3, (Lan+156)->msg);
              SetDlgItemText(hDlg, IDC_STATICTEXT5, (Lan+47)->msg);
@@ -164,8 +164,8 @@ static BOOL CALLBACK Dlg_FileYes(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
              SetDlgItemText(hDlg, IDC_RENAME,      (Lan+163)->msg);
              SetDlgItemText(hDlg, IDC_REN_AUTO,    (Lan+162)->msg);
              SetDlgItemText(hDlg, IDCANCEL,        (Lan+68)->msg);
-             ViewOldFilePar(hDlg);                           //Параметры старого файла
-             ViewNewFilePar(hDlg);                           //Параметры нового файла
+             ViewOldFilePar(hDlg);                           //РџР°СЂР°РјРµС‚СЂС‹ СЃС‚Р°СЂРѕРіРѕ С„Р°Р№Р»Р°
+             ViewNewFilePar(hDlg);                           //РџР°СЂР°РјРµС‚СЂС‹ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°
              return TRUE;
       case WM_CTLCOLORSTATIC:
              if(GetDlgCtrlID(HWND(lParam)) == IDC_STATICTEXT2)
@@ -176,16 +176,16 @@ static BOOL CALLBACK Dlg_FileYes(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
              return TRUE;
       case WM_COMMAND:
            switch(LOWORD(wParam))
-           {  case IDC_REP_ALL:  prCopy = 1;  break;         //Нажата кнопка Заменять все
-              case IDC_REP_OLD:  prCopy = 2;  break;         //Нажата кнопка Заменять старые
-              case IDC_SCIP_ALL: prCopy = 3;  break;         //Нажата кнопка Пропускать все
-              case IDC_REN_AUTO: prCopy = 4;  break;         //Нажата кнопка Переименовывать автоматически
-              case IDC_SCIP:                                 //Нажата кнопка Пропустить
-              case IDOK:                                     //Нажата кнопка Заменить
-              case IDC_RENAME:                               //Нажата кнопка Переименование
-              case IDCANCEL: prCopy = 0;  break;             //Нажата кнопка Отменить режим
+           {  case IDC_REP_ALL:  prCopy = 1;  break;         //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° Р—Р°РјРµРЅСЏС‚СЊ РІСЃРµ
+              case IDC_REP_OLD:  prCopy = 2;  break;         //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° Р—Р°РјРµРЅСЏС‚СЊ СЃС‚Р°СЂС‹Рµ
+              case IDC_SCIP_ALL: prCopy = 3;  break;         //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РџСЂРѕРїСѓСЃРєР°С‚СЊ РІСЃРµ
+              case IDC_REN_AUTO: prCopy = 4;  break;         //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РџРµСЂРµРёРјРµРЅРѕРІС‹РІР°С‚СЊ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё
+              case IDC_SCIP:                                 //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РџСЂРѕРїСѓСЃС‚РёС‚СЊ
+              case IDOK:                                     //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° Р—Р°РјРµРЅРёС‚СЊ
+              case IDC_RENAME:                               //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РџРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ
+              case IDCANCEL: prCopy = 0;  break;             //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РћС‚РјРµРЅРёС‚СЊ СЂРµР¶РёРј
            }
-           EndDialog(hDlg, LOWORD(wParam));                  //Вернули один из кодов
+           EndDialog(hDlg, LOWORD(wParam));                  //Р’РµСЂРЅСѓР»Рё РѕРґРёРЅ РёР· РєРѕРґРѕРІ
            return TRUE;
    }
    return FALSE;
@@ -193,77 +193,77 @@ static BOOL CALLBACK Dlg_FileYes(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 
 //------------------------------------------------------------------------------
 
-static int CtrlFileYes(char *NameF)                          //Проверка наличия файла
+static int CtrlFileYes(char *NameF)                          //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р°
 {
    int ret;
-   if(CtrlFileYesNo(NameF) == 0) return 0;                   //Файла нет - Проверка наличия файла
+   if(CtrlFileYesNo(NameF) == 0) return 0;                   //Р¤Р°Р№Р»Р° РЅРµС‚ - РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р°
    if(prCopy == 0)
         ret = DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_FILE_YES),
                       MainWin, Dlg_FileYes, LPARAM(NameF));
-   switch(prCopy)                                             //Признак действия при групповом копировании
+   switch(prCopy)                                             //РџСЂРёР·РЅР°Рє РґРµР№СЃС‚РІРёСЏ РїСЂРё РіСЂСѓРїРїРѕРІРѕРј РєРѕРїРёСЂРѕРІР°РЅРёРё
    {  case 0: break;
-      case 1: ret = IDOK; break;                             //Нажата кнопка Заменять все
-      case 2: ret = Comp_TimeF(); break;                     //Нажата кнопка Заменять старые
-      case 3: ret = IDC_SCIP; break;                         //Нажата кнопка Пропускать все
-      case 4: return Mk_NewName(NameF);                      //Нажата кнопка Переименовывать автоматически
+      case 1: ret = IDOK; break;                             //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° Р—Р°РјРµРЅСЏС‚СЊ РІСЃРµ
+      case 2: ret = Comp_TimeF(); break;                     //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° Р—Р°РјРµРЅСЏС‚СЊ СЃС‚Р°СЂС‹Рµ
+      case 3: ret = IDC_SCIP; break;                         //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РџСЂРѕРїСѓСЃРєР°С‚СЊ РІСЃРµ
+      case 4: return Mk_NewName(NameF);                      //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РџРµСЂРµРёРјРµРЅРѕРІС‹РІР°С‚СЊ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё
    }
    switch (ret)
-   {  case IDCANCEL: *NameF = 0;  return -1;                 //Отмена режима копирования
-      case IDC_SCIP: *NameF = 0;  return -2;                 //Нажата кнопка пропустить
-      case IDC_RENAME: return 1;                             //Нажата кнопка Переименование
-      case IDOK:                                             //Нажата кнопка Заменить
+   {  case IDCANCEL: *NameF = 0;  return -1;                 //РћС‚РјРµРЅР° СЂРµР¶РёРјР° РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+      case IDC_SCIP: *NameF = 0;  return -2;                 //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РїСЂРѕРїСѓСЃС‚РёС‚СЊ
+      case IDC_RENAME: return 1;                             //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РџРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ
+      case IDOK:                                             //РќР°Р¶Р°С‚Р° РєРЅРѕРїРєР° Р—Р°РјРµРЅРёС‚СЊ
                  if(DeleteFile(NameF) != 0) return 0;
-                 return ErrorSys2((Lan+56)->msg, NameF);     //"Ошибка при удалении файла"
+                 return ErrorSys2((Lan+56)->msg, NameF);     //"РћС€РёР±РєР° РїСЂРё СѓРґР°Р»РµРЅРёРё С„Р°Р№Р»Р°"
    }
    return -1;
 }
 
 //------------------------------------------------------------------------------
 
-void Ctrl_Name_Ch(char *Name)                                //Проверка имени на недопустимые символы и замена недопустимых символов
+void Ctrl_Name_Ch(char *Name)                                //РџСЂРѕРІРµСЂРєР° РёРјРµРЅРё РЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹ Рё Р·Р°РјРµРЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ
 {
    for(int i=0; *(Name+i)!=0; i++)
      for(DWORD j=0; j<sizeof(ndS); j++)
         if(*(Name + i) == *(ndS + j))
         {  *(Name + i) = '_';
-//         pr_ndS = 1;                                       //Признак выполненной замены недопустимого символа
+//         pr_ndS = 1;                                       //РџСЂРёР·РЅР°Рє РІС‹РїРѕР»РЅРµРЅРЅРѕР№ Р·Р°РјРµРЅС‹ РЅРµРґРѕРїСѓСЃС‚РёРјРѕРіРѕ СЃРёРјРІРѕР»Р°
         }
 }
 
 //------------------------------------------------------------------------------
 
-//11int OpenOutFile(char *Name, LONGLONG Size, HANDLE *File)     //Открытие выходного файла
-int OpenOutFileName_New(char *Name, LONGLONG Size, HANDLE *File) //Открытие выходного файла
+//11int OpenOutFile(char *Name, LONGLONG Size, HANDLE *File)     //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+int OpenOutFileName_New(char *Name, LONGLONG Size, HANDLE *File) //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 {
    int ret;
    for(;;)
-   {  if(GetName_OutFile(Name) < 0) return -1;               //Ввод имени для записи файла
-      if((ret = Ctrl1FileYes(Name)) < 0) return ret;         //Проверка наличия файла с указанным именем
-      if(ret == 1) continue;                                 //Необходим ввод нового имени
-      if((ret = DiskFreeSpaceEx(Name, Size)) < 0)return -1;  //Ошибка (если возврат == 1, то места нет)
-      if(ret == 0) break;                                    //Есть место для записи
+   {  if(GetName_OutFile(Name) < 0) return -1;               //Р’РІРѕРґ РёРјРµРЅРё РґР»СЏ Р·Р°РїРёСЃРё С„Р°Р№Р»Р°
+      if((ret = Ctrl1FileYes(Name)) < 0) return ret;         //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р° СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј
+      if(ret == 1) continue;                                 //РќРµРѕР±С…РѕРґРёРј РІРІРѕРґ РЅРѕРІРѕРіРѕ РёРјРµРЅРё
+      if((ret = DiskFreeSpaceEx(Name, Size)) < 0)return -1;  //РћС€РёР±РєР° (РµСЃР»Рё РІРѕР·РІСЂР°С‚ == 1, С‚Рѕ РјРµСЃС‚Р° РЅРµС‚)
+      if(ret == 0) break;                                    //Р•СЃС‚СЊ РјРµСЃС‚Рѕ РґР»СЏ Р·Р°РїРёСЃРё
    }
-//11return Open_OutFile512(Name, File);                      //Открытие выходного файла
-   return Open_OutFile(Name, File);                          //Открытие выходного файла
+//11return Open_OutFile512(Name, File);                      //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+   return Open_OutFile(Name, File);                          //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 }
 
 //------------------------------------------------------------------------------
 
-//11 int OpenOutFileNameYes(char *Name, LONGLONG Size, HANDLE *File)//Открытие выходного файла
-int OpenOutFileName_Yes(char *Name, LONGLONG Size, HANDLE *File)//Открытие выходного файла
+//11 int OpenOutFileNameYes(char *Name, LONGLONG Size, HANDLE *File)//РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+int OpenOutFileName_Yes(char *Name, LONGLONG Size, HANDLE *File)//РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 {
    int ret, pr = 0;
    for(;;)
-   {  if(pr != 0)                                            //При первом проходе имя не спрашивам
-        if(GetName_OutFile(Name) < 0) return -1;             //Ввод имени для записи файла
-      pr = 1;                                                //При возникновении проблем запрашиваем имя
-      if((ret = CtrlFileYes(Name)) < 0) return ret;          //Проверка наличия файла с указанным именем
-      if(ret == 1) continue;                                 //Необходим ввод нового имени
-      if((ret = DiskFreeSpaceEx(Name, Size)) < 0)return -1;  //Ошибка   (если возврат == 1, то места нет)
-      if(ret == 0) break;                                    //Есть место для записи
+   {  if(pr != 0)                                            //РџСЂРё РїРµСЂРІРѕРј РїСЂРѕС…РѕРґРµ РёРјСЏ РЅРµ СЃРїСЂР°С€РёРІР°Рј
+        if(GetName_OutFile(Name) < 0) return -1;             //Р’РІРѕРґ РёРјРµРЅРё РґР»СЏ Р·Р°РїРёСЃРё С„Р°Р№Р»Р°
+      pr = 1;                                                //РџСЂРё РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё РїСЂРѕР±Р»РµРј Р·Р°РїСЂР°С€РёРІР°РµРј РёРјСЏ
+      if((ret = CtrlFileYes(Name)) < 0) return ret;          //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р° СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј
+      if(ret == 1) continue;                                 //РќРµРѕР±С…РѕРґРёРј РІРІРѕРґ РЅРѕРІРѕРіРѕ РёРјРµРЅРё
+      if((ret = DiskFreeSpaceEx(Name, Size)) < 0)return -1;  //РћС€РёР±РєР°   (РµСЃР»Рё РІРѕР·РІСЂР°С‚ == 1, С‚Рѕ РјРµСЃС‚Р° РЅРµС‚)
+      if(ret == 0) break;                                    //Р•СЃС‚СЊ РјРµСЃС‚Рѕ РґР»СЏ Р·Р°РїРёСЃРё
    }
-//11   return Open_OutFile512(Name, File);                   //Открытие выходного файла
-   return Open_OutFile(Name, File);                          //Открытие выходного файла
+//11   return Open_OutFile512(Name, File);                   //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+   return Open_OutFile(Name, File);                          //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 }
 
 #endif

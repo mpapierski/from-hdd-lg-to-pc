@@ -6,7 +6,7 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_func_io_folder ===========================
-int  Get_Name_Dir(char *msg, char *Name_Dir, int pr);        //Запрос имени папки
+int  Get_Name_Dir(char *msg, char *Name_Dir, int pr);        //Р—Р°РїСЂРѕСЃ РёРјРµРЅРё РїР°РїРєРё
 
 static char NameRabDir[260];
 
@@ -44,12 +44,12 @@ SHSTDAPI SHGetMalloc(LPMALLOC * ppMalloc);
 #define BFFM_SETSELECTION      (WM_USER + 102)
 
 //------------------------------------------------------------------------------
-
+
 #pragma argsused
 static int __stdcall BrowseProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
    switch(uMsg)
-   {  case BFFM_INITIALIZED: CenterDlg(hwnd, 0);             //Центрирование окна диалога в главном окне
+   {  case BFFM_INITIALIZED: CenterDlg(hwnd, 0);             //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РґРёР°Р»РѕРіР° РІ РіР»Р°РІРЅРѕРј РѕРєРЅРµ
                              SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
                              break;
    }
@@ -57,18 +57,18 @@ static int __stdcall BrowseProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpDa
 }
 
 //------------------------------------------------------------------------------
-
-int Get_Name_Dir(char *msg, char *Name_Dir, int pr)          //Запрос имени папки
+
+int Get_Name_Dir(char *msg, char *Name_Dir, int pr)          //Р—Р°РїСЂРѕСЃ РёРјРµРЅРё РїР°РїРєРё
 {
-//Чтобы не возникало конфликтов при компиляции - обязательно до подключения vcl.h или еще какого VCL-инклюдника:
+//Р§С‚РѕР±С‹ РЅРµ РІРѕР·РЅРёРєР°Р»Рѕ РєРѕРЅС„Р»РёРєС‚РѕРІ РїСЂРё РєРѕРјРїРёР»СЏС†РёРё - РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РґРѕ РїРѕРґРєР»СЋС‡РµРЅРёСЏ vcl.h РёР»Рё РµС‰Рµ РєР°РєРѕРіРѕ VCL-РёРЅРєР»СЋРґРЅРёРєР°:
 //#define NO_WIN32_LEAN_AND_MEAN
 //#include <vcl.h>
 //#include <shlobj.h>
-   BROWSEINFO bi;                                            //Структура для диалога выбора папки
-   char dir[260];                                            //Места для пути к папке после диалога только путь без диска
+   BROWSEINFO bi;                                            //РЎС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РґРёР°Р»РѕРіР° РІС‹Р±РѕСЂР° РїР°РїРєРё
+   char dir[260];                                            //РњРµСЃС‚Р° РґР»СЏ РїСѓС‚Рё Рє РїР°РїРєРµ РїРѕСЃР»Рµ РґРёР°Р»РѕРіР° С‚РѕР»СЊРєРѕ РїСѓС‚СЊ Р±РµР· РґРёСЃРєР°
 
    LPMALLOC lpMalloc;
-   if(SHGetMalloc(&lpMalloc) != NO_ERROR) return -1;         //Получение адреса динамической памяти функций
+   if(SHGetMalloc(&lpMalloc) != NO_ERROR) return -1;         //РџРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃР° РґРёРЅР°РјРёС‡РµСЃРєРѕР№ РїР°РјСЏС‚Рё С„СѓРЅРєС†РёР№
    bi.hwndOwner = MainWin;
    bi.pidlRoot = NULL;
    bi.pszDisplayName = dir;
@@ -81,10 +81,10 @@ int Get_Name_Dir(char *msg, char *Name_Dir, int pr)          //Запрос имени папк
 // bi.lParam = 0;
    bi.lParam = LPARAM(NameRabDir);
    bi.iImage = 0;
-   ITEMIDLIST *il = SHBrowseForFolder(&bi);                  //Визуализация диалога выбора папки
-   if(il == NULL) return -1;                                 //Была нажата кнопка "Отмена"
-   SHGetPathFromIDList(il, Name_Dir);                        //Выбор из списка имени папки по полученному индексу с диском
-   lpMalloc->Free(il);                                       //Освобождение этой памяти
+   ITEMIDLIST *il = SHBrowseForFolder(&bi);                  //Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ РґРёР°Р»РѕРіР° РІС‹Р±РѕСЂР° РїР°РїРєРё
+   if(il == NULL) return -1;                                 //Р‘С‹Р»Р° РЅР°Р¶Р°С‚Р° РєРЅРѕРїРєР° "РћС‚РјРµРЅР°"
+   SHGetPathFromIDList(il, Name_Dir);                        //Р’С‹Р±РѕСЂ РёР· СЃРїРёСЃРєР° РёРјРµРЅРё РїР°РїРєРё РїРѕ РїРѕР»СѓС‡РµРЅРЅРѕРјСѓ РёРЅРґРµРєСЃСѓ СЃ РґРёСЃРєРѕРј
+   lpMalloc->Free(il);                                       //РћСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЌС‚РѕР№ РїР°РјСЏС‚Рё
    lpMalloc->Release();
    lstrcpy(NameRabDir, Name_Dir);
    return 0;

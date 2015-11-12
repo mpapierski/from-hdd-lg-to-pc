@@ -6,37 +6,37 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_mme_db ===================================
-int  CtrlSize_MME(DWORD Delta);                              //Контроль смещения в массиве MME
-int  CtrlRecoder(void);                                      //Идентификация рекордера
-int  Read_Dir_Part2_MME(void);                               //Чтение каталога второго раздела и файла MME
-int  ReadMME_DB(void);                                       //Чтение файла базы записей
-int  Update_MME_DB(void);                                    //Пересоздание массива информативных имен
-     BYTE *MMe;                                              //Содержимое файла базы
-     DWORD SizeMME;                                          //Число байт в файле MME
-     TABL_MME *tabMME;                                       //Таблица соответствия имен
-     DWORD numNam;                                           //Число имен в таблице MME (больше числа Title из-за наличия частей)
-     TABL_MME *tabMME_Part;                                  //Таблица имен отредактированных Title
-     DWORD numNam_Part;                                      //Число имен в таблице имен отредактированных Title
+int  CtrlSize_MME(DWORD Delta);                              //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
+int  CtrlRecoder(void);                                      //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
+int  Read_Dir_Part2_MME(void);                               //Р§С‚РµРЅРёРµ РєР°С‚Р°Р»РѕРіР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° Рё С„Р°Р№Р»Р° MME
+int  ReadMME_DB(void);                                       //Р§С‚РµРЅРёРµ С„Р°Р№Р»Р° Р±Р°Р·С‹ Р·Р°РїРёСЃРµР№
+int  Update_MME_DB(void);                                    //РџРµСЂРµСЃРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР° РёРЅС„РѕСЂРјР°С‚РёРІРЅС‹С… РёРјРµРЅ
+     BYTE *MMe;                                              //РЎРѕРґРµСЂР¶РёРјРѕРµ С„Р°Р№Р»Р° Р±Р°Р·С‹
+     DWORD SizeMME;                                          //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ С„Р°Р№Р»Рµ MME
+     TABL_MME *tabMME;                                       //РўР°Р±Р»РёС†Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРјРµРЅ
+     DWORD numNam;                                           //Р§РёСЃР»Рѕ РёРјРµРЅ РІ С‚Р°Р±Р»РёС†Рµ MME (Р±РѕР»СЊС€Рµ С‡РёСЃР»Р° Title РёР·-Р·Р° РЅР°Р»РёС‡РёСЏ С‡Р°СЃС‚РµР№)
+     TABL_MME *tabMME_Part;                                  //РўР°Р±Р»РёС†Р° РёРјРµРЅ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅС‹С… Title
+     DWORD numNam_Part;                                      //Р§РёСЃР»Рѕ РёРјРµРЅ РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅС‹С… Title
 
-static BYTE *endMME;                                         //Адрес конца записей в массиве MME
-static BYTE *at_MME;                                         //Адрес начала текущего элемента записи в массиве MME
-static int idRec;                                            //Идентификатор рекордера
-static char Title[128];                                      //Имя файла записанного в папке MEDIA
+static BYTE *endMME;                                         //РђРґСЂРµСЃ РєРѕРЅС†Р° Р·Р°РїРёСЃРµР№ РІ РјР°СЃСЃРёРІРµ MME
+static BYTE *at_MME;                                         //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° С‚РµРєСѓС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° Р·Р°РїРёСЃРё РІ РјР°СЃСЃРёРІРµ MME
+static int idRec;                                            //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЂРµРєРѕСЂРґРµСЂР°
+static char Title[128];                                      //РРјСЏ С„Р°Р№Р»Р° Р·Р°РїРёСЃР°РЅРЅРѕРіРѕ РІ РїР°РїРєРµ MEDIA
 static char nameTV[8];
 
 //------------------------------------------------------------------------------
 
-int CtrlSize_MME(DWORD Delta)                                //Контроль смещения в массиве MME
+int CtrlSize_MME(DWORD Delta)                                //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
 {
-   at_MME += Delta;                                          //Адрес начала следеющего элемента записи
-   if(at_MME > endMME)                                       //Вышли за пределы массива MME
-     return Error4((Lan+107)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg);//return Error1("Структура файла MME.DB неизвестна автору программы.");
+   at_MME += Delta;                                          //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° СЃР»РµРґРµСЋС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° Р·Р°РїРёСЃРё
+   if(at_MME > endMME)                                       //Р’С‹С€Р»Рё Р·Р° РїСЂРµРґРµР»С‹ РјР°СЃСЃРёРІР° MME
+     return Error4((Lan+107)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg);//return Error1("РЎС‚СЂСѓРєС‚СѓСЂР° С„Р°Р№Р»Р° MME.DB РЅРµРёР·РІРµСЃС‚РЅР° Р°РІС‚РѕСЂСѓ РїСЂРѕРіСЂР°РјРјС‹.");
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Ctrl_Recoder(int d, int e)                        //Идентификация рекордера
+static int Ctrl_Recoder(int d, int e)                        //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
 {
    if(*(MMe + d+0) != 0 || *(MMe + d+1) != 0x41 || *(MMe + d+2) != 0 || *(MMe + d+3) != 0x3A ||
       *(MMe + d+4) != 0 || *(MMe + d+5) != 0x5C || *(MMe + e+0) != 0 || *(MMe + e+1) != 0x2E ||
@@ -51,32 +51,32 @@ static int Ctrl_Recoder(int d, int e)                        //Идентификация рек
 
 //------------------------------------------------------------------------------
 
-int CtrlRecoder(void)                                        //Идентификация рекордера
+int CtrlRecoder(void)                                        //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
 {
    if(MMe == NULL) return -1;
-   if(Ctrl_Recoder(300, 346) == 1) return 0;                 //Идентификация рекордера
-   if(Ctrl_Recoder(308, 358) == 1) return 1;                 //Идентификация рекордера
-   if(Ctrl_Recoder(316, 366) == 1) return (2 + Conf.typeRec);//Идентификация рекордера
-   if(Ctrl_Recoder(324, 374) == 1) return 4;                 //Идентификация рекордера
-   if(Ctrl_Recoder(332, 382) == 1) return 5;                 //Идентификация рекордера
+   if(Ctrl_Recoder(300, 346) == 1) return 0;                 //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
+   if(Ctrl_Recoder(308, 358) == 1) return 1;                 //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
+   if(Ctrl_Recoder(316, 366) == 1) return (2 + Conf.typeRec);//РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
+   if(Ctrl_Recoder(324, 374) == 1) return 4;                 //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
+   if(Ctrl_Recoder(332, 382) == 1) return 5;                 //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
    return -1;
 }
 
 //-------------------------------------------------------------------------------
 
 static void Recalc_Par(WCHAR *wTitle, char *name_TV, DATE_T2 *DaT2,
-                       WORD *nPart, DATE_T1 *DaT1)           //Преобразование данных
+                       WORD *nPart, DATE_T1 *DaT1)           //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 {
-   char Title0[128];                                         //Имя файла записанного в папке MEDIA
-   UnicodeToAnsi(wTitle, Title0, 33);                        //Преобразовали имя Title
+   char Title0[128];                                         //РРјСЏ С„Р°Р№Р»Р° Р·Р°РїРёСЃР°РЅРЅРѕРіРѕ РІ РїР°РїРєРµ MEDIA
+   UnicodeToAnsi(wTitle, Title0, 33);                        //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ Title
    for(int j=0; j<6; j++) *(nameTV + j) = *(name_TV + j);
-   for(int j=4; j>0; j--)                                    //Удаление всех хвостовых пробелов
-   {  if(*(nameTV + j) != ' ') break;                        //Первый не пробел
-      *(nameTV + j) = 0;                                     //Убрали пробел
+   for(int j=4; j>0; j--)                                    //РЈРґР°Р»РµРЅРёРµ РІСЃРµС… С…РІРѕСЃС‚РѕРІС‹С… РїСЂРѕР±РµР»РѕРІ
+   {  if(*(nameTV + j) != ' ') break;                        //РџРµСЂРІС‹Р№ РЅРµ РїСЂРѕР±РµР»
+      *(nameTV + j) = 0;                                     //РЈР±СЂР°Р»Рё РїСЂРѕР±РµР»
    }
-   SWAP16(nPart);                                            //Число частей в данном Title
+   SWAP16(nPart);                                            //Р§РёСЃР»Рѕ С‡Р°СЃС‚РµР№ РІ РґР°РЅРЅРѕРј Title
    SWAP16(&DaT2->Year);
-   DaT2->Year = WORD(DaT2->Year - (DaT2->Year / 100) * 100); //Оставили два знака
+   DaT2->Year = WORD(DaT2->Year - (DaT2->Year / 100) * 100); //РћСЃС‚Р°РІРёР»Рё РґРІР° Р·РЅР°РєР°
    SWAP16(&DaT1->year);
    SWAP16(&DaT1->mon);
    SWAP16(&DaT1->day);
@@ -87,182 +87,182 @@ static void Recalc_Par(WCHAR *wTitle, char *name_TV, DATE_T2 *DaT2,
 
 //-------------------------------------------------------------------------------
 
-char *Qu[6][5] = { { "HQ", "SQ", "LQ", "--", "--" },         //рекордер 0
-                   { "EQ", "LQ", "SQ", "HQ", "--" },         //рекордер 1
-                   { "EP", "LP", "SP", "XP", "--" },         //рекордер 2
-                   { "MLP", "EP", "LP", "SP", "XP" },        //рекордер 3
-                   { "MLP", "EP", "LP", "SP", "XP" },        //рекордер 4
-                   { "MLP", "EP", "LP", "SP", "XP" },        //рекордер 5
+char *Qu[6][5] = { { "HQ", "SQ", "LQ", "--", "--" },         //СЂРµРєРѕСЂРґРµСЂ 0
+                   { "EQ", "LQ", "SQ", "HQ", "--" },         //СЂРµРєРѕСЂРґРµСЂ 1
+                   { "EP", "LP", "SP", "XP", "--" },         //СЂРµРєРѕСЂРґРµСЂ 2
+                   { "MLP", "EP", "LP", "SP", "XP" },        //СЂРµРєРѕСЂРґРµСЂ 3
+                   { "MLP", "EP", "LP", "SP", "XP" },        //СЂРµРєРѕСЂРґРµСЂ 4
+                   { "MLP", "EP", "LP", "SP", "XP" },        //СЂРµРєРѕСЂРґРµСЂ 5
                  };
 #pragma argsused
-static int MakeNewName(DWORD t, int n, WORD nPart, BYTE Q, BYTE nAV, DATE_T1 *DaT1)//Создание имени и занесение его в таблицу имен по файлу MME
+static int MakeNewName(DWORD t, int n, WORD nPart, BYTE Q, BYTE nAV, DATE_T1 *DaT1)//РЎРѕР·РґР°РЅРёРµ РёРјРµРЅРё Рё Р·Р°РЅРµСЃРµРЅРёРµ РµРіРѕ РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
 {
    char nameIn[8];
-   ONE_NAME *aNam = (ONE_NAME *)at_MME;                      //Адрес начала записей по одной части данного Title
-   if(CtrlSize_MME(sizeof(ONE_NAME)) < 0) return -1;         //Контроль смещения в массиве MME
+   ONE_NAME *aNam = (ONE_NAME *)at_MME;                      //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРµР№ РїРѕ РѕРґРЅРѕР№ С‡Р°СЃС‚Рё РґР°РЅРЅРѕРіРѕ Title
+   if(CtrlSize_MME(sizeof(ONE_NAME)) < 0) return -1;         //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
 //??SWAP64(&DWORDLONG(aNam->sizeF));
    SWAP64((DWORDLONG*)&aNam->sizeF);
-   (tabMME+numNam)->SizeF = aNam->sizeF;                     //Занесли Размер файла
+   (tabMME+numNam)->SizeF = aNam->sizeF;                     //Р—Р°РЅРµСЃР»Рё Р Р°Р·РјРµСЂ С„Р°Р№Р»Р°
    SWAP32(&aNam->timeLong);
-   (tabMME+numNam)->timeLong = aNam->timeLong;               //Занесли Длительность записей в файле
-   UnicodeToAnsi(aNam->Name1+3, (tabMME+numNam)->NameF, 27); //Занесли Преобразовали имя файла в папке MEDIA (убрали символы A:\)
-   *strchr((tabMME+numNam)->NameF, '.') = 0;                 //Обрубили расширение
+   (tabMME+numNam)->timeLong = aNam->timeLong;               //Р—Р°РЅРµСЃР»Рё Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ Р·Р°РїРёСЃРµР№ РІ С„Р°Р№Р»Рµ
+   UnicodeToAnsi(aNam->Name1+3, (tabMME+numNam)->NameF, 27); //Р—Р°РЅРµСЃР»Рё РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ С„Р°Р№Р»Р° РІ РїР°РїРєРµ MEDIA (СѓР±СЂР°Р»Рё СЃРёРјРІРѕР»С‹ A:\)
+   *strchr((tabMME+numNam)->NameF, '.') = 0;                 //РћР±СЂСѓР±РёР»Рё СЂР°СЃС€РёСЂРµРЅРёРµ
    if(Q > 4) Q = 4;
-   if(nAV == 119) sprintf(nameIn, "DVD");                    //Обозначение источника сигнала
+   if(nAV == 119) sprintf(nameIn, "DVD");                    //РћР±РѕР·РЅР°С‡РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° СЃРёРіРЅР°Р»Р°
    else  if(nAV == 0) sprintf(nameIn, "%s", nameTV);
          else sprintf(nameIn, "AV%1d", nAV);
-   lstrcpy((tabMME+numNam)->aName, Title);                   //Альтернативное имя файла
+   lstrcpy((tabMME+numNam)->aName, Title);                   //РђР»СЊС‚РµСЂРЅР°С‚РёРІРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
    lstrcpy((tabMME+numNam)->Qual, Qu[idRec][Q]);
    lstrcpy((tabMME+numNam)->nameIn, nameIn);
-   (tabMME+numNam)->numPart = 0;                             //Номер части
-   (tabMME+numNam)->dt = *DaT1;                              //Дата и время начала записи файла
-   (tabMME+numNam)->prYes = 0;                               //Признак, что имя парное (1- есть и в mme.db и в каталоге)
+   (tabMME+numNam)->numPart = 0;                             //РќРѕРјРµСЂ С‡Р°СЃС‚Рё
+   (tabMME+numNam)->dt = *DaT1;                              //Р”Р°С‚Р° Рё РІСЂРµРјСЏ РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРё С„Р°Р№Р»Р°
+   (tabMME+numNam)->prYes = 0;                               //РџСЂРёР·РЅР°Рє, С‡С‚Рѕ РёРјСЏ РїР°СЂРЅРѕРµ (1- РµСЃС‚СЊ Рё РІ mme.db Рё РІ РєР°С‚Р°Р»РѕРіРµ)
    (tabMME+numNam)->indFolder = 0xFFFF;
    (tabMME+numNam)->nPart = nPart;
-   (tabMME+numNam)->indTitle = WORD(t+1);                    //Порядковый номер Title
-   if(nPart > 1)                                             //Если больше одной части
-   { (tabMME+numNam)->numPart = WORD(n + 1);                 //Номер части
-     (tabMME+numNam)->indFolder = WORD(numNam_Part);         //Индекс строки в таблице имен папок многофайловых Title
-     if(n == 0)                                              //Первая часть многофайлового Title
-     { *(tabMME_Part+numNam_Part) = *(tabMME+numNam);        //Таблица имен отредактированных Title
-       numNam_Part++;                                        //Число имен в таблице имен отредактированных Title
+   (tabMME+numNam)->indTitle = WORD(t+1);                    //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ Title
+   if(nPart > 1)                                             //Р•СЃР»Рё Р±РѕР»СЊС€Рµ РѕРґРЅРѕР№ С‡Р°СЃС‚Рё
+   { (tabMME+numNam)->numPart = WORD(n + 1);                 //РќРѕРјРµСЂ С‡Р°СЃС‚Рё
+     (tabMME+numNam)->indFolder = WORD(numNam_Part);         //РРЅРґРµРєСЃ СЃС‚СЂРѕРєРё РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ РїР°РїРѕРє РјРЅРѕРіРѕС„Р°Р№Р»РѕРІС‹С… Title
+     if(n == 0)                                              //РџРµСЂРІР°СЏ С‡Р°СЃС‚СЊ РјРЅРѕРіРѕС„Р°Р№Р»РѕРІРѕРіРѕ Title
+     { *(tabMME_Part+numNam_Part) = *(tabMME+numNam);        //РўР°Р±Р»РёС†Р° РёРјРµРЅ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅС‹С… Title
+       numNam_Part++;                                        //Р§РёСЃР»Рѕ РёРјРµРЅ РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅС‹С… Title
      }
      else
-     { (tabMME_Part+numNam_Part-1)->SizeF += aNam->sizeF;    //Суммарный размер
-       (tabMME_Part+numNam_Part-1)->timeLong += aNam->timeLong;//Суммарная длительность записей в файле
+     { (tabMME_Part+numNam_Part-1)->SizeF += aNam->sizeF;    //РЎСѓРјРјР°СЂРЅС‹Р№ СЂР°Р·РјРµСЂ
+       (tabMME_Part+numNam_Part-1)->timeLong += aNam->timeLong;//РЎСѓРјРјР°СЂРЅР°СЏ РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ Р·Р°РїРёСЃРµР№ РІ С„Р°Р№Р»Рµ
      }
    }
    if(++numNam >= MAX_NAME_MME)
-      return Error1((Lan+106)->msg);                         //return Error1("Число записей в файле MME превысило возможности программы.");
+      return Error1((Lan+106)->msg);                         //return Error1("Р§РёСЃР»Рѕ Р·Р°РїРёСЃРµР№ РІ С„Р°Р№Р»Рµ MME РїСЂРµРІС‹СЃРёР»Рѕ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РїСЂРѕРіСЂР°РјРјС‹.");
    return 0;
 }
 
 //-------------------------------------------------------------------------------
 
-static int Make_Tab_Name_MME0(DWORD NumT)                    //Создание таблицы имен по файлу MME
+static int Make_Tab_Name_MME0(DWORD NumT)                    //РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
 {
-   for(DWORD t=0; t<NumT; t++)                               //По всему файлу MME
-   {  PSP_TIT0 *aTit = (PSP_TIT0 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSize_MME(sizeof(PSP_TIT0)) < 0) return -1;      //Контроль смещения в массиве MME
+   for(DWORD t=0; t<NumT; t++)                               //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
+   {  PSP_TIT0 *aTit = (PSP_TIT0 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSize_MME(sizeof(PSP_TIT0)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       Recalc_Par(aTit->Title, aTit->nameTV, &aTit->DaT2, &aTit->nPart, &aTit->DaT1);
-      for(int n=0; n<aTit->nPart; n++)                       //По числу частей в одном Title
-         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //Создание имени и занесение его в таблицу имен по файлу MME
+      for(int n=0; n<aTit->nPart; n++)                       //РџРѕ С‡РёСЃР»Сѓ С‡Р°СЃС‚РµР№ РІ РѕРґРЅРѕРј Title
+         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //РЎРѕР·РґР°РЅРёРµ РёРјРµРЅРё Рё Р·Р°РЅРµСЃРµРЅРёРµ РµРіРѕ РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
 //??  END_REC *eRec = (END_REC *)atMME;
 //??  atMME += sizeof(END_REC);
 //??  if(eRec->nM == 0)  continue;
 //??  SWAP16(&eRec->nM);
-//??  atMME += eRec->nM * sizeof(ONE_MET);                   //Пропустили все записи о метках
+//??  atMME += eRec->nM * sizeof(ONE_MET);                   //РџСЂРѕРїСѓСЃС‚РёР»Рё РІСЃРµ Р·Р°РїРёСЃРё Рѕ РјРµС‚РєР°С…
    }
    return 0;
 }
 
 //-------------------------------------------------------------------------------
 
-static int Make_Tab_Name_MME1(DWORD NumT)                    //Создание таблицы имен по файлу MME
+static int Make_Tab_Name_MME1(DWORD NumT)                    //РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
 {
-   for(DWORD t=0; t<NumT; t++)                               //По всему файлу MME
-   {  PSP_TIT1 *aTit = (PSP_TIT1 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSize_MME(sizeof(PSP_TIT1)) < 0) return -1;      //Контроль смещения в массиве MME
+   for(DWORD t=0; t<NumT; t++)                               //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
+   {  PSP_TIT1 *aTit = (PSP_TIT1 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSize_MME(sizeof(PSP_TIT1)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       Recalc_Par(aTit->Title, aTit->nameTV, &aTit->DaT2, &aTit->nPart, &aTit->DaT1);
-      for(int n=0; n<aTit->nPart; n++)                       //По числу частей
-         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //Создание имени и занесение его в таблицу имен по файлу MME
+      for(int n=0; n<aTit->nPart; n++)                       //РџРѕ С‡РёСЃР»Сѓ С‡Р°СЃС‚РµР№
+         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //РЎРѕР·РґР°РЅРёРµ РёРјРµРЅРё Рё Р·Р°РЅРµСЃРµРЅРёРµ РµРіРѕ РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
       END_REC *eRec = (END_REC *)at_MME;
-      if(CtrlSize_MME(sizeof(END_REC)) < 0) return -1;       //Контроль смещения в массиве MME
-      if(eRec->numMet == 0)  continue;                       //Меток нет
+      if(CtrlSize_MME(sizeof(END_REC)) < 0) return -1;       //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
+      if(eRec->numMet == 0)  continue;                       //РњРµС‚РѕРє РЅРµС‚
       SWAP16(&eRec->numMet);
-      if(CtrlSize_MME(eRec->numMet * sizeof(ONE_MET)) < 0) return -1;//Пропустили все записи о метках
+      if(CtrlSize_MME(eRec->numMet * sizeof(ONE_MET)) < 0) return -1;//РџСЂРѕРїСѓСЃС‚РёР»Рё РІСЃРµ Р·Р°РїРёСЃРё Рѕ РјРµС‚РєР°С…
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int Make_Tab_Name_MME2(DWORD NumT)                    //Создание таблицы имен по файлу MME
+static int Make_Tab_Name_MME2(DWORD NumT)                    //РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
 {
-   for(DWORD t=0; t<NumT; t++)                               //По всему файлу MME
-   {  PSP_TIT2 *aTit = (PSP_TIT2 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSize_MME(sizeof(PSP_TIT2)) < 0) return -1;      //Контроль смещения в массиве MME
+   for(DWORD t=0; t<NumT; t++)                               //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
+   {  PSP_TIT2 *aTit = (PSP_TIT2 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSize_MME(sizeof(PSP_TIT2)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       Recalc_Par(aTit->Title, aTit->nameTV, &aTit->DaT2, &aTit->nPart, &aTit->DaT1);
-      for(int n=0; n<aTit->nPart; n++)                       //По числу частей в одном Title
-         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //Создание имени и занесение его в таблицу имен по файлу MME
+      for(int n=0; n<aTit->nPart; n++)                       //РџРѕ С‡РёСЃР»Сѓ С‡Р°СЃС‚РµР№ РІ РѕРґРЅРѕРј Title
+         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //РЎРѕР·РґР°РЅРёРµ РёРјРµРЅРё Рё Р·Р°РЅРµСЃРµРЅРёРµ РµРіРѕ РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
       END_REC *eRec = (END_REC *)at_MME;
-      if(CtrlSize_MME(sizeof(END_REC)) < 0) return -1;       //Контроль смещения в массиве MME
+      if(CtrlSize_MME(sizeof(END_REC)) < 0) return -1;       //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       if(eRec->numMet != 0)
       {  SWAP16(&eRec->numMet);
-         if(CtrlSize_MME(eRec->numMet * sizeof(ONE_MET)) < 0) return -1;//Пропустили все записи о метках
+         if(CtrlSize_MME(eRec->numMet * sizeof(ONE_MET)) < 0) return -1;//РџСЂРѕРїСѓСЃС‚РёР»Рё РІСЃРµ Р·Р°РїРёСЃРё Рѕ РјРµС‚РєР°С…
       }
-      END0_ZAP_MME *aEnd0 = (END0_ZAP_MME *)at_MME;          //Адрес начала заголовка очередной записи
-      if(CtrlSize_MME(sizeof(END0_ZAP_MME)) < 0) return -1;  //Контроль смещения в массиве MME
+      END0_ZAP_MME *aEnd0 = (END0_ZAP_MME *)at_MME;          //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSize_MME(sizeof(END0_ZAP_MME)) < 0) return -1;  //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       SWAP16(&aEnd0->NN);
-      if(CtrlSize_MME(aEnd0->NN * sizeof(END1_ZAP_MME)) < 0) return -1;//Пропустили все записи не знаю о чем
+      if(CtrlSize_MME(aEnd0->NN * sizeof(END1_ZAP_MME)) < 0) return -1;//РџСЂРѕРїСѓСЃС‚РёР»Рё РІСЃРµ Р·Р°РїРёСЃРё РЅРµ Р·РЅР°СЋ Рѕ С‡РµРј
    }
    return 0;
 }
 
 //-------------------------------------------------------------------------------
 
-static int  Make_Tab_Name_MME4(DWORD NumT)                   //Создание таблицы имен по файлу MME
+static int  Make_Tab_Name_MME4(DWORD NumT)                   //РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
 {
-   for(DWORD t=0; t<NumT; t++)                               //По всему файлу MME
-   {  PSP_TIT4 *aTit = (PSP_TIT4 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSize_MME(sizeof(PSP_TIT4)) < 0) return -1;      //Контроль смещения в массиве MME
+   for(DWORD t=0; t<NumT; t++)                               //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
+   {  PSP_TIT4 *aTit = (PSP_TIT4 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSize_MME(sizeof(PSP_TIT4)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       Recalc_Par(aTit->Title, aTit->nameTV, &aTit->DaT2, &aTit->nPart, &aTit->DaT1);
-      for(int n=0; n<aTit->nPart; n++)                       //По числу частей в одном Title
-         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //Создание имени и занесение его в таблицу имен по файлу MME
+      for(int n=0; n<aTit->nPart; n++)                       //РџРѕ С‡РёСЃР»Сѓ С‡Р°СЃС‚РµР№ РІ РѕРґРЅРѕРј Title
+         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //РЎРѕР·РґР°РЅРёРµ РёРјРµРЅРё Рё Р·Р°РЅРµСЃРµРЅРёРµ РµРіРѕ РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
       END_REC *eRec = (END_REC *)at_MME;
-      if(CtrlSize_MME(sizeof(END_REC)) < 0) return -1;       //Контроль смещения в массиве MME
+      if(CtrlSize_MME(sizeof(END_REC)) < 0) return -1;       //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       if(eRec->numMet != 0)
       {  SWAP16(&eRec->numMet);
-         if(CtrlSize_MME(eRec->numMet * sizeof(ONE_MET)) < 0) return -1;//Пропустили все записи о метках
+         if(CtrlSize_MME(eRec->numMet * sizeof(ONE_MET)) < 0) return -1;//РџСЂРѕРїСѓСЃС‚РёР»Рё РІСЃРµ Р·Р°РїРёСЃРё Рѕ РјРµС‚РєР°С…
       }
-      END0_ZAP_MME *aEnd0 = (END0_ZAP_MME *)at_MME;          //Адрес начала заголовка очередной записи
-      if(CtrlSize_MME(sizeof(END0_ZAP_MME)) < 0) return -1;  //Контроль смещения в массиве MME
+      END0_ZAP_MME *aEnd0 = (END0_ZAP_MME *)at_MME;          //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSize_MME(sizeof(END0_ZAP_MME)) < 0) return -1;  //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       SWAP16(&aEnd0->NN);
-      if(CtrlSize_MME(aEnd0->NN * sizeof(END1_ZAP_MME)) < 0) return -1;//Пропустили все записи не знаю о чем
+      if(CtrlSize_MME(aEnd0->NN * sizeof(END1_ZAP_MME)) < 0) return -1;//РџСЂРѕРїСѓСЃС‚РёР»Рё РІСЃРµ Р·Р°РїРёСЃРё РЅРµ Р·РЅР°СЋ Рѕ С‡РµРј
    }
    return 0;
 }
 
 //-------------------------------------------------------------------------------
 
-static int Make_Tab_Name_MME5(DWORD NumT)                    //Создание таблицы имен по файлу MME
+static int Make_Tab_Name_MME5(DWORD NumT)                    //РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
 {
-   for(DWORD t=0; t<NumT; t++)                               //По всему файлу MME
-   {  PSP_TIT5 *aTit = (PSP_TIT5 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSize_MME(sizeof(PSP_TIT5)) < 0) return -1;      //Контроль смещения в массиве MME
+   for(DWORD t=0; t<NumT; t++)                               //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
+   {  PSP_TIT5 *aTit = (PSP_TIT5 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSize_MME(sizeof(PSP_TIT5)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       Recalc_Par(aTit->Title, aTit->nameTV, &aTit->DaT2, &aTit->nPart, &aTit->DaT1);
-      for(int n=0; n<aTit->nPart; n++)                       //По числу частей в одном Title
-         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //Создание имени и занесение его в таблицу имен по файлу MME
+      for(int n=0; n<aTit->nPart; n++)                       //РџРѕ С‡РёСЃР»Сѓ С‡Р°СЃС‚РµР№ РІ РѕРґРЅРѕРј Title
+         if(MakeNewName(t, n, aTit->nPart, aTit->Q, aTit->nAV, &aTit->DaT1) < 0) return -1; //РЎРѕР·РґР°РЅРёРµ РёРјРµРЅРё Рё Р·Р°РЅРµСЃРµРЅРёРµ РµРіРѕ РІ С‚Р°Р±Р»РёС†Сѓ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
       END_REC *eRec = (END_REC *)at_MME;
-      if(CtrlSize_MME(sizeof(END_REC)) < 0) return -1;       //Контроль смещения в массиве MME
+      if(CtrlSize_MME(sizeof(END_REC)) < 0) return -1;       //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       if(eRec->numMet != 0)
       {  SWAP16(&eRec->numMet);
-         if(CtrlSize_MME(eRec->numMet * sizeof(ONE_MET)) < 0) return -1;//Пропустили все записи о метках
+         if(CtrlSize_MME(eRec->numMet * sizeof(ONE_MET)) < 0) return -1;//РџСЂРѕРїСѓСЃС‚РёР»Рё РІСЃРµ Р·Р°РїРёСЃРё Рѕ РјРµС‚РєР°С…
       }
-      END0_ZAP_MME *aEnd0 = (END0_ZAP_MME *)at_MME;          //Адрес начала заголовка очередной записи
-      if(CtrlSize_MME(sizeof(END0_ZAP_MME)) < 0) return -1;  //Контроль смещения в массиве MME
+      END0_ZAP_MME *aEnd0 = (END0_ZAP_MME *)at_MME;          //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSize_MME(sizeof(END0_ZAP_MME)) < 0) return -1;  //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       SWAP16(&aEnd0->NN);
-      if(CtrlSize_MME(aEnd0->NN * sizeof(END1_ZAP_MME)) < 0) return -1;//Пропустили все записи не знаю о чем
+      if(CtrlSize_MME(aEnd0->NN * sizeof(END1_ZAP_MME)) < 0) return -1;//РџСЂРѕРїСѓСЃС‚РёР»Рё РІСЃРµ Р·Р°РїРёСЃРё РЅРµ Р·РЅР°СЋ Рѕ С‡РµРј
    }
    return 0;
 }
 
 //-------------------------------------------------------------------------------
 
-static int Make_Tab_Name_MME(void)                           //Создание таблицы имен по файлу MME
+static int Make_Tab_Name_MME(void)                           //РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
 {
-   tabMME = (TABL_MME *)MyAllocMem((MAX_NAME_MME+256) * sizeof(TABL_MME));//Таблица соответствия имен
+   tabMME = (TABL_MME *)MyAllocMem((MAX_NAME_MME+256) * sizeof(TABL_MME));//РўР°Р±Р»РёС†Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРјРµРЅ
    if(tabMME == NULL)  return -1;
-   tabMME_Part = tabMME+MAX_NAME_MME;                        //Таблица имен отредактированных Title
-   numNam_Part = 0;                                          //Число имен в таблице имен отредактированных Title
+   tabMME_Part = tabMME+MAX_NAME_MME;                        //РўР°Р±Р»РёС†Р° РёРјРµРЅ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅС‹С… Title
+   numNam_Part = 0;                                          //Р§РёСЃР»Рѕ РёРјРµРЅ РІ С‚Р°Р±Р»РёС†Рµ РёРјРµРЅ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅС‹С… Title
    at_MME = MMe;
-   PSP_MME *pspMME = (PSP_MME *)at_MME;                      //Адрес начала паспорта файла MME
-   if(CtrlSize_MME(sizeof(PSP_MME)) < 0) return -1;          //Контроль смещения в массиве MME
-   SWAP32(&pspMME->NumT);                                    //Число Title в файле MME
-   if(pspMME->NumT == 0) return 0;                           //Нет ни одной записи в базе
-   idRec = CtrlRecoder();                                    //Идентификация рекордера
+   PSP_MME *pspMME = (PSP_MME *)at_MME;                      //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° РїР°СЃРїРѕСЂС‚Р° С„Р°Р№Р»Р° MME
+   if(CtrlSize_MME(sizeof(PSP_MME)) < 0) return -1;          //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
+   SWAP32(&pspMME->NumT);                                    //Р§РёСЃР»Рѕ Title РІ С„Р°Р№Р»Рµ MME
+   if(pspMME->NumT == 0) return 0;                           //РќРµС‚ РЅРё РѕРґРЅРѕР№ Р·Р°РїРёСЃРё РІ Р±Р°Р·Рµ
+   idRec = CtrlRecoder();                                    //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
    if(idRec < 0)
-      return Error4((Lan+107)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg); //return Error1("Тип рекордера неопознан.");
+      return Error4((Lan+107)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg); //return Error1("РўРёРї СЂРµРєРѕСЂРґРµСЂР° РЅРµРѕРїРѕР·РЅР°РЅ.");
    switch(idRec)
    { case 0: if(Make_Tab_Name_MME0(pspMME->NumT) < 0) return -1; break;
      case 1: if(Make_Tab_Name_MME1(pspMME->NumT) < 0) return -1; break;
@@ -272,111 +272,111 @@ static int Make_Tab_Name_MME(void)                           //Создание таблицы 
      case 5: if(Make_Tab_Name_MME5(pspMME->NumT) < 0) return -1; break;
    }
    if(at_MME != endMME)
-      return Error4((Lan+107)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg);//return Error1("Структура файла MME.DB неизвестна автору программы.");
+      return Error4((Lan+107)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg);//return Error1("РЎС‚СЂСѓРєС‚СѓСЂР° С„Р°Р№Р»Р° MME.DB РЅРµРёР·РІРµСЃС‚РЅР° Р°РІС‚РѕСЂСѓ РїСЂРѕРіСЂР°РјРјС‹.");
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int Read_File_MME(DWORD ClSt)                                //Чтение файла базы
+int Read_File_MME(DWORD ClSt)                                //Р§С‚РµРЅРёРµ С„Р°Р№Р»Р° Р±Р°Р·С‹
 {
-   DWORD numCl = (SizeMME + sCl2_B - 1) / sCl2_B;            //Число кластеров необходимое для размещения файла данного размера
-   DWORD sizeF = numCl * sCl2_B;                             //Запас под полный кластер
-   MMe = (BYTE *)MyAllocMem(sizeF);                          //Память файл базы
+   DWORD numCl = (SizeMME + sCl2_B - 1) / sCl2_B;            //Р§РёСЃР»Рѕ РєР»Р°СЃС‚РµСЂРѕРІ РЅРµРѕР±С…РѕРґРёРјРѕРµ РґР»СЏ СЂР°Р·РјРµС‰РµРЅРёСЏ С„Р°Р№Р»Р° РґР°РЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР°
+   DWORD sizeF = numCl * sCl2_B;                             //Р—Р°РїР°СЃ РїРѕРґ РїРѕР»РЅС‹Р№ РєР»Р°СЃС‚РµСЂ
+   MMe = (BYTE *)MyAllocMem(sizeF);                          //РџР°РјСЏС‚СЊ С„Р°Р№Р» Р±Р°Р·С‹
    if(MMe == NULL)  return -1;
-   endMME = MMe + SizeMME;                                   //Адрес конца записей в массиве MME
+   endMME = MMe + SizeMME;                                   //РђРґСЂРµСЃ РєРѕРЅС†Р° Р·Р°РїРёСЃРµР№ РІ РјР°СЃСЃРёРІРµ MME
    BYTE *aMME = MMe;
-   DWORD wSizeB = sCl2_B;                                    //Число записываемых байт равно числу байт в кластере
-   DWORD nCl = ClSt;                                         //Текущий номер кластера равен первому кластеру файла
-   DWORD SizeToEnd = SizeMME;                                //Число байт которые осталось записать
-   for(DWORD i=0; i<numCl; i++)                              //По числу кластеров
+   DWORD wSizeB = sCl2_B;                                    //Р§РёСЃР»Рѕ Р·Р°РїРёСЃС‹РІР°РµРјС‹С… Р±Р°Р№С‚ СЂР°РІРЅРѕ С‡РёСЃР»Сѓ Р±Р°Р№С‚ РІ РєР»Р°СЃС‚РµСЂРµ
+   DWORD nCl = ClSt;                                         //РўРµРєСѓС‰РёР№ РЅРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° СЂР°РІРµРЅ РїРµСЂРІРѕРјСѓ РєР»Р°СЃС‚РµСЂСѓ С„Р°Р№Р»Р°
+   DWORD SizeToEnd = SizeMME;                                //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РєРѕС‚РѕСЂС‹Рµ РѕСЃС‚Р°Р»РѕСЃСЊ Р·Р°РїРёСЃР°С‚СЊ
+   for(DWORD i=0; i<numCl; i++)                              //РџРѕ С‡РёСЃР»Сѓ РєР»Р°СЃС‚РµСЂРѕРІ
    {  if(nCl == 0x0FFFFFFF)
-        return Error1((Lan+12)->msg);                        //return Error1("Неожиданно найден признак конца цепочки FAT.");
+        return Error1((Lan+12)->msg);                        //return Error1("РќРµРѕР¶РёРґР°РЅРЅРѕ РЅР°Р№РґРµРЅ РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё FAT.");
       if(*(FAT2 + nCl) == 0)
-        return Error1((Lan+11)->msg);                        //return Error1("Обнаружено несоответствие значения FAT и ссылки на кластер файла.");
-      if(wSizeB > SizeToEnd) wSizeB = DWORD(SizeToEnd);      //Размер остатка записи меньше размера кластера
-      DWORD nSector = Start_SecDir2 + (nCl - 1) * sClSec2;   //Сектор начала текущего кластера
+        return Error1((Lan+11)->msg);                        //return Error1("РћР±РЅР°СЂСѓР¶РµРЅРѕ РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ Р·РЅР°С‡РµРЅРёСЏ FAT Рё СЃСЃС‹Р»РєРё РЅР° РєР»Р°СЃС‚РµСЂ С„Р°Р№Р»Р°.");
+      if(wSizeB > SizeToEnd) wSizeB = DWORD(SizeToEnd);      //Р Р°Р·РјРµСЂ РѕСЃС‚Р°С‚РєР° Р·Р°РїРёСЃРё РјРµРЅСЊС€Рµ СЂР°Р·РјРµСЂР° РєР»Р°СЃС‚РµСЂР°
+      DWORD nSector = Start_SecDir2 + (nCl - 1) * sClSec2;   //РЎРµРєС‚РѕСЂ РЅР°С‡Р°Р»Р° С‚РµРєСѓС‰РµРіРѕ РєР»Р°СЃС‚РµСЂР°
 #if defined OUT_TEST
       char Ss[300];
       wsprintf(Ss, "Load Dir (claster2 %d, sector %d)", nCl, nSector);
       Add_SpecSpis(Ss);
 #endif
-      if(ReadClast2_P(nSector, aMME) < 0) return -1;         //Чтение кластера
+      if(ReadClast2_P(nSector, aMME) < 0) return -1;         //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
 #if defined OUT_TEST
       View_HEX_Any(aMME, sCl2_B);
 #endif
       aMME += sCl2_B;
-      SizeToEnd -= wSizeB;                                   //Число байт которые осталось записать
-      nCl = *(FAT2 + nCl);                                   //Номер следующего кластера
+      SizeToEnd -= wSizeB;                                   //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РєРѕС‚РѕСЂС‹Рµ РѕСЃС‚Р°Р»РѕСЃСЊ Р·Р°РїРёСЃР°С‚СЊ
+      nCl = *(FAT2 + nCl);                                   //РќРѕРјРµСЂ СЃР»РµРґСѓСЋС‰РµРіРѕ РєР»Р°СЃС‚РµСЂР°
       if(nCl > maxZapFAT2 && nCl != 0x0FFFFFFF)
-        return Error1((Lan+13)->msg);                        //"Номер кластера превышает допустимое значение."
+        return Error1((Lan+13)->msg);                        //"РќРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР° РїСЂРµРІС‹С€Р°РµС‚ РґРѕРїСѓСЃС‚РёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ."
       if(SizeToEnd <= 0 && nCl != 0x0FFFFFFF)
-        return Error1((Lan+29)->msg);                        //return Error2("Выходной файл заданного размера записан,", "а признак конца цепочки FAT не найден.");
+        return Error1((Lan+29)->msg);                        //return Error2("Р’С‹С…РѕРґРЅРѕР№ С„Р°Р№Р» Р·Р°РґР°РЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР° Р·Р°РїРёСЃР°РЅ,", "Р° РїСЂРёР·РЅР°Рє РєРѕРЅС†Р° С†РµРїРѕС‡РєРё FAT РЅРµ РЅР°Р№РґРµРЅ.");
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int Read_Dir_Part2_MME(void)                                 //Чтение каталога второго раздела и файла MME
+int Read_Dir_Part2_MME(void)                                 //Р§С‚РµРЅРёРµ РєР°С‚Р°Р»РѕРіР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° Рё С„Р°Р№Р»Р° MME
 {
    BYTE buff[sCl2_B];
 
-   SizeMME = 0;                                              //Нулевая длина файла (как признак отсутствия)
-   tabMME = NULL;                                            //Таблица соответствия имен
-   numNam = 0;                                               //Число имен в таблице MME
+   SizeMME = 0;                                              //РќСѓР»РµРІР°СЏ РґР»РёРЅР° С„Р°Р№Р»Р° (РєР°Рє РїСЂРёР·РЅР°Рє РѕС‚СЃСѓС‚СЃС‚РІРёСЏ)
+   tabMME = NULL;                                            //РўР°Р±Р»РёС†Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРјРµРЅ
+   numNam = 0;                                               //Р§РёСЃР»Рѕ РёРјРµРЅ РІ С‚Р°Р±Р»РёС†Рµ MME
 #if defined OUT_TEST
    DWORD nClast = 1;
-   DWORD nSector = Start_SecDir2 + (nClast-1) * sClSec;      //Номер сектора по номеру кластера
+   DWORD nSector = Start_SecDir2 + (nClast-1) * sClSec;      //РќРѕРјРµСЂ СЃРµРєС‚РѕСЂР° РїРѕ РЅРѕРјРµСЂСѓ РєР»Р°СЃС‚РµСЂР°
    char Ss[300];
    wsprintf(Ss, "Load Dir (claster2 %d, sector %d)", nClast, nSector);
    Add_SpecSpis(Ss);
 #endif
-   if(ReadClast2_P(Start_SecDir2, buff) < 0) return -1;      //Чтение кластера
+   if(ReadClast2_P(Start_SecDir2, buff) < 0) return -1;      //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
 #if defined OUT_TEST
    View_HEX_Any(buff, sCl2_B);
 #endif
    One_Str_Cat *Kat = (One_Str_Cat *)buff;
-   for(DWORD n=0; n<4 * sClSec2; n++)                          //В каждом секторе 4 записи
-   {  if((Kat + n)->pf.type == 0) return 0;                  //Конец каталога и файл не найден
-//      if((Kat + n)->pf.type == 0xFFFF) continue;             //Конец каталога и файл не найден
-//    if(n == 0) return 0;                                   //Нет записей в папке MEDIA
-//    else return Error4((Lan+15)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg); //"Неизвестный тип записи в строке каталога."
+   for(DWORD n=0; n<4 * sClSec2; n++)                          //Р’ РєР°Р¶РґРѕРј СЃРµРєС‚РѕСЂРµ 4 Р·Р°РїРёСЃРё
+   {  if((Kat + n)->pf.type == 0) return 0;                  //РљРѕРЅРµС† РєР°С‚Р°Р»РѕРіР° Рё С„Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ
+//      if((Kat + n)->pf.type == 0xFFFF) continue;             //РљРѕРЅРµС† РєР°С‚Р°Р»РѕРіР° Рё С„Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ
+//    if(n == 0) return 0;                                   //РќРµС‚ Р·Р°РїРёСЃРµР№ РІ РїР°РїРєРµ MEDIA
+//    else return Error4((Lan+15)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg); //"РќРµРёР·РІРµСЃС‚РЅС‹Р№ С‚РёРї Р·Р°РїРёСЃРё РІ СЃС‚СЂРѕРєРµ РєР°С‚Р°Р»РѕРіР°."
       WORD NameDel = *((WORD*)&(Kat + n)->Name);
-      if(NameDel == 0xE500 && (Kat + n)->pf.ClSt == 0) continue; //Это удаленное имя
+      if(NameDel == 0xE500 && (Kat + n)->pf.ClSt == 0) continue; //Р­С‚Рѕ СѓРґР°Р»РµРЅРЅРѕРµ РёРјСЏ
       if((Kat + n)->pf.type != 32 && (Kat + n)->pf.type != 48)
-        return Error4((Lan+15)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg); //"Неизвестный тип записи в строке каталога."
+        return Error4((Lan+15)->msg, (Lan+102)->msg, (Lan+103)->msg, (Lan+104)->msg); //"РќРµРёР·РІРµСЃС‚РЅС‹Р№ С‚РёРї Р·Р°РїРёСЃРё РІ СЃС‚СЂРѕРєРµ РєР°С‚Р°Р»РѕРіР°."
       int prRec = 0;
-      if(*(Kat->Name+14) == 0x2000) prRec = 1;               //Старейшая серия (у нее пробелы в имени)
+      if(*(Kat->Name+14) == 0x2000) prRec = 1;               //РЎС‚Р°СЂРµР№С€Р°СЏ СЃРµСЂРёСЏ (Сѓ РЅРµРµ РїСЂРѕР±РµР»С‹ РІ РёРјРµРЅРё)
       char nam[128], ext[128];
-      if(prRec == 0)                                         //Признак рекордера 0 или 1
-      {  UnicodeToAnsi(Kat->Name, nam, 41);                  //Преобразовали имя
-         UnicodeToAnsi(Kat->Ext, ext, 4);                    //Преобразовали расширение
+      if(prRec == 0)                                         //РџСЂРёР·РЅР°Рє СЂРµРєРѕСЂРґРµСЂР° 0 РёР»Рё 1
+      {  UnicodeToAnsi(Kat->Name, nam, 41);                  //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ
+         UnicodeToAnsi(Kat->Ext, ext, 4);                    //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё СЂР°СЃС€РёСЂРµРЅРёРµ
       }
-      if(prRec == 1)                                         //Признак рекордера 0 или 1 (старейшая серия)
-      {  UnicodeToAnsi(Kat->Name, nam, 45);                  //Преобразовали имя
+      if(prRec == 1)                                         //РџСЂРёР·РЅР°Рє СЂРµРєРѕСЂРґРµСЂР° 0 РёР»Рё 1 (СЃС‚Р°СЂРµР№С€Р°СЏ СЃРµСЂРёСЏ)
+      {  UnicodeToAnsi(Kat->Name, nam, 45);                  //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ
          lstrcpy(ext, nam + 42);
-         if(*(ext+2) == ' ') *(ext+2) = 0;                   //В данном каталоге может быть только расширение DB (2 символа)
+         if(*(ext+2) == ' ') *(ext+2) = 0;                   //Р’ РґР°РЅРЅРѕРј РєР°С‚Р°Р»РѕРіРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ С‚РѕР»СЊРєРѕ СЂР°СЃС€РёСЂРµРЅРёРµ DB (2 СЃРёРјРІРѕР»Р°)
          for(int i=41; i>0; i--)
          {  if(*(nam + i) != ' ') break;
             *(nam + i) = 0;
          }
       }
-      if(lstrcmp(nam, "MME") != 0) continue;                 //Это не база
-//В дампе файла "BACKUP" нет
-//    if(lstrcmp(nam, "BACKUP") != 0) continue;              //Это не база
-      if(lstrcmp(ext, "DB") != 0) continue;                  //Это не база
-      SizeMME = DWORD((Kat + n)->pf.SizeF);                  //Число байт в файле MME
-      if(SizeMME == 0) return 0;                             //Нулевая длина файла
-      return Read_File_MME((Kat + n)->pf.ClSt);              //Чтение файла базы
+      if(lstrcmp(nam, "MME") != 0) continue;                 //Р­С‚Рѕ РЅРµ Р±Р°Р·Р°
+//Р’ РґР°РјРїРµ С„Р°Р№Р»Р° "BACKUP" РЅРµС‚
+//    if(lstrcmp(nam, "BACKUP") != 0) continue;              //Р­С‚Рѕ РЅРµ Р±Р°Р·Р°
+      if(lstrcmp(ext, "DB") != 0) continue;                  //Р­С‚Рѕ РЅРµ Р±Р°Р·Р°
+      SizeMME = DWORD((Kat + n)->pf.SizeF);                  //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РІ С„Р°Р№Р»Рµ MME
+      if(SizeMME == 0) return 0;                             //РќСѓР»РµРІР°СЏ РґР»РёРЅР° С„Р°Р№Р»Р°
+      return Read_File_MME((Kat + n)->pf.ClSt);              //Р§С‚РµРЅРёРµ С„Р°Р№Р»Р° Р±Р°Р·С‹
    }
-   return 0;                                                 //Файл не найден
+   return 0;                                                 //Р¤Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ
 }
 
 //------------------------------------------------------------------------------
 
 #if defined VIEW_TAB_MME
-static void View_Tab_MME_DB(void)                            //Визуализация таблицы
+static void View_Tab_MME_DB(void)                            //Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹
 {
    char Ss[1024];
    for(DWORD i=0; i<numNam; i++)
@@ -390,27 +390,27 @@ static void View_Tab_MME_DB(void)                            //Визуализация табл
                   tlHour, tlMin, tlSec,
                   (tabMME + i)->dt.day, (tabMME + i)->dt.mon, (tabMME + i)->dt.year,
                   (tabMME + i)->dt.hour, (tabMME + i)->dt.min, (tabMME + i)->dt.sec);
-      Add_Spis(Ss);                                          //Добавление строки в список
+      Add_Spis(Ss);                                          //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
    }
 }
 #endif
 
 //------------------------------------------------------------------------------
 
-int ReadMME_DB(void)                                         //Чтение файла базы записей
+int ReadMME_DB(void)                                         //Р§С‚РµРЅРёРµ С„Р°Р№Р»Р° Р±Р°Р·С‹ Р·Р°РїРёСЃРµР№
 {
-   if(Conf.altName == 1) return 0;                           //Не показывать информативные имена
-   if(Read_Dir_Part2_MME() < 0) return -1;                   //Чтение каталога второго раздела и файла MME
-   if(SizeMME == 0) return 0;                                //Нулевая длина файла
+   if(Conf.altName == 1) return 0;                           //РќРµ РїРѕРєР°Р·С‹РІР°С‚СЊ РёРЅС„РѕСЂРјР°С‚РёРІРЅС‹Рµ РёРјРµРЅР°
+   if(Read_Dir_Part2_MME() < 0) return -1;                   //Р§С‚РµРЅРёРµ РєР°С‚Р°Р»РѕРіР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° Рё С„Р°Р№Р»Р° MME
+   if(SizeMME == 0) return 0;                                //РќСѓР»РµРІР°СЏ РґР»РёРЅР° С„Р°Р№Р»Р°
 #if !defined OUT_TEST1 && !defined TEST_LG2_MME
-   int ret = Make_Tab_Name_MME();                            //Создание таблицы имен по файлу MME
+   int ret = Make_Tab_Name_MME();                            //РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ РёРјРµРЅ РїРѕ С„Р°Р№Р»Сѓ MME
    MyFreeMem(&(void*)MMe);
    if(ret < 0)
    {  MyFreeMem(&(void*)tabMME);
       return -1;
    }
   #if defined VIEW_TAB_MME
-   View_Tab_MME_DB();                                        //Визуализация таблицы
+   View_Tab_MME_DB();                                        //Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹
   #endif
 #endif
    return 0;
@@ -418,11 +418,11 @@ int ReadMME_DB(void)                                         //Чтение файла базы
 
 //------------------------------------------------------------------------------
 
-int Update_MME_DB(void)                                      //Пересоздание массива информативных имен
+int Update_MME_DB(void)                                      //РџРµСЂРµСЃРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР° РёРЅС„РѕСЂРјР°С‚РёРІРЅС‹С… РёРјРµРЅ
 {
    MyFreeMem(&(void*)MMe);
-   MyFreeMem(&(void*)tabMME);                                //Таблица соответствия имен
-   return ReadMME_DB();                                      //Чтение файла базы записей
+   MyFreeMem(&(void*)tabMME);                                //РўР°Р±Р»РёС†Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРјРµРЅ
+   return ReadMME_DB();                                      //Р§С‚РµРЅРёРµ С„Р°Р№Р»Р° Р±Р°Р·С‹ Р·Р°РїРёСЃРµР№
 }
 
 #endif

@@ -6,8 +6,8 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_func_1 ===================================
-void *MyAllocMem(DWORD Size);                                //Запрос динамической памяти
-void MyFreeMem(void **Adr);                                  //Освобождение блока памяти
+void *MyAllocMem(DWORD Size);                                //Р—Р°РїСЂРѕСЃ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ РїР°РјСЏС‚Рё
+void MyFreeMem(void **Adr);                                  //РћСЃРІРѕР±РѕР¶РґРµРЅРёРµ Р±Р»РѕРєР° РїР°РјСЏС‚Рё
 int  Error1(char *Msg);
 int  Error2(char *Msg1, char *Msg2);
 int  Error3(char *Msg1, char *Msg2, char *Msg3);
@@ -23,26 +23,26 @@ void Message1(char *Msg1);
 void Message2(char *Msg1, char *Msg2);
 
 //------------------------------------------------------------------------------
-
-void *MyAllocMem(DWORD Size)                                 //Запрос динамической памяти
+
+void *MyAllocMem(DWORD Size)                                 //Р—Р°РїСЂРѕСЃ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ РїР°РјСЏС‚Рё
 {
    void *Adr;
    if(Size <= 0)
-   {  Error1((Lan+38)->msg);                                 //Error1("Попытка получить память нулевой длины.");
+   {  Error1((Lan+38)->msg);                                 //Error1("РџРѕРїС‹С‚РєР° РїРѕР»СѓС‡РёС‚СЊ РїР°РјСЏС‚СЊ РЅСѓР»РµРІРѕР№ РґР»РёРЅС‹.");
       return NULL;
    }
    if((Adr = VirtualAlloc(NULL, Size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE) )== NULL)
-      ErrorSys1((Lan+39)->msg);                              //ErrorSys1("Нет свободной памяти для работы.");
+      ErrorSys1((Lan+39)->msg);                              //ErrorSys1("РќРµС‚ СЃРІРѕР±РѕРґРЅРѕР№ РїР°РјСЏС‚Рё РґР»СЏ СЂР°Р±РѕС‚С‹.");
    return Adr;
 }
 
 //------------------------------------------------------------------------------
 
-void MyFreeMem(void **Adr)                                   //Освобождение блока памяти
+void MyFreeMem(void **Adr)                                   //РћСЃРІРѕР±РѕР¶РґРµРЅРёРµ Р±Р»РѕРєР° РїР°РјСЏС‚Рё
 {
-   if(*Adr == NULL)  return;                                 //Память не занята 
+   if(*Adr == NULL)  return;                                 //РџР°РјСЏС‚СЊ РЅРµ Р·Р°РЅСЏС‚Р°В 
    if(VirtualFree(*Adr, NULL, MEM_RELEASE) == FALSE)
-      ErrorSys1((Lan+40)->msg);                              //ErrorSys1("Ошибка освобождения памяти.");
+      ErrorSys1((Lan+40)->msg);                              //ErrorSys1("РћС€РёР±РєР° РѕСЃРІРѕР±РѕР¶РґРµРЅРёСЏ РїР°РјСЏС‚Рё.");
    *Adr = NULL;
 }
 
@@ -51,9 +51,9 @@ void MyFreeMem(void **Adr)                                   //Освобождение блок
 int Error1(char *Msg)
 {
 #if defined OUT_TEST
-   Add_SpecSpis(Msg);                         //Добавление строки в список
+   Add_SpecSpis(Msg);                         //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
 #endif
-   MessageBox(MainWin, Msg, (Lan+35)->msg, MB_TOPMOST | MB_OK | MB_ICONSTOP | MB_APPLMODAL);// MessageBox(MainWin, Msg, "Ошибка", MB_TOPMOST | MB_OK | MB_ICONSTOP);
+   MessageBox(MainWin, Msg, (Lan+35)->msg, MB_TOPMOST | MB_OK | MB_ICONSTOP | MB_APPLMODAL);// MessageBox(MainWin, Msg, "РћС€РёР±РєР°", MB_TOPMOST | MB_OK | MB_ICONSTOP);
    return -1;
 }
 
@@ -86,20 +86,20 @@ int Error4(char *Msg1, char *Msg2, char *Msg3, char *Msg4)
 
 //------------------------------------------------------------------------------
 
-#define MAX_CHAR 40                                          //Примерная длина строки
+#define MAX_CHAR 40                                          //РџСЂРёРјРµСЂРЅР°СЏ РґР»РёРЅР° СЃС‚СЂРѕРєРё
 
 int ErrorSys1(char *Msg)
 {
    char Ss[2048], MsgErr[512];
    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),  MsgErr, 512, NULL);
-   int n = lstrlen(MsgErr);                                  //Число символов в системном сообщении
-   int m = MAX_CHAR;                                         //Длина строки
+   int n = lstrlen(MsgErr);                                  //Р§РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ СЃРёСЃС‚РµРјРЅРѕРј СЃРѕРѕР±С‰РµРЅРёРё
+   int m = MAX_CHAR;                                         //Р”Р»РёРЅР° СЃС‚СЂРѕРєРё
    if(n > m)
    {  for(;;)
       { int i;
-        for(i=m; i<n; i++)                                   //Делим фразу на несколько строк
-          if(*(MsgErr+i) == ' ')                             //Делим строку по пробелам
+        for(i=m; i<n; i++)                                   //Р”РµР»РёРј С„СЂР°Р·Сѓ РЅР° РЅРµСЃРєРѕР»СЊРєРѕ СЃС‚СЂРѕРє
+          if(*(MsgErr+i) == ' ')                             //Р”РµР»РёРј СЃС‚СЂРѕРєСѓ РїРѕ РїСЂРѕР±РµР»Р°Рј
           {  *(MsgErr+i) = '\n';
              m = i + MAX_CHAR + 1;
              break;
@@ -108,11 +108,11 @@ int ErrorSys1(char *Msg)
       }
    }
 #if defined OUT_TEST
-   Add_SpecSpis(Msg);                                        //Добавление строки в список
-   Add_SpecSpis(MsgErr);                                     //Добавление строки в список
+   Add_SpecSpis(Msg);                                        //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+   Add_SpecSpis(MsgErr);                                     //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
 #endif
-   wsprintf(Ss, "%s\n\n%s:\n%s", Msg, (Lan+37)->msg, MsgErr);// wsprintf(Ss, "%s\n\nСистемное сообщение:\n%s", Msg, MsgErr);
-   MessageBox(MainWin, Ss, (Lan+35)->msg, MB_TOPMOST | MB_OK | MB_ICONSTOP);// MessageBox(MainWin, Ss, "Ошибка", MB_TOPMOST | MB_OK | MB_ICONSTOP);
+   wsprintf(Ss, "%s\n\n%s:\n%s", Msg, (Lan+37)->msg, MsgErr);// wsprintf(Ss, "%s\n\nРЎРёСЃС‚РµРјРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ:\n%s", Msg, MsgErr);
+   MessageBox(MainWin, Ss, (Lan+35)->msg, MB_TOPMOST | MB_OK | MB_ICONSTOP);// MessageBox(MainWin, Ss, "РћС€РёР±РєР°", MB_TOPMOST | MB_OK | MB_ICONSTOP);
    return -1;
 }
 
@@ -129,8 +129,8 @@ int ErrorSys2(char *Msg1, char *Msg2)
 
 char MsgYesNo1(char *Msg1)
 {
-//   if(MessageBox(MainWin, Msg1, (Lan+36)->msg, MB_TOPMOST | MB_YESNO | MB_ICONQUESTION) == IDYES) return 'Y';// if(MessageBox(MainWin, Msg1, "ВНИМАНИЕ !!!", MB_TOPMOST | MB_YESNO | MB_ICONQUESTION) == IDYES) return 'Y';
-   if(MessageBox(NULL, Msg1, (Lan+36)->msg, MB_TOPMOST | MB_YESNO | MB_ICONQUESTION) == IDYES) return 'Y';// if(MessageBox(MainWin, Msg1, "ВНИМАНИЕ !!!", MB_TOPMOST | MB_YESNO | MB_ICONQUESTION) == IDYES) return 'Y';
+//   if(MessageBox(MainWin, Msg1, (Lan+36)->msg, MB_TOPMOST | MB_YESNO | MB_ICONQUESTION) == IDYES) return 'Y';// if(MessageBox(MainWin, Msg1, "Р’РќРРњРђРќРР• !!!", MB_TOPMOST | MB_YESNO | MB_ICONQUESTION) == IDYES) return 'Y';
+   if(MessageBox(NULL, Msg1, (Lan+36)->msg, MB_TOPMOST | MB_YESNO | MB_ICONQUESTION) == IDYES) return 'Y';// if(MessageBox(MainWin, Msg1, "Р’РќРРњРђРќРР• !!!", MB_TOPMOST | MB_YESNO | MB_ICONQUESTION) == IDYES) return 'Y';
    return 'N';
 }
 

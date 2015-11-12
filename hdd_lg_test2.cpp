@@ -8,14 +8,14 @@
 #if defined TEST_LG2_MME
 
 //============================ hdd_lg_test2 ====================================
-int  Read_Test2(void);                                       //Тестовое чтение и вывод
+int  Read_Test2(void);                                       //РўРµСЃС‚РѕРІРѕРµ С‡С‚РµРЅРёРµ Рё РІС‹РІРѕРґ
 
 static char Ss[10 * 4096], *as;
-static BYTE *at_MME;                                         //Адрес начала текущей записи
-static BYTE *endMME;                                         //Адрес конца записей в массиве MME
-static int numF;                                             //Порядковый номер файла (пары)
-static DWORD LstNN;                                          //Позиция начала для NN
-static int numT;                                             //Число глав
+static BYTE *at_MME;                                         //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° С‚РµРєСѓС‰РµР№ Р·Р°РїРёСЃРё
+static BYTE *endMME;                                         //РђРґСЂРµСЃ РєРѕРЅС†Р° Р·Р°РїРёСЃРµР№ РІ РјР°СЃСЃРёРІРµ MME
+static int numF;                                             //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С„Р°Р№Р»Р° (РїР°СЂС‹)
+static DWORD LstNN;                                          //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РґР»СЏ NN
+static int numT;                                             //Р§РёСЃР»Рѕ РіР»Р°РІ
 
 //------------------------------------------------------------------------------
 
@@ -39,58 +39,58 @@ inline void Out_B(BYTE *B, DWORD N)
 
 //------------------------------------------------------------------------------
 
-static int CtrlSizeMME_(DWORD Delta)                         //Контроль смещения в массиве MME
+static int CtrlSizeMME_(DWORD Delta)                         //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
 {
-   at_MME += Delta;                                          //Адрес начала следеющего элемента записи
-   if(at_MME > endMME)                                       //Вышли за пределы массива MME
-     return Error1("Hex. Структура файла MME.DB неизвестна автору программы.");
+   at_MME += Delta;                                          //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° СЃР»РµРґРµСЋС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° Р·Р°РїРёСЃРё
+   if(at_MME > endMME)                                       //Р’С‹С€Р»Рё Р·Р° РїСЂРµРґРµР»С‹ РјР°СЃСЃРёРІР° MME
+     return Error1("Hex. РЎС‚СЂСѓРєС‚СѓСЂР° С„Р°Р№Р»Р° MME.DB РЅРµРёР·РІРµСЃС‚РЅР° Р°РІС‚РѕСЂСѓ РїСЂРѕРіСЂР°РјРјС‹.");
    return 0;
 }
 
 //-------------------------------------------------------------------------------
 
-static void View_C2l_Hex(BYTE *buff, int pr)                 //Вывод содержимого кластера
+static void View_C2l_Hex(BYTE *buff, int pr)                 //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РєР»Р°СЃС‚РµСЂР°
 {
    BYTE *t_buff = buff;
-   for(int i=0; i<sClSec2; i++)                              //По числу секторов в кластере
-   {  View_Sec_Hex(t_buff, pr);                              //Вывод содержимого сектора
-      t_buff += sSecB;                                       //Увеличили адрес вывода на размер сектора
+   for(int i=0; i<sClSec2; i++)                              //РџРѕ С‡РёСЃР»Сѓ СЃРµРєС‚РѕСЂРѕРІ РІ РєР»Р°СЃС‚РµСЂРµ
+   {  View_Sec_Hex(t_buff, pr);                              //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ СЃРµРєС‚РѕСЂР°
+      t_buff += sSecB;                                       //РЈРІРµР»РёС‡РёР»Рё Р°РґСЂРµСЃ РІС‹РІРѕРґР° РЅР° СЂР°Р·РјРµСЂ СЃРµРєС‚РѕСЂР°
       Add_Spis("----------------------------------------------------------------------------");
    }
 }
 
 //------------------------------------------------------------------------------
 
-static int WorkHead(int ind)                                 //Обработка заголовка
+static int WorkHead(int ind)                                 //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РіРѕР»РѕРІРєР°
 {
-   numF = 0;                                                 //Порядковый номер файла (пары)
+   numF = 0;                                                 //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С„Р°Р№Р»Р° (РїР°СЂС‹)
 #if defined EMULATOR_HDD
-   wsprintf(Ss, "Тип рекордера - %d, %s", ind, NameFDump);
+   wsprintf(Ss, "РўРёРї СЂРµРєРѕСЂРґРµСЂР° - %d, %s", ind, NameFDump);
 #else
-   wsprintf(Ss, "Тип рекордера - %d", ind);
+   wsprintf(Ss, "РўРёРї СЂРµРєРѕСЂРґРµСЂР° - %d", ind);
 #endif
-   Add_Spis(Ss);                                             //Добавление строки в список
+   Add_Spis(Ss);                                             //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
    as = Ss;
-   at_MME = MMe;                                             //Адрес начала текущей записи
+   at_MME = MMe;                                             //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° С‚РµРєСѓС‰РµР№ Р·Р°РїРёСЃРё
    PSP_MME *pspMME = (PSP_MME *)MMe;
-   if(CtrlSizeMME_(sizeof(PSP_MME)) < 0) return -1;          //Контроль смещения в массиве MME
-   as += sprintf(as, "Заголовок:");
+   if(CtrlSizeMME_(sizeof(PSP_MME)) < 0) return -1;          //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
+   as += sprintf(as, "Р—Р°РіРѕР»РѕРІРѕРє:");
    OutDW(pspMME->Dw1, sizeof(pspMME->Dw1));
    SWAP32(&pspMME->NumT);
-   as += sprintf(as, " ЧислоTitle=%4d[%08X]", pspMME->NumT, pspMME->NumT);
+   as += sprintf(as, " Р§РёСЃР»РѕTitle=%4d[%08X]", pspMME->NumT, pspMME->NumT);
    OutDW(&pspMME->Dw2, sizeof(pspMME->Dw2));
    SWAP64(&DWORDLONG(pspMME->size1));
-   as += sprintf(as, " ВсегоКластеров(S70)=%9.2lf[%08X %08X]", double(pspMME->size1)/1024/512, *((DWORD*)&pspMME->size1 + 1), *(DWORD*)&pspMME->size1);
+   as += sprintf(as, " Р’СЃРµРіРѕРљР»Р°СЃС‚РµСЂРѕРІ(S70)=%9.2lf[%08X %08X]", double(pspMME->size1)/1024/512, *((DWORD*)&pspMME->size1 + 1), *(DWORD*)&pspMME->size1);
    SWAP64(&DWORDLONG(pspMME->size2));
-   as += sprintf(as, " ПервыйнеЗанятый(S67)=%9.2lf[%08X %08X]", double(pspMME->size2)/1024/512, *((DWORD*)&pspMME->size2 + 1), *(DWORD*)&pspMME->size2);
+   as += sprintf(as, " РџРµСЂРІС‹Р№РЅРµР—Р°РЅСЏС‚С‹Р№(S67)=%9.2lf[%08X %08X]", double(pspMME->size2)/1024/512, *((DWORD*)&pspMME->size2 + 1), *(DWORD*)&pspMME->size2);
    SWAP64(&DWORDLONG(pspMME->size3));
    as += sprintf(as, " ??3=%9.2lf[%08X %08X]", double(pspMME->size3)/1024/512, *((DWORD*)&pspMME->size3 + 1), *(DWORD*)&pspMME->size3);
    SWAP64(&DWORDLONG(pspMME->size4));
    as += sprintf(as, " ??4=%9.2lf[%08X %08X]", double(pspMME->size4)/1024/512, *((DWORD*)&pspMME->size4 + 1), *(DWORD*)&pspMME->size4);
    OutDW(pspMME->Dw3, sizeof(pspMME->Dw3));
    *as = 0;
-   Add_Spis(Ss);                                             //Добавление строки в список
-   Add_Spis("---------------------------------------------");//Добавление строки в список
+   Add_Spis(Ss);                                             //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+   Add_Spis("---------------------------------------------");//Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
    numT = pspMME->NumT;
    return 0;
 }
@@ -103,7 +103,7 @@ static void Out_Dat1(DATE_T1 *DaT1)
    SWAP16(&DaT1->mon);
    SWAP16(&DaT1->day);
    SWAP16(&DaT1->hour);
-   as += sprintf(as, " Дата=%04d.%02d.%02d[%04X%02X%02X] Время=%02d:%02d:%02d[%02X%02X%02X]",
+   as += sprintf(as, " Р”Р°С‚Р°=%04d.%02d.%02d[%04X%02X%02X] Р’СЂРµРјСЏ=%02d:%02d:%02d[%02X%02X%02X]",
                           DaT1->year, DaT1->mon, DaT1->day, DaT1->year, DaT1->mon, DaT1->day,
                           DaT1->hour, DaT1->min, DaT1->sec, DaT1->hour, DaT1->min, DaT1->sec);
 }
@@ -113,7 +113,7 @@ static void Out_Dat1(DATE_T1 *DaT1)
 static void Out_Dat2(DATE_T2 *DaT2)
 {
    SWAP16(&DaT2->Year);
-   as += sprintf(as, " Дата=%04d.%02d.%02d[%04X%02X%02X] Время=%02d:%02d:%02d[%02X%02X%02X] ",
+   as += sprintf(as, " Р”Р°С‚Р°=%04d.%02d.%02d[%04X%02X%02X] Р’СЂРµРјСЏ=%02d:%02d:%02d[%02X%02X%02X] ",
                          DaT2->Year, DaT2->Mon, DaT2->Day, DaT2->Year, DaT2->Mon, DaT2->Day,
                          DaT2->Hour, DaT2->Min, DaT2->Sec, DaT2->Hour, DaT2->Min, DaT2->Sec);
 }
@@ -122,7 +122,7 @@ static void Out_Dat2(DATE_T2 *DaT2)
 
 static void Out_Can(BYTE *prCan)
 {
-   as += sprintf(as, " КаналТВ_№=");
+   as += sprintf(as, " РљР°РЅР°Р»РўР’_в„–=");
    if(prCan[1] == 0)
    {  if(prCan[0] > 99)
         as += sprintf(as, "?%03d[%02X%02X]", prCan[0], prCan[0], prCan[1]);
@@ -136,7 +136,7 @@ static void Out_Can(BYTE *prCan)
 
 static void Out_nAV(BYTE nAV)
 {
-   as += sprintf(as, " Источник=");
+   as += sprintf(as, " РСЃС‚РѕС‡РЅРёРє=");
    if(nAV == 119)     as += sprintf(as, "DVD[%02X]", nAV);
    else  if(nAV == 0) as += sprintf(as, "TV_[%02X]", nAV);
          else         as += sprintf(as, "AV%d[%02X]", nAV, nAV);
@@ -151,14 +151,14 @@ static void Out_timeLong(DWORD *timeLong)
    int M1 = *timeLong - H * 3600;
    int M = M1 / 60;
    int S = M1 - M * 60;
-   as += sprintf(as, " Длительность=%02d:%02d:%02d(%5dс)[%04X]", H, M, S, *timeLong, *timeLong);
+   as += sprintf(as, " Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ=%02d:%02d:%02d(%5dСЃ)[%04X]", H, M, S, *timeLong, *timeLong);
 }
 
 //------------------------------------------------------------------------------
 
 static void Out_Q(BYTE Q)
 {
-   as += sprintf(as, " Качество=");
+   as += sprintf(as, " РљР°С‡РµСЃС‚РІРѕ=");
    switch(Q)
    {  case 3: as += sprintf(as, "HP[%02X]", Q); break;
       case 2: as += sprintf(as, "SP[%02X]", Q); break;
@@ -172,7 +172,7 @@ static void Out_Q(BYTE Q)
 
 static void Out_Janr(BYTE Janr)
 {
-   as += sprintf(as, " Жанр=");
+   as += sprintf(as, " Р–Р°РЅСЂ=");
    switch(Janr)
    {  case 0xA: as += sprintf(as, "DOCU_[%02X]", Janr); break;
       case 0x9: as += sprintf(as, "EQU._[%02X]", Janr); break;
@@ -194,14 +194,14 @@ static void Out_Janr(BYTE Janr)
 static void Out_nPart(WORD *nPart)
 {
    SWAP16(nPart);
-   as += sprintf(as, " ЧислоЧастей=%3d[%04X]", *nPart, *nPart);
+   as += sprintf(as, " Р§РёСЃР»РѕР§Р°СЃС‚РµР№=%3d[%04X]", *nPart, *nPart);
 }
 
 //------------------------------------------------------------------------------
 
 static void Out_nameTV(char *nameTV)
 {
-   as += sprintf(as, " ИмяКанала=%6s[%02X%02X%02X%02X%02X%02X]",
+   as += sprintf(as, " РРјСЏРљР°РЅР°Р»Р°=%6s[%02X%02X%02X%02X%02X%02X]",
                  nameTV, BYTE(nameTV[0]), BYTE(nameTV[1]), BYTE(nameTV[2]),
                          BYTE(nameTV[3]), BYTE(nameTV[4]), BYTE(nameTV[5]));
 }
@@ -211,8 +211,8 @@ static void Out_nameTV(char *nameTV)
 static void Out_Title(WCHAR *wTitle)
 {
    char Title[128];
-   UnicodeToAnsi(wTitle, Title, 32);                         //Преобразовали Название
-   as += sprintf(as, " Название=%s", Title);
+   UnicodeToAnsi(wTitle, Title, 32);                         //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РќР°Р·РІР°РЅРёРµ
+   as += sprintf(as, " РќР°Р·РІР°РЅРёРµ=%s", Title);
    int l = lstrlen(Title);
    for(int j=l; j<33; j++, (as)++)  *as = '_';
 }
@@ -222,14 +222,14 @@ static void Out_Title(WCHAR *wTitle)
 static void Out_Number(DWORD Number)
 {
    SWAP32(&Number);
-   as += sprintf(as, " ВнутреннийНомер=%3d[%08X]", Number, Number);
+   as += sprintf(as, " Р’РЅСѓС‚СЂРµРЅРЅРёР№РќРѕРјРµСЂ=%3d[%08X]", Number, Number);
 }
 
 //------------------------------------------------------------------------------
 
 static void Out_NN(WORD *NN)
 {
-   DWORD lstNN = LstNN - (DWORD(as) - DWORD(Ss));            //Позиция начала для NN
+   DWORD lstNN = LstNN - (DWORD(as) - DWORD(Ss));            //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РґР»СЏ NN
    if(lstNN > 0)
      for(DWORD i=0; i<lstNN; i++, (as)++) *as = '_';
    SWAP16(NN);
@@ -241,30 +241,30 @@ static void Out_NN(WORD *NN)
 static void Out_sizeF(LONGLONG sizeF)
 {
    SWAP64(&DWORDLONG(sizeF));
-// as += sprintf(as, " РазмерФайла=%11.0lf[%08X %08X]", double(sizeF), *((DWORD*)&sizeF + 1), *(DWORD*)&sizeF);
+// as += sprintf(as, " Р Р°Р·РјРµСЂР¤Р°Р№Р»Р°=%11.0lf[%08X %08X]", double(sizeF), *((DWORD*)&sizeF + 1), *(DWORD*)&sizeF);
    char dd[48], *as1;
    sprintf(dd, "%16.0f", double(sizeF));
-   as1 = Char_Dig_p(dd, 14);                                  //Преобразование символьного числа в разрядку
-   as += sprintf(as, " РазмерФайла=%s[%08X %08X]", as1, *((DWORD*)&sizeF + 1), *(DWORD*)&sizeF);
+   as1 = Char_Dig_p(dd, 14);                                  //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‡РёСЃР»Р° РІ СЂР°Р·СЂСЏРґРєСѓ
+   as += sprintf(as, " Р Р°Р·РјРµСЂР¤Р°Р№Р»Р°=%s[%08X %08X]", as1, *((DWORD*)&sizeF + 1), *(DWORD*)&sizeF);
 }
 
 //------------------------------------------------------------------------------
 
-static int WorkName(int nPart)                               //Обработка записей имен
+static int WorkName(int nPart)                               //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РёРјРµРЅ
 {
    char Name1[128], Name2[128];
-   DWORD L = DWORD(as) - DWORD(Ss);                          //Размер потоянной части
-   for(int n=0; n<nPart; n++)                                //По числу частей в одном Title
+   DWORD L = DWORD(as) - DWORD(Ss);                          //Р Р°Р·РјРµСЂ РїРѕС‚РѕСЏРЅРЅРѕР№ С‡Р°СЃС‚Рё
+   for(int n=0; n<nPart; n++)                                //РџРѕ С‡РёСЃР»Сѓ С‡Р°СЃС‚РµР№ РІ РѕРґРЅРѕРј Title
    {  ONE_NAME *aNam = (ONE_NAME *)at_MME;
-      if(CtrlSizeMME_(sizeof(ONE_NAME)) < 0) return -1;      //Контроль смещения в массиве MME
+      if(CtrlSizeMME_(sizeof(ONE_NAME)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       as += sprintf(as, " ||");
-      UnicodeToAnsi(aNam->Name1, Name1, 30);                 //Преобразовали расширение
+      UnicodeToAnsi(aNam->Name1, Name1, 30);                 //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё СЂР°СЃС€РёСЂРµРЅРёРµ
       as += sprintf(as, " %s", Name1);
-      if(lstrlen(Name1) < 29) as += sprintf(as, " х");
+      if(lstrlen(Name1) < 29) as += sprintf(as, " С…");
       Out_B(aNam->b1, sizeof(aNam->b1));
-      UnicodeToAnsi(aNam->Name2, Name2, 30);                 //Преобразовали расширение
+      UnicodeToAnsi(aNam->Name2, Name2, 30);                 //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё СЂР°СЃС€РёСЂРµРЅРёРµ
       as += sprintf(as, " %s", Name2);
-      if(lstrlen(Name2) < 29) as += sprintf(as, " х");
+      if(lstrlen(Name2) < 29) as += sprintf(as, " С…");
       OutDW(aNam->Dw1, sizeof(aNam->Dw1));
       Out_sizeF(aNam->sizeF);
       OutDW(aNam->Dw2, sizeof(aNam->Dw2));
@@ -286,45 +286,45 @@ static int WorkName(int nPart)                               //Обработка записей
       as += sprintf(as, " {(AAA1-AAA0)/tLong2=%7.1lf}", double(aNam->AAA1-aNam->AAA0)/aNam->tLong2);
       OutDW(aNam->Dw5, sizeof(aNam->Dw5));
 //-----
-      if(nPart - n == 1) continue;                           //Для последней части не завершаем строку
+      if(nPart - n == 1) continue;                           //Р”Р»СЏ РїРѕСЃР»РµРґРЅРµР№ С‡Р°СЃС‚Рё РЅРµ Р·Р°РІРµСЂС€Р°РµРј СЃС‚СЂРѕРєСѓ
       *as = 0;
-      Add_Spis(Ss);                                          //Добавление строки в список
-      if(nPart > 1)                                          //Более одного фрагмента
-      {  numF += 2;                                          //Порядковый номер файла (пары)
-         sprintf(Ss, "        №файла=%4d", numF);            //Порядковый номер файла
-         for(DWORD j=19; j<L; j++)  *(Ss+j) = '.';           //Очистка места постоянной части
+      Add_Spis(Ss);                                          //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+      if(nPart > 1)                                          //Р‘РѕР»РµРµ РѕРґРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+      {  numF += 2;                                          //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С„Р°Р№Р»Р° (РїР°СЂС‹)
+         sprintf(Ss, "        в„–С„Р°Р№Р»Р°=%4d", numF);            //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С„Р°Р№Р»Р°
+         for(DWORD j=19; j<L; j++)  *(Ss+j) = '.';           //РћС‡РёСЃС‚РєР° РјРµСЃС‚Р° РїРѕСЃС‚РѕСЏРЅРЅРѕР№ С‡Р°СЃС‚Рё
       }
-      as = Ss + L;                                           //Сместились на размер постоянной части
+      as = Ss + L;                                           //РЎРјРµСЃС‚РёР»РёСЃСЊ РЅР° СЂР°Р·РјРµСЂ РїРѕСЃС‚РѕСЏРЅРЅРѕР№ С‡Р°СЃС‚Рё
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int WorkMet(void)                                     //Обработка записей меток
+static int WorkMet(void)                                     //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РјРµС‚РѕРє
 {
    END_REC *eRec = (END_REC *)at_MME;
-   if(CtrlSizeMME_(sizeof(END_REC)) < 0) return -1;          //Контроль смещения в массиве MME
+   if(CtrlSizeMME_(sizeof(END_REC)) < 0) return -1;          //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
    SWAP16(&eRec->numMet);
    SWAP16(&eRec->A);
    SWAP32(&eRec->B);
-   as += sprintf(as, " || ЧислоМеток=%2d[%04X] %04X %08X", eRec->numMet, eRec->numMet, eRec->A, eRec->B);
-   LstNN = DWORD(as) - DWORD(Ss);                            //Позиция начала для NN
-   if(eRec->numMet == 0) return 0;                           //Нет меток
-   *as = 0;                                                  //Завершили строку листинга
-   Add_Spis(Ss);                                             //Добавление строки в список
-   for(int i=0; i<eRec->numMet; i++)                         //По числу меток
+   as += sprintf(as, " || Р§РёСЃР»РѕРњРµС‚РѕРє=%2d[%04X] %04X %08X", eRec->numMet, eRec->numMet, eRec->A, eRec->B);
+   LstNN = DWORD(as) - DWORD(Ss);                            //РџРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РґР»СЏ NN
+   if(eRec->numMet == 0) return 0;                           //РќРµС‚ РјРµС‚РѕРє
+   *as = 0;                                                  //Р—Р°РІРµСЂС€РёР»Рё СЃС‚СЂРѕРєСѓ Р»РёСЃС‚РёРЅРіР°
+   Add_Spis(Ss);                                             //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+   for(int i=0; i<eRec->numMet; i++)                         //РџРѕ С‡РёСЃР»Сѓ РјРµС‚РѕРє
    {  char Name[128];
       as = Ss;
       as += sprintf(as, "==================================================");
       ONE_MET *oM = (ONE_MET *)at_MME;
-      if(CtrlSizeMME_(sizeof(ONE_MET)) < 0) return -1;       //Контроль смещения в массиве MME
+      if(CtrlSizeMME_(sizeof(ONE_MET)) < 0) return -1;       //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       OutDW(oM->Dw1, sizeof(oM->Dw1));
-      UnicodeToAnsi(oM->Name, Name, 30);                     //Преобразовали имя файла
+      UnicodeToAnsi(oM->Name, Name, 30);                     //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ С„Р°Р№Р»Р°
       lstrcpy(as, Name);
       as += lstrlen(Name);
       OutDW(oM->Dw2, sizeof(oM->Dw2));
-      if(eRec->numMet - i == 1) continue;                    //Для последней части не завершаем строку
+      if(eRec->numMet - i == 1) continue;                    //Р”Р»СЏ РїРѕСЃР»РµРґРЅРµР№ С‡Р°СЃС‚Рё РЅРµ Р·Р°РІРµСЂС€Р°РµРј СЃС‚СЂРѕРєСѓ
       Add_Spis(Ss);
    }
    return 0;
@@ -332,51 +332,51 @@ static int WorkMet(void)                                     //Обработка записей
 
 //------------------------------------------------------------------------------
 
-static int WorkEndZap(void)                                  //Обработка хвостовых записей
+static int WorkEndZap(void)                                  //РћР±СЂР°Р±РѕС‚РєР° С…РІРѕСЃС‚РѕРІС‹С… Р·Р°РїРёСЃРµР№
 {
-   END0_ZAP_MME *aEnd0 = (END0_ZAP_MME *)at_MME;             //Адрес начала заголовка очередной записи
-   if(CtrlSizeMME_(sizeof(END0_ZAP_MME)) < 0) return -1;     //Контроль смещения в массиве MME
+   END0_ZAP_MME *aEnd0 = (END0_ZAP_MME *)at_MME;             //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+   if(CtrlSizeMME_(sizeof(END0_ZAP_MME)) < 0) return -1;     //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
    Out_NN(&aEnd0->NN);
    Out_B(aEnd0->b1, sizeof(aEnd0->b1));
-   DWORD L = DWORD(as) - DWORD(Ss);                          //Размер потоянной части
+   DWORD L = DWORD(as) - DWORD(Ss);                          //Р Р°Р·РјРµСЂ РїРѕС‚РѕСЏРЅРЅРѕР№ С‡Р°СЃС‚Рё
    for(int i=0; i<aEnd0->NN; i++)
    {  as += sprintf(as, " ||");
-      END1_ZAP_MME *aEnd = (END1_ZAP_MME *)at_MME;           //Адрес начала заголовка очередной записи
-      if(CtrlSizeMME_(sizeof(END1_ZAP_MME)) < 0) return -1;  //Контроль смещения в массиве MME
+      END1_ZAP_MME *aEnd = (END1_ZAP_MME *)at_MME;           //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSizeMME_(sizeof(END1_ZAP_MME)) < 0) return -1;  //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       OutDW(aEnd->Dw1, sizeof(aEnd->Dw1));
       char Name[128];
-      UnicodeToAnsi(aEnd->Name3, Name, 30);                  //Преобразовали расширение
+      UnicodeToAnsi(aEnd->Name3, Name, 30);                  //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё СЂР°СЃС€РёСЂРµРЅРёРµ
       as += sprintf(as, " %s", Name);
       OutDW(aEnd->Dw2, sizeof(aEnd->Dw2));
-      if(aEnd0->NN - i == 1) continue;                       //Для последней части не завершаем строку
+      if(aEnd0->NN - i == 1) continue;                       //Р”Р»СЏ РїРѕСЃР»РµРґРЅРµР№ С‡Р°СЃС‚Рё РЅРµ Р·Р°РІРµСЂС€Р°РµРј СЃС‚СЂРѕРєСѓ
       *as = 0;
-      Add_Spis(Ss);                                          //Добавление строки в список
-      if(aEnd0->NN > 1)                                      //Более одного фрагмента
-          for(DWORD j=0; j<L; j++)  *(Ss+j) = '_';           //Очистка места постоянной части
-      as = Ss + L;                                           //Сместились на размер постоянной части
+      Add_Spis(Ss);                                          //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+      if(aEnd0->NN > 1)                                      //Р‘РѕР»РµРµ РѕРґРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+          for(DWORD j=0; j<L; j++)  *(Ss+j) = '_';           //РћС‡РёСЃС‚РєР° РјРµСЃС‚Р° РїРѕСЃС‚РѕСЏРЅРЅРѕР№ С‡Р°СЃС‚Рё
+      as = Ss + L;                                           //РЎРјРµСЃС‚РёР»РёСЃСЊ РЅР° СЂР°Р·РјРµСЂ РїРѕСЃС‚РѕСЏРЅРЅРѕР№ С‡Р°СЃС‚Рё
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int ViewMME0_Hex(void)                                //Вывод содержимого файла MME
+static int ViewMME0_Hex(void)                                //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ С„Р°Р№Р»Р° MME
 {
-   if(WorkHead(0) < 0) return -1;                            //Обработка заголовка
-   for(int t=0; t<numT; t++)                                 //По всему файлу MME
+   if(WorkHead(0) < 0) return -1;                            //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РіРѕР»РѕРІРєР°
+   for(int t=0; t<numT; t++)                                 //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
    {  as = Ss;
-      numF += 2;                                             //Порядковый номер файла (пары)
-      as += sprintf(as, "№пп=%3d №файла=%4d", t+1, numF);    //Порядковый номер записи и файла
-      PSP_TIT0 *aTit = (PSP_TIT0 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSizeMME_(sizeof(PSP_TIT0)) < 0) return -1;      //Контроль смещения в массиве MME
+      numF += 2;                                             //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С„Р°Р№Р»Р° (РїР°СЂС‹)
+      as += sprintf(as, "в„–РїРї=%3d в„–С„Р°Р№Р»Р°=%4d", t+1, numF);    //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ Р·Р°РїРёСЃРё Рё С„Р°Р№Р»Р°
+      PSP_TIT0 *aTit = (PSP_TIT0 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSizeMME_(sizeof(PSP_TIT0)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       OutDW(aTit->Dw1, sizeof(aTit->Dw1));
 //    Out_Number(aTit->Number);
-      as += sprintf(as, " хххххххх хххххххх ххххххххххххххххххххххх");
+      as += sprintf(as, " С…С…С…С…С…С…С…С… С…С…С…С…С…С…С…С… С…С…С…С…С…С…С…С…С…С…С…С…С…С…С…С…С…С…С…С…С…С…С…");
       Out_Dat1(&aTit->DaT1);
       Out_Can(aTit->prCan1);
 //    SWAP32(&aTit->B);
 //    as += sprintf(as, " %08X", aTit->B);
-      as += sprintf(as, " хххххххх");
+      as += sprintf(as, " С…С…С…С…С…С…С…С…");
       Out_nAV(aTit->nAV);
       Out_Can(aTit->prCan2);
       Out_nameTV(aTit->nameTV);
@@ -394,27 +394,27 @@ static int ViewMME0_Hex(void)                                //Вывод содержимого
       SWAP16(&(aTit->E));
       as += sprintf(as, " %04X", aTit->E);
       OutDW(aTit->Dw3, sizeof(aTit->Dw3));
-      if(WorkName(aTit->nPart)< 0) return -1;                //Обработка записей имен
-//    Work_Met(&as);                                         //Обработка записей меток
-      *as = 0;                                               //Завершили строку листинга
-      Add_Spis(Ss);                                          //Добавление строки в список
+      if(WorkName(aTit->nPart)< 0) return -1;                //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РёРјРµРЅ
+//    Work_Met(&as);                                         //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РјРµС‚РѕРє
+      *as = 0;                                               //Р—Р°РІРµСЂС€РёР»Рё СЃС‚СЂРѕРєСѓ Р»РёСЃС‚РёРЅРіР°
+      Add_Spis(Ss);                                          //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-static int ViewMME1_Hex(void)                                //Вывод содержимого файла MME
+static int ViewMME1_Hex(void)                                //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ С„Р°Р№Р»Р° MME
 {
-   if(WorkHead(1) < 0) return -1;                            //Обработка заголовка
-   for(int t=0; t<numT; t++)                                 //По всему файлу MME
+   if(WorkHead(1) < 0) return -1;                            //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РіРѕР»РѕРІРєР°
+   for(int t=0; t<numT; t++)                                 //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
    {  as = Ss;
-      numF += 2;                                             //Порядковый номер файла (пары)
-      as += sprintf(as, "№пп=%3d №файла=%4d", t+1, numF);    //Порядковый номер записи и файла
-      PSP_TIT1 *aTit = (PSP_TIT1 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSizeMME_(sizeof(PSP_TIT1)) < 0) return -1;      //Контроль смещения в массиве MME
+      numF += 2;                                             //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С„Р°Р№Р»Р° (РїР°СЂС‹)
+      as += sprintf(as, "в„–РїРї=%3d в„–С„Р°Р№Р»Р°=%4d", t+1, numF);    //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ Р·Р°РїРёСЃРё Рё С„Р°Р№Р»Р°
+      PSP_TIT1 *aTit = (PSP_TIT1 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSizeMME_(sizeof(PSP_TIT1)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       OutDW(aTit->Dw1, sizeof(aTit->Dw1));
-      as += sprintf(as, " хххххххх хххххххх");
+      as += sprintf(as, " С…С…С…С…С…С…С…С… С…С…С…С…С…С…С…С…");
       Out_Number(aTit->Number);
       Out_Dat1(&aTit->DaT1);
       Out_Can(aTit->prCan1);
@@ -437,25 +437,25 @@ static int ViewMME1_Hex(void)                                //Вывод содержимого
       SWAP16(&(aTit->E));
       as += sprintf(as, " %04X", aTit->E);
       OutDW(aTit->Dw3, sizeof(aTit->Dw3));
-      if(WorkName(aTit->nPart)< 0) return -1;                //Обработка записей имен
-      if(WorkMet() < 0) return -1;                           //Обработка записей меток
-      *as = 0;                                               //Завершили строку листинга
-      Add_Spis(Ss);                                          //Добавление строки в список
+      if(WorkName(aTit->nPart)< 0) return -1;                //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РёРјРµРЅ
+      if(WorkMet() < 0) return -1;                           //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РјРµС‚РѕРє
+      *as = 0;                                               //Р—Р°РІРµСЂС€РёР»Рё СЃС‚СЂРѕРєСѓ Р»РёСЃС‚РёРЅРіР°
+      Add_Spis(Ss);                                          //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
    }
    return 0;
 }
 
 //-------------------------------------------------------------------------------
 
-static int ViewMME2_Hex(void)                                //Вывод содержимого файла MME
+static int ViewMME2_Hex(void)                                //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ С„Р°Р№Р»Р° MME
 {
-   if(WorkHead(2) < 0) return -1;                            //Обработка заголовка
-   for(int t=0; t<numT; t++)                                 //По всему файлу MME
+   if(WorkHead(2) < 0) return -1;                            //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РіРѕР»РѕРІРєР°
+   for(int t=0; t<numT; t++)                                 //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
    {  as = Ss;
-      numF += 2;                                             //Порядковый номер файла (пары)
-      as += sprintf(as, "№пп=%3d №файла=%4d", t+1, numF);    //Порядковый номер записи и файла
-      PSP_TIT2 *aTit = (PSP_TIT2 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSizeMME_(sizeof(PSP_TIT2)) < 0) return -1;      //Контроль смещения в массиве MME
+      numF += 2;                                             //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С„Р°Р№Р»Р° (РїР°СЂС‹)
+      as += sprintf(as, "в„–РїРї=%3d в„–С„Р°Р№Р»Р°=%4d", t+1, numF);    //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ Р·Р°РїРёСЃРё Рё С„Р°Р№Р»Р°
+      PSP_TIT2 *aTit = (PSP_TIT2 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSizeMME_(sizeof(PSP_TIT2)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       OutDW(aTit->Dw1, sizeof(aTit->Dw1));
       Out_Number(aTit->Number);
       Out_Dat1(&aTit->DaT1);
@@ -479,26 +479,26 @@ static int ViewMME2_Hex(void)                                //Вывод содержимого
       SWAP16(&(aTit->E));
       as += sprintf(as, " %04X", aTit->E);
       OutDW(aTit->Dw3, sizeof(aTit->Dw3));
-      if(WorkName(aTit->nPart)< 0) return -1;                //Обработка записей имен
-      if(WorkMet() < 0) return -1;                           //Обработка записей меток
-      if(WorkEndZap() < 0) return -1;                        //Обработка хвостовых записей
-      *as = 0;                                               //Завершили строку листинга
-      Add_Spis(Ss);                                          //Добавление строки в список
+      if(WorkName(aTit->nPart)< 0) return -1;                //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РёРјРµРЅ
+      if(WorkMet() < 0) return -1;                           //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РјРµС‚РѕРє
+      if(WorkEndZap() < 0) return -1;                        //РћР±СЂР°Р±РѕС‚РєР° С…РІРѕСЃС‚РѕРІС‹С… Р·Р°РїРёСЃРµР№
+      *as = 0;                                               //Р—Р°РІРµСЂС€РёР»Рё СЃС‚СЂРѕРєСѓ Р»РёСЃС‚РёРЅРіР°
+      Add_Spis(Ss);                                          //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
    }
    return 0;
 }
 
 //-------------------------------------------------------------------------------
 
-static int ViewMME4_Hex(void)                                //Вывод содержимого файла MME
+static int ViewMME4_Hex(void)                                //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ С„Р°Р№Р»Р° MME
 {
-   if(WorkHead(4) < 0) return -1;                            //Обработка заголовка
-   for(int t=0; t<numT; t++)                                 //По всему файлу MME
+   if(WorkHead(4) < 0) return -1;                            //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РіРѕР»РѕРІРєР°
+   for(int t=0; t<numT; t++)                                 //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
    {  as = Ss;
-      numF += 2;                                             //Порядковый номер файла (пары)
-      as += sprintf(as, "№пп=%3d №файла=%4d", t+1, numF);    //Порядковый номер записи и файла
-      PSP_TIT4 *aTit = (PSP_TIT4 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSizeMME_(sizeof(PSP_TIT4)) < 0) return -1;      //Контроль смещения в массиве MME
+      numF += 2;                                             //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С„Р°Р№Р»Р° (РїР°СЂС‹)
+      as += sprintf(as, "в„–РїРї=%3d в„–С„Р°Р№Р»Р°=%4d", t+1, numF);    //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ Р·Р°РїРёСЃРё Рё С„Р°Р№Р»Р°
+      PSP_TIT4 *aTit = (PSP_TIT4 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSizeMME_(sizeof(PSP_TIT4)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       OutDW(aTit->Dw1, sizeof(aTit->Dw1));
       Out_Number(aTit->Number);
       Out_Dat1(&aTit->DaT1);
@@ -522,26 +522,26 @@ static int ViewMME4_Hex(void)                                //Вывод содержимого
       SWAP16(&(aTit->E));
       as += sprintf(as, " %04X", aTit->E);
       OutDW(aTit->Dw3, sizeof(aTit->Dw3));
-      if(WorkName(aTit->nPart)< 0) return -1;                //Обработка записей имен
-      if(WorkMet() < 0) return -1;                           //Обработка записей меток
-      if(WorkEndZap() < 0) return -1;                        //Обработка хвостовых записей
-      *as = 0;                                               //Завершили строку листинга
-      Add_Spis(Ss);                                          //Добавление строки в список
+      if(WorkName(aTit->nPart)< 0) return -1;                //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РёРјРµРЅ
+      if(WorkMet() < 0) return -1;                           //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РјРµС‚РѕРє
+      if(WorkEndZap() < 0) return -1;                        //РћР±СЂР°Р±РѕС‚РєР° С…РІРѕСЃС‚РѕРІС‹С… Р·Р°РїРёСЃРµР№
+      *as = 0;                                               //Р—Р°РІРµСЂС€РёР»Рё СЃС‚СЂРѕРєСѓ Р»РёСЃС‚РёРЅРіР°
+      Add_Spis(Ss);                                          //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
    }
    return 0;
 }
 
 //-------------------------------------------------------------------------------
 
-static int ViewMME5_Hex(void)                                //Вывод содержимого файла MME
+static int ViewMME5_Hex(void)                                //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ С„Р°Р№Р»Р° MME
 {
-   if(WorkHead(5) < 0) return -1;                            //Обработка заголовка
-   for(int t=0; t<numT; t++)                                 //По всему файлу MME
+   if(WorkHead(5) < 0) return -1;                            //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РіРѕР»РѕРІРєР°
+   for(int t=0; t<numT; t++)                                 //РџРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ MME
    {  as = Ss;
-      numF += 2;                                             //Порядковый номер файла (пары)
-      as += sprintf(as, "№пп=%3d №файла=%4d", t+1, numF);    //Порядковый номер записи и файла
-      PSP_TIT5 *aTit = (PSP_TIT5 *)at_MME;                   //Адрес начала заголовка очередной записи
-      if(CtrlSizeMME_(sizeof(PSP_TIT5)) < 0) return -1;      //Контроль смещения в массиве MME
+      numF += 2;                                             //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ С„Р°Р№Р»Р° (РїР°СЂС‹)
+      as += sprintf(as, "в„–РїРї=%3d в„–С„Р°Р№Р»Р°=%4d", t+1, numF);    //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ Р·Р°РїРёСЃРё Рё С„Р°Р№Р»Р°
+      PSP_TIT5 *aTit = (PSP_TIT5 *)at_MME;                   //РђРґСЂРµСЃ РЅР°С‡Р°Р»Р° Р·Р°РіРѕР»РѕРІРєР° РѕС‡РµСЂРµРґРЅРѕР№ Р·Р°РїРёСЃРё
+      if(CtrlSizeMME_(sizeof(PSP_TIT5)) < 0) return -1;      //РљРѕРЅС‚СЂРѕР»СЊ СЃРјРµС‰РµРЅРёСЏ РІ РјР°СЃСЃРёРІРµ MME
       OutDW(aTit->Dw1, sizeof(aTit->Dw1));
       Out_Number(aTit->Number);
       Out_Dat1(&aTit->DaT1);
@@ -565,11 +565,11 @@ static int ViewMME5_Hex(void)                                //Вывод содержимого
       SWAP16(&(aTit->E));
       as += sprintf(as, " %04X", aTit->E);
       OutDW(aTit->Dw3, sizeof(aTit->Dw3));
-      if(WorkName(aTit->nPart)< 0) return -1;                //Обработка записей имен
-      if(WorkMet() < 0) return -1;                           //Обработка записей меток
-      if(WorkEndZap() < 0) return -1;                        //Обработка хвостовых записей
-      *as = 0;                                               //Завершили строку листинга
-      Add_Spis(Ss);                                          //Добавление строки в список
+      if(WorkName(aTit->nPart)< 0) return -1;                //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РёРјРµРЅ
+      if(WorkMet() < 0) return -1;                           //РћР±СЂР°Р±РѕС‚РєР° Р·Р°РїРёСЃРµР№ РјРµС‚РѕРє
+      if(WorkEndZap() < 0) return -1;                        //РћР±СЂР°Р±РѕС‚РєР° С…РІРѕСЃС‚РѕРІС‹С… Р·Р°РїРёСЃРµР№
+      *as = 0;                                               //Р—Р°РІРµСЂС€РёР»Рё СЃС‚СЂРѕРєСѓ Р»РёСЃС‚РёРЅРіР°
+      Add_Spis(Ss);                                          //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
    }
    return 0;
 }
@@ -577,21 +577,21 @@ static int ViewMME5_Hex(void)                                //Вывод содержимого
 //------------------------------------------------------------------------------
 
 #if defined TEST_LG2_ALL
-static int View_Dir_Part2(void)                              //Визуализация каталога второго раздела
+static int View_Dir_Part2(void)                              //Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ РєР°С‚Р°Р»РѕРіР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
 {
    BYTE buff[sCl2_B];
 
-   sprintf(Ss, " ********** Начальный сектор корневой папки второго раздела - %d **********", Start_SecDir2);
-   Add_Spis(Ss);                                             //Добавление строки в список
-   if(ReadClast2_P(Start_SecDir2, buff) < 0) return -1;      //Чтение кластера
+   sprintf(Ss, " ********** РќР°С‡Р°Р»СЊРЅС‹Р№ СЃРµРєС‚РѕСЂ РєРѕСЂРЅРµРІРѕР№ РїР°РїРєРё РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° - %d **********", Start_SecDir2);
+   Add_Spis(Ss);                                             //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+   if(ReadClast2_P(Start_SecDir2, buff) < 0) return -1;      //Р§С‚РµРЅРёРµ РєР»Р°СЃС‚РµСЂР°
    One_Str_Cat *Kat = (One_Str_Cat *)buff;
-   for(int n=0; n<4*sClSec2; n++)                            //В каждом секторе 4 записи
-   {  if((Kat + n)->pf.type == 0) break;                     //Конец каталога
-      sprintf(Ss, "....Строка каталога %d..............................................", n+1);
+   for(int n=0; n<4*sClSec2; n++)                            //Р’ РєР°Р¶РґРѕРј СЃРµРєС‚РѕСЂРµ 4 Р·Р°РїРёСЃРё
+   {  if((Kat + n)->pf.type == 0) break;                     //РљРѕРЅРµС† РєР°С‚Р°Р»РѕРіР°
+      sprintf(Ss, "....РЎС‚СЂРѕРєР° РєР°С‚Р°Р»РѕРіР° %d..............................................", n+1);
       Add_Spis(Ss);
 /*
       BYTE *bb = (BYTE*)(Kat + n);
-      for(int i=0; i<128; i+=32)                             //Вывод шеснадцатиричного дампа одной строки каталога
+      for(int i=0; i<128; i+=32)                             //Р’С‹РІРѕРґ С€РµСЃРЅР°РґС†Р°С‚РёСЂРёС‡РЅРѕРіРѕ РґР°РјРїР° РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё РєР°С‚Р°Р»РѕРіР°
       {   &as = Ss;
           for(int j=i; j<i+32; j++)
           {   &as += sprintf(" %02X", bb[j]);
@@ -599,21 +599,21 @@ static int View_Dir_Part2(void)                              //Визуализация ката
                  as += sprintf(as, "   ");
           }
           *(&as + 1) = 0;
-          Add_Spis(Ss);                                      //Добавление строки в список
+          Add_Spis(Ss);                                      //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
       }
 */
       WORD NameDel = *((WORD*)&(Kat + n)->Name);
       char nam[128], ext[128];
-      if(pr_tRec == 0)                                       //Признак рекордера 0 или 1 (старейшая серия)
-      {  UnicodeToAnsi((Kat + n)->Name, nam, 41);            //Преобразовали имя из UNICODE
-         UnicodeToAnsi((Kat + n)->Ext, ext, 4);              //Преобразовали расширение из UNICODE
+      if(pr_tRec == 0)                                       //РџСЂРёР·РЅР°Рє СЂРµРєРѕСЂРґРµСЂР° 0 РёР»Рё 1 (СЃС‚Р°СЂРµР№С€Р°СЏ СЃРµСЂРёСЏ)
+      {  UnicodeToAnsi((Kat + n)->Name, nam, 41);            //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ РёР· UNICODE
+         UnicodeToAnsi((Kat + n)->Ext, ext, 4);              //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё СЂР°СЃС€РёСЂРµРЅРёРµ РёР· UNICODE
       }
-      if(pr_tRec == 1)                                       //Признак рекордера 0 или 1 (старейшая серия)
-      {  UnicodeToAnsi((Kat + n)->Name, nam, 45);            //Преобразовали имя и расширение из UNICODE
-         lstrcpy(ext, nam + 42);                             //Выбрали расширение
-         if(*ext == ' ') *ext = 0;                           //Если расширения нет, то очистили
-         for(int i=41; i>0; i--)                             //Очистили хвост имени от пробелов остави только символы
-         {  if(*(nam + i) != ' ') break;                     //Поставили конец имени после последнего символа
+      if(pr_tRec == 1)                                       //РџСЂРёР·РЅР°Рє СЂРµРєРѕСЂРґРµСЂР° 0 РёР»Рё 1 (СЃС‚Р°СЂРµР№С€Р°СЏ СЃРµСЂРёСЏ)
+      {  UnicodeToAnsi((Kat + n)->Name, nam, 45);            //РџСЂРµРѕР±СЂР°Р·РѕРІР°Р»Рё РёРјСЏ Рё СЂР°СЃС€РёСЂРµРЅРёРµ РёР· UNICODE
+         lstrcpy(ext, nam + 42);                             //Р’С‹Р±СЂР°Р»Рё СЂР°СЃС€РёСЂРµРЅРёРµ
+         if(*ext == ' ') *ext = 0;                           //Р•СЃР»Рё СЂР°СЃС€РёСЂРµРЅРёСЏ РЅРµС‚, С‚Рѕ РѕС‡РёСЃС‚РёР»Рё
+         for(int i=41; i>0; i--)                             //РћС‡РёСЃС‚РёР»Рё С…РІРѕСЃС‚ РёРјРµРЅРё РѕС‚ РїСЂРѕР±РµР»РѕРІ РѕСЃС‚Р°РІРё С‚РѕР»СЊРєРѕ СЃРёРјРІРѕР»С‹
+         {  if(*(nam + i) != ' ') break;                     //РџРѕСЃС‚Р°РІРёР»Рё РєРѕРЅРµС† РёРјРµРЅРё РїРѕСЃР»Рµ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРёРјРІРѕР»Р°
             *(nam + i) = 0;
          }
       }
@@ -629,44 +629,44 @@ static int View_Dir_Part2(void)                              //Визуализация ката
       BYTE *b = (BYTE*)&(Kat + n)->pf.lL1;
       as += sprintf(as, "| %02X%02X%02X%02X %02X%02X%02X%02X |", b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]);
       as += sprintf(as, "%16.0lf |", double((Kat + n)->pf.lL2));
-      if(NameDel == 0xE500)                                  //Это удаленное имя (первая буква имени а)
-         as += sprintf(as, "  УДАЛЕНО");
-      Add_Spis(Ss);                                          //Добавление строки в список
+      if(NameDel == 0xE500)                                  //Р­С‚Рѕ СѓРґР°Р»РµРЅРЅРѕРµ РёРјСЏ (РїРµСЂРІР°СЏ Р±СѓРєРІР° РёРјРµРЅРё Р°)
+         as += sprintf(as, "  РЈР”РђР›Р•РќРћ");
+      Add_Spis(Ss);                                          //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
       if((Kat + n)->pf.type != 32) // && (Kat + n)->pf.type != 48)
-         Add_Spis("Неизвестный тип записи в каталоге.");
+         Add_Spis("РќРµРёР·РІРµСЃС‚РЅС‹Р№ С‚РёРї Р·Р°РїРёСЃРё РІ РєР°С‚Р°Р»РѕРіРµ.");
    }
-   Add_Spis("");                                             //Добавление строки в список
-   Add_Spis("");                                             //Добавление строки в список
-   return 0;                                                 //Файл не найден
+   Add_Spis("");                                             //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+   Add_Spis("");                                             //Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃРїРёСЃРѕРє
+   return 0;                                                 //Р¤Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ
 }
 #endif
 
 //------------------------------------------------------------------------------
 
-int  Read_Test2(void)                                        //Тестовое чтение и вывод
+int  Read_Test2(void)                                        //РўРµСЃС‚РѕРІРѕРµ С‡С‚РµРЅРёРµ Рё РІС‹РІРѕРґ
 {
 #if defined TEST_LG2_ALL
-   if(View_Dir_Part2() < 0) return -1;                       //Визуализация каталога второго раздела
+   if(View_Dir_Part2() < 0) return -1;                       //Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ РєР°С‚Р°Р»РѕРіР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р°
 #endif
-   if(Read_Dir_Part2_MME() < 0) return -1;                   //Чтение каталога второго раздела и файла MME
-   endMME = MMe + SizeMME;                                   //Адрес конца записей в массиве MME
+   if(Read_Dir_Part2_MME() < 0) return -1;                   //Р§С‚РµРЅРёРµ РєР°С‚Р°Р»РѕРіР° РІС‚РѕСЂРѕРіРѕ СЂР°Р·РґРµР»Р° Рё С„Р°Р№Р»Р° MME
+   endMME = MMe + SizeMME;                                   //РђРґСЂРµСЃ РєРѕРЅС†Р° Р·Р°РїРёСЃРµР№ РІ РјР°СЃСЃРёРІРµ MME
 /*
    BYTE *t_buff = MMe;
    int N = (SizeMME + sSecB - 1) / sSecB;
-   for(int i=0; i<=N; i++)                                   //По числу секторов в кластере
-   {  View_Sec_Hex(t_buff, 0);                               //Вывод содержимого сектора
-      t_buff += sSecB;                                       //Увеличили адрес вывода на размер сектора
+   for(int i=0; i<=N; i++)                                   //РџРѕ С‡РёСЃР»Сѓ СЃРµРєС‚РѕСЂРѕРІ РІ РєР»Р°СЃС‚РµСЂРµ
+   {  View_Sec_Hex(t_buff, 0);                               //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ СЃРµРєС‚РѕСЂР°
+      t_buff += sSecB;                                       //РЈРІРµР»РёС‡РёР»Рё Р°РґСЂРµСЃ РІС‹РІРѕРґР° РЅР° СЂР°Р·РјРµСЂ СЃРµРєС‚РѕСЂР°
       Add_Spis("----------------------------------------------------------------------------");
    }
 */
-   int ident = CtrlRecoder();                                //Идентификация рекордера
+   int ident = CtrlRecoder();                                //РРґРµРЅС‚РёС„РёРєР°С†РёСЏ СЂРµРєРѕСЂРґРµСЂР°
    if(ident < 0)
-   {  Error1("Рекордер неопознан.");
+   {  Error1("Р РµРєРѕСЂРґРµСЂ РЅРµРѕРїРѕР·РЅР°РЅ.");
       BYTE *t_buff = MMe;
       int N = (SizeMME + sSecB - 1) / sSecB;
-      for(int i=0; i<N; i++)                                 //По числу секторов в кластере
-      {  View_Sec_Hex(t_buff, 0);                            //Вывод содержимого сектора
-         t_buff += sSecB;                                    //Увеличили адрес вывода на размер сектора
+      for(int i=0; i<N; i++)                                 //РџРѕ С‡РёСЃР»Сѓ СЃРµРєС‚РѕСЂРѕРІ РІ РєР»Р°СЃС‚РµСЂРµ
+      {  View_Sec_Hex(t_buff, 0);                            //Р’С‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ СЃРµРєС‚РѕСЂР°
+         t_buff += sSecB;                                    //РЈРІРµР»РёС‡РёР»Рё Р°РґСЂРµСЃ РІС‹РІРѕРґР° РЅР° СЂР°Р·РјРµСЂ СЃРµРєС‚РѕСЂР°
          Add_Spis("----------------------------------------------------------------------------");
       }
       return 0;
@@ -680,17 +680,17 @@ int  Read_Test2(void)                                        //Тестовое чтение и
       case 5: if(ViewMME5_Hex() < 0) return -1; break;
    }
    if(at_MME == endMME)
-   {  Add_Spis("Файл MME обработан успешно.");  return 0;  }
-   int nOst = DWORD(endMME) - DWORD(at_MME);                 //Число байт оставшееся до конца файла
+   {  Add_Spis("Р¤Р°Р№Р» MME РѕР±СЂР°Р±РѕС‚Р°РЅ СѓСЃРїРµС€РЅРѕ.");  return 0;  }
+   int nOst = DWORD(endMME) - DWORD(at_MME);                 //Р§РёСЃР»Рѕ Р±Р°Р№С‚ РѕСЃС‚Р°РІС€РµРµСЃСЏ РґРѕ РєРѕРЅС†Р° С„Р°Р№Р»Р°
    char *as = Ss;
-   as += sprintf(as, "Конец файла MME: ");                   //Порядковый номер записи
+   as += sprintf(as, "РљРѕРЅРµС† С„Р°Р№Р»Р° MME: ");                   //РџРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ Р·Р°РїРёСЃРё
    for(int i=0; i<nOst; i++)
    {  as += sprintf(as, " %02X", *at_MME);
       at_MME++;
    }
    *as = 0;
    Add_Spis(Ss);
-//Память освобождается при выходе их программы
+//РџР°РјСЏС‚СЊ РѕСЃРІРѕР±РѕР¶РґР°РµС‚СЃСЏ РїСЂРё РІС‹С…РѕРґРµ РёС… РїСЂРѕРіСЂР°РјРјС‹
    return 0;
 }
 

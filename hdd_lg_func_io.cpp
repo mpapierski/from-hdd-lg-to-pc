@@ -6,45 +6,45 @@
 #include "from_hdd_lg_to_pc.h"
 
 //============================ hdd_lg_func_io ==================================
-void ClearDopDlg(void);                                      //Очистка параметров дополнительного диалога
-int  SetInFilePointer(LONGLONG Poz);                         //Изменение позиции указателя в файле (на физическом диске)
-void CloseFile(HANDLE *File);                                //Закрыли файл (физический диск)
-int  GetName_OutFile(char *NameF);                           //Ввод имени для записи файла
-int  CtrlFileYesNo(char *NameF);                             //Проверка наличия файла
-int  DiskFreeSpaceEx_F(char *Name_Dir, DWORDLONG Size);      //Проверка свободного места
-int  Open_OutFileAlw(char *Name, HANDLE *File);              //Открытие выходного файла
-//int  Open_FileR(char *Name, HANDLE *File, int *nn);          //Открытие существующего файла
-//11int  Open_OutFile512(char *Name, HANDLE *File);          //Открытие выходного файла
-int  Open_OutFile(char *Name, HANDLE *File);                 //Открытие выходного файла
-int  DiskFreeSpaceEx(char *NameF, DWORDLONG Size);           //Проверка свободного места
-     ModifDialog ModDlg;                                     //Для модификации диалога
-     WIN32_FIND_DATA DataF;                                  //Параметры файла если он есть
+void ClearDopDlg(void);                                      //РћС‡РёСЃС‚РєР° РїР°СЂР°РјРµС‚СЂРѕРІ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РґРёР°Р»РѕРіР°
+int  SetInFilePointer(LONGLONG Poz);                         //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ (РЅР° С„РёР·РёС‡РµСЃРєРѕРј РґРёСЃРєРµ)
+void CloseFile(HANDLE *File);                                //Р—Р°РєСЂС‹Р»Рё С„Р°Р№Р» (С„РёР·РёС‡РµСЃРєРёР№ РґРёСЃРє)
+int  GetName_OutFile(char *NameF);                           //Р’РІРѕРґ РёРјРµРЅРё РґР»СЏ Р·Р°РїРёСЃРё С„Р°Р№Р»Р°
+int  CtrlFileYesNo(char *NameF);                             //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р°
+int  DiskFreeSpaceEx_F(char *Name_Dir, DWORDLONG Size);      //РџСЂРѕРІРµСЂРєР° СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
+int  Open_OutFileAlw(char *Name, HANDLE *File);              //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+//int  Open_FileR(char *Name, HANDLE *File, int *nn);          //РћС‚РєСЂС‹С‚РёРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р°
+//11int  Open_OutFile512(char *Name, HANDLE *File);          //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+int  Open_OutFile(char *Name, HANDLE *File);                 //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+int  DiskFreeSpaceEx(char *NameF, DWORDLONG Size);           //РџСЂРѕРІРµСЂРєР° СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
+     ModifDialog ModDlg;                                     //Р”Р»СЏ РјРѕРґРёС„РёРєР°С†РёРё РґРёР°Р»РѕРіР°
+     WIN32_FIND_DATA DataF;                                  //РџР°СЂР°РјРµС‚СЂС‹ С„Р°Р№Р»Р° РµСЃР»Рё РѕРЅ РµСЃС‚СЊ
 
 //------------------------------------------------------------------------------
 
-void ClearDopDlg(void)                                       //Очистка параметров дополнительного диалога
+void ClearDopDlg(void)                                       //РћС‡РёСЃС‚РєР° РїР°СЂР°РјРµС‚СЂРѕРІ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РґРёР°Р»РѕРіР°
 {
-   ModDlg.Flags = 0;                                         //Дополнительные флаги
-   ModDlg.fnHook = 0;                                        //Функция обработки дополнительного диалога
-   ModDlg.DopDlgName = 0;                                    //Дополнительный диалог который суммируется с основным
+   ModDlg.Flags = 0;                                         //Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ С„Р»Р°РіРё
+   ModDlg.fnHook = 0;                                        //Р¤СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РґРёР°Р»РѕРіР°
+   ModDlg.DopDlgName = 0;                                    //Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РґРёР°Р»РѕРі РєРѕС‚РѕСЂС‹Р№ СЃСѓРјРјРёСЂСѓРµС‚СЃСЏ СЃ РѕСЃРЅРѕРІРЅС‹Рј
 }
 
 //------------------------------------------------------------------------------
 
-int SetInFilePointer(LONGLONG Poz)                           //Изменение позиции указателя в файле (на физическом диске)
+int SetInFilePointer(LONGLONG Poz)                           //РР·РјРµРЅРµРЅРёРµ РїРѕР·РёС†РёРё СѓРєР°Р·Р°С‚РµР»СЏ РІ С„Р°Р№Р»Рµ (РЅР° С„РёР·РёС‡РµСЃРєРѕРј РґРёСЃРєРµ)
 {
    LARGE_INTEGER TPoz;
 
    TPoz.QuadPart = Poz;
    TPoz.u.LowPart = SetFilePointer(hDrive, TPoz.u.LowPart, &TPoz.u.HighPart, FILE_BEGIN);
    if(TPoz.u.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR)
-      return ErrorSys1((Lan+41)->msg);                       //"Ошибка при позиционировании по диску."
+      return ErrorSys1((Lan+41)->msg);                       //"РћС€РёР±РєР° РїСЂРё РїРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёРё РїРѕ РґРёСЃРєСѓ."
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-void CloseFile(HANDLE *File)                                 //Закрыли файл (физический диск)
+void CloseFile(HANDLE *File)                                 //Р—Р°РєСЂС‹Р»Рё С„Р°Р№Р» (С„РёР·РёС‡РµСЃРєРёР№ РґРёСЃРє)
 {
    if(*File == 0) return;
    CloseHandle(*File);
@@ -53,125 +53,125 @@ void CloseFile(HANDLE *File)                                 //Закрыли файл (физ
 
 //------------------------------------------------------------------------------
 
-int GetName_OutFile(char *NameF)                             //Ввод имени для записи файла
+int GetName_OutFile(char *NameF)                             //Р’РІРѕРґ РёРјРµРЅРё РґР»СЏ Р·Р°РїРёСЃРё С„Р°Р№Р»Р°
 {
    OPENFILENAME ofn;
-   char DirName[260];                                        //Начальный путь для поиска файлов
-   char FileTitle[260];                                      //Заголовок окна
-   char Filter[260];                                         //Фильтры поиска
-   char *Title = (Lan+42)->msg;                              //"Укажите имя записываемого файла"
+   char DirName[260];                                        //РќР°С‡Р°Р»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+   char FileTitle[260];                                      //Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
+   char Filter[260];                                         //Р¤РёР»СЊС‚СЂС‹ РїРѕРёСЃРєР°
+   char *Title = (Lan+42)->msg;                              //"РЈРєР°Р¶РёС‚Рµ РёРјСЏ Р·Р°РїРёСЃС‹РІР°РµРјРѕРіРѕ С„Р°Р№Р»Р°"
    char NameFile[260];
    char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
 
-   strcpy(NameFile, NameF);                                  //Начальный путь для поиска файлов
-   *DirName = 0;                                             //На случай если имени небыло
-   if(*NameFile != 0)                                        //Имя уже было
+   strcpy(NameFile, NameF);                                  //РќР°С‡Р°Р»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+   *DirName = 0;                                             //РќР° СЃР»СѓС‡Р°Р№ РµСЃР»Рё РёРјРµРЅРё РЅРµР±С‹Р»Рѕ
+   if(*NameFile != 0)                                        //РРјСЏ СѓР¶Рµ Р±С‹Р»Рѕ
    {  fnsplit(NameFile, Driv, Dir, Name, Ext);
       fnmerge(DirName, Driv, Dir, NULL, NULL);
       fnmerge(NameFile, NULL, NULL, Name, Ext);
-      if(*Name == '*') *Name = 0;                            //Если нет конкретного имени
+      if(*Name == '*') *Name = 0;                            //Р•СЃР»Рё РЅРµС‚ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РёРјРµРЅРё
    }
-   sprintf(Filter, "%s *%s|*%s|%s (*.*)|*.*", (Lan+43)->msg, Ext, Ext, (Lan+44)->msg); //Фильтры поиска //sprintf(Filter, "Файлы *%s|*%s|Все файлы (*.*)|*.*", Ext, Ext);
-   for(int i=0; Filter[i]!='\0'; i++)                        //Заменили разделитель 0
+   sprintf(Filter, "%s *%s|*%s|%s (*.*)|*.*", (Lan+43)->msg, Ext, Ext, (Lan+44)->msg); //Р¤РёР»СЊС‚СЂС‹ РїРѕРёСЃРєР° //sprintf(Filter, "Р¤Р°Р№Р»С‹ *%s|*%s|Р’СЃРµ С„Р°Р№Р»С‹ (*.*)|*.*", Ext, Ext);
+   for(int i=0; Filter[i]!='\0'; i++)                        //Р—Р°РјРµРЅРёР»Рё СЂР°Р·РґРµР»РёС‚РµР»СЊ 0
      if(Filter[i] == '|') Filter[i] = '\0';
-   ZeroMemory(&ofn, sizeof(OPENFILENAME));                   //Заполнили нулями
-   ofn.lStructSize = sizeof(OPENFILENAME);                   //Длина структуры
-   ofn.hwndOwner = MainWin;                                  //Владелец диалога
-   ofn.hInstance = MainInst;                                 //Идентификатор программы владеющая диалогом
-   ofn.lpstrFilter = Filter;                                 //Типы просматриваемых файлов
-//     lpstrCustomFilter                                     //Специальные фильтры
-//     nMaxCustFilter                                        //Длина специального фильтра
-   ofn.nFilterIndex = 1;                                     //Индекс для работы с фильтрами
-   ofn.lpstrFile = NameFile;                                 //Имя файла в случае успеха
-   ofn.nMaxFile = sizeof(NameFile);                          //Длина поля имени файла
-   ofn.lpstrFileTitle = FileTitle;                           //Текст заголовка
+   ZeroMemory(&ofn, sizeof(OPENFILENAME));                   //Р—Р°РїРѕР»РЅРёР»Рё РЅСѓР»СЏРјРё
+   ofn.lStructSize = sizeof(OPENFILENAME);                   //Р”Р»РёРЅР° СЃС‚СЂСѓРєС‚СѓСЂС‹
+   ofn.hwndOwner = MainWin;                                  //Р’Р»Р°РґРµР»РµС† РґРёР°Р»РѕРіР°
+   ofn.hInstance = MainInst;                                 //РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРѕРіСЂР°РјРјС‹ РІР»Р°РґРµСЋС‰Р°СЏ РґРёР°Р»РѕРіРѕРј
+   ofn.lpstrFilter = Filter;                                 //РўРёРїС‹ РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРјС‹С… С„Р°Р№Р»РѕРІ
+//     lpstrCustomFilter                                     //РЎРїРµС†РёР°Р»СЊРЅС‹Рµ С„РёР»СЊС‚СЂС‹
+//     nMaxCustFilter                                        //Р”Р»РёРЅР° СЃРїРµС†РёР°Р»СЊРЅРѕРіРѕ С„РёР»СЊС‚СЂР°
+   ofn.nFilterIndex = 1;                                     //РРЅРґРµРєСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„РёР»СЊС‚СЂР°РјРё
+   ofn.lpstrFile = NameFile;                                 //РРјСЏ С„Р°Р№Р»Р° РІ СЃР»СѓС‡Р°Рµ СѓСЃРїРµС…Р°
+   ofn.nMaxFile = sizeof(NameFile);                          //Р”Р»РёРЅР° РїРѕР»СЏ РёРјРµРЅРё С„Р°Р№Р»Р°
+   ofn.lpstrFileTitle = FileTitle;                           //РўРµРєСЃС‚ Р·Р°РіРѕР»РѕРІРєР°
    ofn.nMaxFileTitle = sizeof(FileTitle);                    //
-   ofn.lpstrInitialDir = DirName;                            //Начальный каталог файлов
+   ofn.lpstrInitialDir = DirName;                            //РќР°С‡Р°Р»СЊРЅС‹Р№ РєР°С‚Р°Р»РѕРі С„Р°Р№Р»РѕРІ
    ofn.lpstrTitle = Title;
    ofn.Flags = ModDlg.Flags | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-// ofn.nFileOffset;                                          //Смещение в внутри lpstrFile
-// ofn.nFileExtension;                                       //Смещение в внутри lpstrFile
+// ofn.nFileOffset;                                          //РЎРјРµС‰РµРЅРёРµ РІ РІРЅСѓС‚СЂРё lpstrFile
+// ofn.nFileExtension;                                       //РЎРјРµС‰РµРЅРёРµ РІ РІРЅСѓС‚СЂРё lpstrFile
 // ofn.lpstrDefExt = ".*";
-// ofn.lCustData;                                            //Для функции обработчиков
-   ofn.lpfnHook = ModDlg.fnHook;                             //Функция обработки дополнительного диалога
-   ofn.lpTemplateName = ModDlg.DopDlgName;                   //Дополнительный диалог который суммируется с основным
-   if(GetSaveFileName(&ofn) == FALSE || *NameFile == 0)      //Функция диалога
+// ofn.lCustData;                                            //Р”Р»СЏ С„СѓРЅРєС†РёРё РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
+   ofn.lpfnHook = ModDlg.fnHook;                             //Р¤СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РґРёР°Р»РѕРіР°
+   ofn.lpTemplateName = ModDlg.DopDlgName;                   //Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РґРёР°Р»РѕРі РєРѕС‚РѕСЂС‹Р№ СЃСѓРјРјРёСЂСѓРµС‚СЃСЏ СЃ РѕСЃРЅРѕРІРЅС‹Рј
+   if(GetSaveFileName(&ofn) == FALSE || *NameFile == 0)      //Р¤СѓРЅРєС†РёСЏ РґРёР°Р»РѕРіР°
    {   *NameF = 0;    return -1;  }
-   strcpy(NameF, NameFile);                                  //Переслали имя файла
+   strcpy(NameF, NameFile);                                  //РџРµСЂРµСЃР»Р°Р»Рё РёРјСЏ С„Р°Р№Р»Р°
    return 0;
 }
 
 //------------------------------------------------------------------------------
 
-int CtrlFileYesNo(char *NameF)                               //Проверка наличия файла
+int CtrlFileYesNo(char *NameF)                               //РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„Р°Р№Р»Р°
 {
 // WIN32_FIND_DATA DataF;
    HANDLE  File;
 
-   if((File = FindFirstFile(NameF, &DataF)) == INVALID_HANDLE_VALUE) return 0; //Файла нет                                              //Файл не найден
+   if((File = FindFirstFile(NameF, &DataF)) == INVALID_HANDLE_VALUE) return 0; //Р¤Р°Р№Р»Р° РЅРµС‚                                              //Р¤Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ
    FindClose(File);
-   return 1;                                                 //Файл есть
+   return 1;                                                 //Р¤Р°Р№Р» РµСЃС‚СЊ
 }
 
 //------------------------------------------------------------------------------
 
-int Open_OutFileAlw(char *Name, HANDLE *File)                //Открытие выходного файла
+int Open_OutFileAlw(char *Name, HANDLE *File)                //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 {
-  *File = CreateFile(Name,                                   //Адрес строки с именем файла
-                     GENERIC_WRITE,                          //Способ доступа к файлу
-                     0,                                      //Посторонний процес не получит доступа
-                     NULL,                                   //Адрес структуры с параметрами защиты ядра
-                     CREATE_ALWAYS,                          //Тип открытия файла
-                     FILE_ATTRIBUTE_NORMAL,                  //Атрибуты файла
-                     NULL);                                  //Используется для временных файлов
+  *File = CreateFile(Name,                                   //РђРґСЂРµСЃ СЃС‚СЂРѕРєРё СЃ РёРјРµРЅРµРј С„Р°Р№Р»Р°
+                     GENERIC_WRITE,                          //РЎРїРѕСЃРѕР± РґРѕСЃС‚СѓРїР° Рє С„Р°Р№Р»Сѓ
+                     0,                                      //РџРѕСЃС‚РѕСЂРѕРЅРЅРёР№ РїСЂРѕС†РµСЃ РЅРµ РїРѕР»СѓС‡РёС‚ РґРѕСЃС‚СѓРїР°
+                     NULL,                                   //РђРґСЂРµСЃ СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё Р·Р°С‰РёС‚С‹ СЏРґСЂР°
+                     CREATE_ALWAYS,                          //РўРёРї РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°
+                     FILE_ATTRIBUTE_NORMAL,                  //РђС‚СЂРёР±СѓС‚С‹ С„Р°Р№Р»Р°
+                     NULL);                                  //РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РІСЂРµРјРµРЅРЅС‹С… С„Р°Р№Р»РѕРІ
    if(*File == INVALID_HANDLE_VALUE)
    {  *File = NULL;
-      return ErrorSys2((Lan+82)->msg, Name);                 //"Ошибка при открытии выходного файла"
+      return ErrorSys2((Lan+82)->msg, Name);                 //"РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°"
    }
    return 0;
 }
 
 //------------------------------------------------------------------------------
 /*
-int Open_FileR(char *Name, HANDLE *File, int *nn)            //Открытие существующего файла
+int Open_FileR(char *Name, HANDLE *File, int *nn)            //РћС‚РєСЂС‹С‚РёРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р°
 {
-  *File = CreateFile(Name,                                   //Адрес строки с именем файла
-                     GENERIC_READ | GENERIC_WRITE,           //Способ доступа к файлу
-                     0,                                      //Посторонний процес не получит доступа
-                     NULL,                                   //Адрес структуры с параметрами защиты ядра
-                     OPEN_EXISTING,                          //Тип открытия файла
-                     FILE_ATTRIBUTE_NORMAL,                  //Атрибуты файла
-                     NULL);                                  //Используется для временных файлов
+  *File = CreateFile(Name,                                   //РђРґСЂРµСЃ СЃС‚СЂРѕРєРё СЃ РёРјРµРЅРµРј С„Р°Р№Р»Р°
+                     GENERIC_READ | GENERIC_WRITE,           //РЎРїРѕСЃРѕР± РґРѕСЃС‚СѓРїР° Рє С„Р°Р№Р»Сѓ
+                     0,                                      //РџРѕСЃС‚РѕСЂРѕРЅРЅРёР№ РїСЂРѕС†РµСЃ РЅРµ РїРѕР»СѓС‡РёС‚ РґРѕСЃС‚СѓРїР°
+                     NULL,                                   //РђРґСЂРµСЃ СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё Р·Р°С‰РёС‚С‹ СЏРґСЂР°
+                     OPEN_EXISTING,                          //РўРёРї РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°
+                     FILE_ATTRIBUTE_NORMAL,                  //РђС‚СЂРёР±СѓС‚С‹ С„Р°Р№Р»Р°
+                     NULL);                                  //РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РІСЂРµРјРµРЅРЅС‹С… С„Р°Р№Р»РѕРІ
    if(*File == INVALID_HANDLE_VALUE)
    {  *File = NULL;
-      if(GetLastError() == 32)                               //Файл еще занят
+      if(GetLastError() == 32)                               //Р¤Р°Р№Р» РµС‰Рµ Р·Р°РЅСЏС‚
       { (*nn)++;
-        Sleep(250);                                          //Задержка на 250 мс
-        if(*nn < 100)                                        //Надеюсь, что за 25 секунд файл освободится
-           return Open_FileR(Name, File, nn);                //Еще раз Открытие существующего файла
+        Sleep(250);                                          //Р—Р°РґРµСЂР¶РєР° РЅР° 250 РјСЃ
+        if(*nn < 100)                                        //РќР°РґРµСЋСЃСЊ, С‡С‚Рѕ Р·Р° 25 СЃРµРєСѓРЅРґ С„Р°Р№Р» РѕСЃРІРѕР±РѕРґРёС‚СЃСЏ
+           return Open_FileR(Name, File, nn);                //Р•С‰Рµ СЂР°Р· РћС‚РєСЂС‹С‚РёРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р°
       }
-      return ErrorSys2((Lan+82)->msg, Name);                 //"Ошибка при открытии выходного файла"
+      return ErrorSys2((Lan+82)->msg, Name);                 //"РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°"
    }
    return 0;
 }
 */
 //------------------------------------------------------------------------------
 
-//11int Open_OutFile512(char *Name, HANDLE *File)                //Открытие выходного файла
-int Open_OutFile(char *Name, HANDLE *File)                //Открытие выходного файла
+//11int Open_OutFile512(char *Name, HANDLE *File)                //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+int Open_OutFile(char *Name, HANDLE *File)                //РћС‚РєСЂС‹С‚РёРµ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 {
-  *File = CreateFile(Name,                                   //Адрес строки с именем файла
-                     GENERIC_WRITE,                          //Способ доступа к файлу
-                     0,                                      //Посторонний процес не получит доступа
-                     NULL,                                   //Адрес структуры с параметрами защиты ядра
-                     CREATE_NEW,                             //Тип открытия файла (не должно быть)
+  *File = CreateFile(Name,                                   //РђРґСЂРµСЃ СЃС‚СЂРѕРєРё СЃ РёРјРµРЅРµРј С„Р°Р№Р»Р°
+                     GENERIC_WRITE,                          //РЎРїРѕСЃРѕР± РґРѕСЃС‚СѓРїР° Рє С„Р°Р№Р»Сѓ
+                     0,                                      //РџРѕСЃС‚РѕСЂРѕРЅРЅРёР№ РїСЂРѕС†РµСЃ РЅРµ РїРѕР»СѓС‡РёС‚ РґРѕСЃС‚СѓРїР°
+                     NULL,                                   //РђРґСЂРµСЃ СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё Р·Р°С‰РёС‚С‹ СЏРґСЂР°
+                     CREATE_NEW,                             //РўРёРї РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° (РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ)
 //11                 FILE_FLAG_NO_BUFFERING |
            //        FILE_FLAG_SEQUENTIAL_SCAN |
-                     FILE_ATTRIBUTE_NORMAL,                  //Атрибуты файла
-                     NULL);                                  //Используется для временных файлов
+                     FILE_ATTRIBUTE_NORMAL,                  //РђС‚СЂРёР±СѓС‚С‹ С„Р°Р№Р»Р°
+                     NULL);                                  //РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РІСЂРµРјРµРЅРЅС‹С… С„Р°Р№Р»РѕРІ
    if(*File == INVALID_HANDLE_VALUE)
    {  *File = NULL;
-      return ErrorSys2((Lan+82)->msg, Name);                 //"Ошибка при открытии выходного файла"
+      return ErrorSys2((Lan+82)->msg, Name);                 //"РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°"
    }
    return 0;
 }
@@ -184,18 +184,18 @@ static BOOL CALLBACK Dlg_FileSize(HWND hDlg, UINT Message, WPARAM wParam, LPARAM
    switch(Message)
    {
       case WM_INITDIALOG:
-             CenterDlg(hDlg, 0);                             //Центрирование окна диалога в главном окне
-             SetWindowText(hDlg, (Lan+36)->msg);             //Вывели новый заголовок  ВНИМАНИЕ!
-             SetDlgItemText(hDlg, IDC_STATICTEXT1, (Lan+50)->msg); //На диске указанном для записи недостаточно свободного места.
-             SetDlgItemText(hDlg, IDC_STATICTEXT3, (Lan+48)->msg); //Доступно
+             CenterDlg(hDlg, 0);                             //Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РґРёР°Р»РѕРіР° РІ РіР»Р°РІРЅРѕРј РѕРєРЅРµ
+             SetWindowText(hDlg, (Lan+36)->msg);             //Р’С‹РІРµР»Рё РЅРѕРІС‹Р№ Р·Р°РіРѕР»РѕРІРѕРє  Р’РќРРњРђРќРР•!
+             SetDlgItemText(hDlg, IDC_STATICTEXT1, (Lan+50)->msg); //РќР° РґРёСЃРєРµ СѓРєР°Р·Р°РЅРЅРѕРј РґР»СЏ Р·Р°РїРёСЃРё РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°.
+             SetDlgItemText(hDlg, IDC_STATICTEXT3, (Lan+48)->msg); //Р”РѕСЃС‚СѓРїРЅРѕ
              SetDlgItemText(hDlg, IDC_STATICTEXT4, FileSize_Txt(*(DWORDLONG*)(lParam)));
-             SetDlgItemText(hDlg, IDC_STATICTEXT5, (Lan+47)->msg); //байт
-             SetDlgItemText(hDlg, IDC_STATICTEXT6, (Lan+49)->msg); //Требуется
+             SetDlgItemText(hDlg, IDC_STATICTEXT5, (Lan+47)->msg); //Р±Р°Р№С‚
+             SetDlgItemText(hDlg, IDC_STATICTEXT6, (Lan+49)->msg); //РўСЂРµР±СѓРµС‚СЃСЏ
              SetDlgItemText(hDlg, IDC_STATICTEXT7, FileSize_Txt(*((DWORDLONG*)(lParam) + 1)));
-             SetDlgItemText(hDlg, IDC_STATICTEXT8, (Lan+47)->msg); //байт
-             SetDlgItemText(hDlg, IDC_STATICTEXT9, (Lan+52)->msg); //Хотите указать другой путь ?
-             SetDlgItemText(hDlg, IDOK, (Lan+45)->msg);            //Да
-             SetDlgItemText(hDlg, IDCANCEL, (Lan+51)->msg);        //Нет
+             SetDlgItemText(hDlg, IDC_STATICTEXT8, (Lan+47)->msg); //Р±Р°Р№С‚
+             SetDlgItemText(hDlg, IDC_STATICTEXT9, (Lan+52)->msg); //РҐРѕС‚РёС‚Рµ СѓРєР°Р·Р°С‚СЊ РґСЂСѓРіРѕР№ РїСѓС‚СЊ ?
+             SetDlgItemText(hDlg, IDOK, (Lan+45)->msg);            //Р”Р°
+             SetDlgItemText(hDlg, IDCANCEL, (Lan+51)->msg);        //РќРµС‚
              return TRUE;
       case WM_CTLCOLORSTATIC:
              if(GetDlgCtrlID(HWND(lParam)) == IDC_STATICTEXT1)
@@ -207,7 +207,7 @@ static BOOL CALLBACK Dlg_FileSize(HWND hDlg, UINT Message, WPARAM wParam, LPARAM
       case WM_COMMAND:
              switch(LOWORD(wParam))
              {  case IDOK:
-                case IDCANCEL: EndDialog(hDlg, LOWORD(wParam));    //Вернули один из двух кодов
+                case IDCANCEL: EndDialog(hDlg, LOWORD(wParam));    //Р’РµСЂРЅСѓР»Рё РѕРґРёРЅ РёР· РґРІСѓС… РєРѕРґРѕРІ
                                return TRUE;
              }
              break;
@@ -217,7 +217,7 @@ static BOOL CALLBACK Dlg_FileSize(HWND hDlg, UINT Message, WPARAM wParam, LPARAM
 
 //------------------------------------------------------------------------------
 
-int DiskFreeSpaceEx(char *NameF, DWORDLONG Size)             //Проверка свободного места
+int DiskFreeSpaceEx(char *NameF, DWORDLONG Size)             //РџСЂРѕРІРµСЂРєР° СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
 {
     ULARGE_INTEGER FreeBytes, TotalBytes, TotalFreeBytes;
     char   Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
@@ -227,10 +227,10 @@ int DiskFreeSpaceEx(char *NameF, DWORDLONG Size)             //Проверка свободно
     lstrcpy(Path, Driv);
     lstrcat(Path, "\\");
 
-    if(GetDiskFreeSpaceEx(Path, &FreeBytes,                  //Число свободных доступных байт (максимальный размер файла)
-                                &TotalBytes,                 //Общее число байт на диске
-                                &TotalFreeBytes) == FALSE)   //Общее число свободных байт на диске (сумма всех свободных мест)
-       return ErrorSys1((Lan+46)->msg);                      //"Системная ошибка при запросе емкости диска."
+    if(GetDiskFreeSpaceEx(Path, &FreeBytes,                  //Р§РёСЃР»Рѕ СЃРІРѕР±РѕРґРЅС‹С… РґРѕСЃС‚СѓРїРЅС‹С… Р±Р°Р№С‚ (РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р°)
+                                &TotalBytes,                 //РћР±С‰РµРµ С‡РёСЃР»Рѕ Р±Р°Р№С‚ РЅР° РґРёСЃРєРµ
+                                &TotalFreeBytes) == FALSE)   //РћР±С‰РµРµ С‡РёСЃР»Рѕ СЃРІРѕР±РѕРґРЅС‹С… Р±Р°Р№С‚ РЅР° РґРёСЃРєРµ (СЃСѓРјРјР° РІСЃРµС… СЃРІРѕР±РѕРґРЅС‹С… РјРµСЃС‚)
+       return ErrorSys1((Lan+46)->msg);                      //"РЎРёСЃС‚РµРјРЅР°СЏ РѕС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ РµРјРєРѕСЃС‚Рё РґРёСЃРєР°."
     if(FreeBytes.QuadPart < Size)
     {  DWORDLONG size[2];
        size[0] = FreeBytes.QuadPart;
@@ -239,30 +239,30 @@ int DiskFreeSpaceEx(char *NameF, DWORDLONG Size)             //Проверка свободно
           MainWin, Dlg_FileSize, LPARAM(size)) == IDCANCEL) return -1;
        return 1;
     }
-    if(Size <= 0xFFFFFFFF-2) return 0;                       //Предельный размер для FAT32 и наш файл меньше
+    if(Size <= 0xFFFFFFFF-2) return 0;                       //РџСЂРµРґРµР»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РґР»СЏ FAT32 Рё РЅР°С€ С„Р°Р№Р» РјРµРЅСЊС€Рµ
 
     char FileSystemName[260];
     GetVolumeInformation(Path, NULL, 0, NULL, 0, NULL,
                          FileSystemName, sizeof(FileSystemName));
     if(lstrcmp(FileSystemName, "FAT32") != 0) return 0;
-  //if(MsgYesNo3("Для записи указан диск с файловой системой FAT32",
-  //             "максимальный размер файла в которой 4ГБ - 2",
-  //             "Хотите указать другой путь ?") == 'N') return -1;
+  //if(MsgYesNo3("Р”Р»СЏ Р·Р°РїРёСЃРё СѓРєР°Р·Р°РЅ РґРёСЃРє СЃ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРѕР№ FAT32",
+  //             "РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р° РІ РєРѕС‚РѕСЂРѕР№ 4Р“Р‘ - 2",
+  //             "РҐРѕС‚РёС‚Рµ СѓРєР°Р·Р°С‚СЊ РґСЂСѓРіРѕР№ РїСѓС‚СЊ ?") == 'N') return -1;
     if(MsgYesNo3((Lan+53)->msg, (Lan+54)->msg, (Lan+55)->msg) == 'N') return -1;
-    return 1;                                                //Места нет
+    return 1;                                                //РњРµСЃС‚Р° РЅРµС‚
 }
 
 //------------------------------------------------------------------------------
 
-int DiskFreeSpaceEx_F(char *Name_Dir, DWORDLONG Size)        //Проверка свободного места
+int DiskFreeSpaceEx_F(char *Name_Dir, DWORDLONG Size)        //РџСЂРѕРІРµСЂРєР° СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°
 {
    ULARGE_INTEGER FreeBytes, TotalBytes, TotalFreeBytes;
    char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT], Path[MAXPATH];
    fnsplit(Name_Dir, Driv, Dir, Name, Ext);
    lstrcpy(Path, Driv);
    lstrcat(Path, "\\");
-   if(GetDiskFreeSpaceEx(Path, &FreeBytes, &TotalBytes, &TotalFreeBytes) == FALSE)//Общее число свободных байт на диске (сумма всех свободных мест)
-       return ErrorSys1((Lan+46)->msg);                      //"Системная ошибка при запросе емкости диска."
+   if(GetDiskFreeSpaceEx(Path, &FreeBytes, &TotalBytes, &TotalFreeBytes) == FALSE)//РћР±С‰РµРµ С‡РёСЃР»Рѕ СЃРІРѕР±РѕРґРЅС‹С… Р±Р°Р№С‚ РЅР° РґРёСЃРєРµ (СЃСѓРјРјР° РІСЃРµС… СЃРІРѕР±РѕРґРЅС‹С… РјРµСЃС‚)
+       return ErrorSys1((Lan+46)->msg);                      //"РЎРёСЃС‚РµРјРЅР°СЏ РѕС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ РµРјРєРѕСЃС‚Рё РґРёСЃРєР°."
 
    if(TotalFreeBytes.QuadPart >= Size)  return 0;
    DWORDLONG size[2];
