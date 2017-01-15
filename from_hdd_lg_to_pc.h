@@ -9,7 +9,6 @@
 #include <commctrl.h>
 #include <string.h>
 #include <stdio.h>
-#include <dir.h>
 #pragma hdrstop
 #include "defparam.h"
 #include "mme_db_head.h"
