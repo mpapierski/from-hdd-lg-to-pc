@@ -37,33 +37,16 @@ typedef struct { DWORD Dw1[6]; WCHAR Name[30]; DWORD Dw2[3];  } ONE_MET;
 typedef struct { WORD numMet, A; DWORD B; } END_REC;
 typedef struct { WORD NN; BYTE b1[6]; } END0_ZAP_MME;
 typedef struct { DWORD Dw1[8]; WCHAR Name3[30]; DWORD Dw2[3]; } END1_ZAP_MME;
-#if sizeof(PSP_TIT0) != 228
-   #error Error sizeof(PSP_TIT0)
-#endif
-#if sizeof(PSP_TIT1) != 236
-   #error Error sizeof(PSP_TIT1)
-#endif
-#if sizeof(PSP_TIT2) != 244
-   #error Error sizeof(PSP_TIT2)
-#endif
-#if sizeof(PSP_TIT4) != 252
-   #error Error sizeof(PSP_TIT4)
-#endif
-#if sizeof(PSP_TIT5) != 260
-   #error Error sizeof(PSP_TIT5)
-#endif
-#if sizeof(END1_ZAP_MME) != (112 - 8)
-   #error Error sizeof(END1_ZAP_MME)
-#endif
-#if sizeof(PSP_MME) != 72
-   #error Error sizeof(PSP_MME)
-#endif
-#if sizeof(ONE_NAME) != 232
-   #error Error sizeof(ONE_NAME)
-#endif
-#if sizeof(ONE_MET) != 96
-   #error Error sizeof(ONE_MET)
-#endif
+
+static_assert(sizeof(PSP_TIT0) == 228, "Error sizeof(PSP_TIT0)");
+static_assert(sizeof(PSP_TIT1) == 236, "Error sizeof(PSP_TIT1)");
+static_assert(sizeof(PSP_TIT2) == 244, "Error sizeof(PSP_TIT2)");
+static_assert(sizeof(PSP_TIT4) == 252, "Error sizeof(PSP_TIT4)");
+static_assert(sizeof(PSP_TIT5) == 260, "Error sizeof(PSP_TIT5)");
+static_assert(sizeof(END1_ZAP_MME) == (112 - 8), "Error sizeof(END1_ZAP_MME)");
+static_assert(sizeof(PSP_MME) == 72, "Error sizeof(PSP_MME)");
+static_assert(sizeof(ONE_NAME) == 232, "Error sizeof(ONE_NAME)");
+static_assert(sizeof(ONE_MET) == 96, "Error sizeof(ONE_MET)");
 
 #endif
 
