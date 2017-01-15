@@ -3,6 +3,8 @@
 #ifndef __MME_DB_HEAD_H__
 #define __MME_DB_HEAD_H__
 
+#pragma pack(push,1)
+
 typedef struct { DWORD Dw1[2], NumT, Dw2; LONGLONG size1, size2, size3, size4; DWORD Dw3[6]; } PSP_MME;
 typedef struct { WORD year, mon, day, hour; BYTE min, sec; } DATE_T1;
 typedef struct { WORD Year; BYTE Mon, Day, Hour, Min, Sec; } DATE_T2;
@@ -37,6 +39,8 @@ typedef struct { DWORD Dw1[6]; WCHAR Name[30]; DWORD Dw2[3];  } ONE_MET;
 typedef struct { WORD numMet, A; DWORD B; } END_REC;
 typedef struct { WORD NN; BYTE b1[6]; } END0_ZAP_MME;
 typedef struct { DWORD Dw1[8]; WCHAR Name3[30]; DWORD Dw2[3]; } END1_ZAP_MME;
+
+#pragma pack(pop)
 
 static_assert(sizeof(PSP_TIT0) == 228, "Error sizeof(PSP_TIT0)");
 static_assert(sizeof(PSP_TIT1) == 236, "Error sizeof(PSP_TIT1)");
