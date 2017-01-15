@@ -416,9 +416,8 @@
 
    const int numStrLan = sizeof(Lan_RU) / sizeof(LANG);      //Число языковых строк
    LANG Lan_Any[numStrLan];                                  //Произвольный язык
-#if sizeof(Lan_RU) / sizeof(LANG) != sizeof(Lan_EN) / sizeof(LANG)
-   #error ERROR sizeof(Lan_RU) != sizeof(Lan_EN)
-#endif
+
+static_assert(sizeof(Lan_RU) / sizeof(LANG) == sizeof(Lan_EN) / sizeof(LANG), "ERROR sizeof(Lan_RU) != sizeof(Lan_EN)");
 
 #endif
 

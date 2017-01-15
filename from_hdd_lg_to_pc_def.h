@@ -70,6 +70,8 @@
 #define MAX_NAME_S 4096                                      //Максимальное число имен в списке
 #define MAX_SP (256*MAX_NAME_S)                              //Размер памяти под список файлов
 
+#pragma pack(push,1)
+
 typedef struct { WORD type; DWORD ClSt; BYTE Sec, Min, Hour, r, Day, Mon; WORD Year;
                  LONGLONG SizeF, lL1, lL2; } PAR_FILE;       //Часть строки каталога
 typedef struct { char NameF[128]; PAR_FILE pf; WORD prSel, Level;
@@ -116,15 +118,13 @@ typedef struct { BYTE a[440];                                //Нули
                  DWORD numSecP2;                             //Общее число секторов в разделе
                  DWORD C[8];                                 //Две пустых строки - нули
                  WORD  IdEnd; } SEC_0;                       //Ending Signature - 55 AA
-#if sizeof(One_Str_Cat) != 128
-   #error Error sizeof(One_Str_Cat)
-#endif
-#if sizeof(SEC_63) != 512
-   #error Error sizeof(SEC_63)
-#endif
-#if sizeof(SEC_0) != 512
-   #error Error sizeof(SEC_0)
-#endif
+
+#pragma pack(pop)
+
+static_assert(sizeof(One_Str_Cat) == 128, "Error sizeof(One_Str_Cat)");
+static_assert(sizeof(SEC_63) == 512, "Error sizeof(SEC_63)");
+static_assert(sizeof(SEC_0) == 512, "Error sizeof(SEC_0)");
+
 typedef struct { long Ind; char *msg; } LANG;                //Структура языкового массива
 #define IDENT_STR "from_hdd_lg_to_pc.conf"
 typedef struct                                               //64 байта
