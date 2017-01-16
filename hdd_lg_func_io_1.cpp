@@ -55,7 +55,7 @@ static int Ctrl1FileYes(char *NameF)                         //Проверка 
 {
    if(CtrlFileYesNo(NameF) == 0) return 0;                   //Файла нет - Проверка наличия файла
    int ret = DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_F_YESNO),
-                   MainWin, Dlg_Warning, LPARAM(NameF));
+                   MainWin, (DLGPROC)Dlg_Warning, LPARAM(NameF));
    if(ret == IDCANCEL) { *NameF = 0;  return -1; }           //Отмена режима
    if(ret == IDC_NEW) return 1;                              //Нажата кнопка Ввод нового имени файла
    if(DeleteFile(NameF) != 0) return 0;
@@ -199,7 +199,7 @@ static int CtrlFileYes(char *NameF)                          //Проверка 
    if(CtrlFileYesNo(NameF) == 0) return 0;                   //Файла нет - Проверка наличия файла
    if(prCopy == 0)
         ret = DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_FILE_YES),
-                      MainWin, Dlg_FileYes, LPARAM(NameF));
+                      MainWin, (DLGPROC)Dlg_FileYes, LPARAM(NameF));
    switch(prCopy)                                             //Признак действия при групповом копировании
    {  case 0: break;
       case 1: ret = IDOK; break;                             //Нажата кнопка Заменять все

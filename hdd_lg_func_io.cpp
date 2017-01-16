@@ -236,7 +236,7 @@ int DiskFreeSpaceEx(char *NameF, DWORDLONG Size)             //Проверка 
        size[0] = FreeBytes.QuadPart;
        size[1] = Size;
        if(DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_FILE_SIZE),
-          MainWin, Dlg_FileSize, LPARAM(size)) == IDCANCEL) return -1;
+          MainWin, (DLGPROC)Dlg_FileSize, LPARAM(size)) == IDCANCEL) return -1;
        return 1;
     }
     if(Size <= 0xFFFFFFFF-2) return 0;                       //Предельный размер для FAT32 и наш файл меньше
@@ -269,7 +269,7 @@ int DiskFreeSpaceEx_F(char *Name_Dir, DWORDLONG Size)        //Проверка 
    size[0] = TotalFreeBytes.QuadPart;
    size[1] = Size;
    if(DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_FILE_SIZE),
-          MainWin, Dlg_FileSize, LPARAM(size)) == IDCANCEL) return -1;
+          MainWin, (DLGPROC)Dlg_FileSize, LPARAM(size)) == IDCANCEL) return -1;
    return 1;
 }
 

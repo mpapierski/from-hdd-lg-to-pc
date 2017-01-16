@@ -119,7 +119,7 @@ void InitProgressBar1(DWORD Size, char *Msg)
 {
    EnableW(FALSE);                                           //Изменение активности кнопок
    prDlg = 0;                                                //Признак диалога 0-один прогресс, 1-два прогресса
-   hwndDlg = CreateDialog(MainInst, MAKEINTRESOURCE(IDD_DLG_PROGR_BAR), MainWin, DlgProgressBar);
+   hwndDlg = CreateDialog(MainInst, MAKEINTRESOURCE(IDD_DLG_PROGR_BAR), MainWin, (DLGPROC)DlgProgressBar);
    SetDlgItemText(hwndDlg, IDC_STATICTEXT1, Msg);
    PrBar = GetDlgItem(hwndDlg, IDC_PROGRESS);
    DC_PR = GetDC(PrBar);
@@ -286,7 +286,7 @@ void InitProgressBar2_2(DWORD Size, char *Msg)               //Функция п
 {
    EnableW(FALSE);                                           //Изменение активности кнопок
    prDlg = 1;                                                //Признак диалога 0-один прогресс, 1-два прогресса
-   hwndDlg = CreateDialog(MainInst, MAKEINTRESOURCE(IDD_DLG_PROGR_BAR2), MainWin, DlgProgressBar);
+   hwndDlg = CreateDialog(MainInst, MAKEINTRESOURCE(IDD_DLG_PROGR_BAR2), MainWin, (DLGPROC)DlgProgressBar);
    SetDlgItemText(hwndDlg, IDC_STATICTEXT11, Msg);
    PrBar2 = GetDlgItem(hwndDlg, IDC_PROGRESS2);
 

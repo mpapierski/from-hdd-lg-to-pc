@@ -215,7 +215,7 @@ static BOOL CALLBACK Dlg_Wait(HWND hDlg, UINT Message, WPARAM wParam, LPARAM lPa
 
 void Open_Wait_Found_HDD(void)                               //Окошко со словами подождите
 {
-   hWaitDlg = CreateDialog(MainInst, MAKEINTRESOURCE(IDD_WAIT), MainWin, Dlg_Wait);
+   hWaitDlg = CreateDialog(MainInst, MAKEINTRESOURCE(IDD_WAIT), MainWin, (DLGPROC)Dlg_Wait);
 }
 
 //------------------------------------------------------------------------------
@@ -281,7 +281,7 @@ static BOOL CALLBACK AboutDlg(HWND hDlg, UINT Message, WPARAM wParam, LPARAM lPa
 
 void About(void)
 {
-   DialogBox(MainInst, MAKEINTRESOURCE(IDD_DLG_ABOUT), MainWin, AboutDlg);
+   DialogBox(MainInst, MAKEINTRESOURCE(IDD_DLG_ABOUT), MainWin, (DLGPROC)AboutDlg);
 }
 
 //------------------------------------------------------------------------------

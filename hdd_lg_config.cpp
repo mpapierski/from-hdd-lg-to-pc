@@ -496,7 +496,7 @@ void NewConfig(void)                                         //Изменени�
    CONF oldConf = Conf;                                      //Сохранили предыдущее состояние
    char oldNameF_Lan[260];                                   //Имя файла языка если оно задано
    lstrcpy(oldNameF_Lan, NameF_Lan);                         //Сохранили предыдущее состояние
-   if(DialogBox(MainInst, MAKEINTRESOURCE(IDD_DLG_CONFIG), MainWin, Dlg_NewConf) == IDCANCEL)
+   if(DialogBox(MainInst, MAKEINTRESOURCE(IDD_DLG_CONFIG), MainWin, (DLGPROC)Dlg_NewConf) == IDCANCEL)
    {  Conf = oldConf;                                        //Восстановили предыдущее состояние
       lstrcpy(NameF_Lan, oldNameF_Lan);                      //Восстановили предыдущее состояние
       return;

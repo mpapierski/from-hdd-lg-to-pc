@@ -163,7 +163,7 @@ int  RenameFiFo(HTREEITEM hitem, OneStrTree *aTree)          //Переимен�
 // lstrcat(oldName, ".");
 // lstrcat(oldName, oldExt);
    if(DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_NAME),
-                MainWin, Dlg_NewName, LPARAM(oldName)) == IDCANCEL) return -1;
+                MainWin, (DLGPROC)Dlg_NewName, LPARAM(oldName)) == IDCANCEL) return -1;
    Ansi_To_Unicode(NameFoFi, (Kat + nsDir)->Name, 40);       //Преобразовали имя из UNICODE и внесли в каталог
 #if !defined EMULATOR_HDD                                    //Режим эмулятора
    if(Save_Dir() < 0) return -1;                             //Сохранение кластера каталога
@@ -254,7 +254,7 @@ int  DeleteFiFo(HTREEITEM hitem, OneStrTree *aTree)          //Удаление 
       lstrcat(oldName, oldExt);
    }
    if(DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_DEL_NAME),
-                MainWin, Dlg_DelName, LPARAM(oldName)) == IDCANCEL) return -1;
+                MainWin, (DLGPROC)Dlg_DelName, LPARAM(oldName)) == IDCANCEL) return -1;
    c_FAT1 = (DWORD *)MyAllocMem(Size_FAT1);                  //Память под FAT
    if(c_FAT1 == NULL)  return -1;
    CopyMemory(c_FAT1, FAT1, Size_FAT1);                      //Скопировали содержимое FAT1

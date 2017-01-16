@@ -267,7 +267,7 @@ static int Create_New_Folder_ToHDD(void)                     //Cоздание �
 int New_Folder_ToHDD(void)                                   //Cоздание папок на диске LG
 {
    if(DialogBoxParam(MainInst, MAKEINTRESOURCE(IDD_DLG_NAME),
-                MainWin, Dlg_NewName, LPARAM(0)) == IDCANCEL) return -1;
+                MainWin, (DLGPROC)Dlg_NewName, LPARAM(0)) == IDCANCEL) return -1;
    return Create_New_Folder_ToHDD();                         //Cоздание папки на диске LG
 }
 
