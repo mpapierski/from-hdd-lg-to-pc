@@ -148,9 +148,9 @@ static void NameToKat(char *NameF, char *ExtF, One_Str_Cat *Kat) //Формир�
 
 static int Add_Item_To_Tree(char *NameF)                     //Добавления строки в дерево
 {
-   char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT];
 
-   fnsplit(NameF, Driv, Dir, Name, Ext);
+   _splitpath(NameF, Driv, Dir, Name, Ext);
    if((s_Kat+ns_Dir)->pf.type == 48)                         //Это папка
    {  lstrcat(Name, Ext);                                    //У папки расширения нет как такового
       *Ext = *(Ext+1) = 0;
@@ -200,9 +200,9 @@ int Change_Dir_For_File(char *NameF)                         //Изменени�
    if(ns_Dir >= 4*sClSec)
       return Error1((Lan+181)->msg);                         //"В каталоге нет места для новой записи."
    ZeroMemory(s_Kat+ns_Dir, sizeof(One_Str_Cat));            //Все очистили
-   char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT];
 
-   fnsplit(NameF, Driv, Dir, Name, Ext);
+   _splitpath(NameF, Driv, Dir, Name, Ext);
    NameToKat(Name, Ext, s_Kat+ns_Dir);                       //Формирование имени файла в Unicode
    SYSTEMTIME sysTime;
    FILETIME TimeF;                                           //Дата и время входного файла

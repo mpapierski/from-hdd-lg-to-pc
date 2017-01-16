@@ -404,9 +404,9 @@ int ReadMME_DB(void)                                         //Чтение фа
    if(SizeMME == 0) return 0;                                //Нулевая длина файла
 #if !defined OUT_TEST1 && !defined TEST_LG2_MME
    int ret = Make_Tab_Name_MME();                            //Создание таблицы имен по файлу MME
-   MyFreeMem(&(void*)MMe);
+   MyFreeMem(reinterpret_cast<void**>(&MMe));
    if(ret < 0)
-   {  MyFreeMem(&(void*)tabMME);
+   {  MyFreeMem(reinterpret_cast<void**>(&tabMME));
       return -1;
    }
   #if defined VIEW_TAB_MME
@@ -420,8 +420,8 @@ int ReadMME_DB(void)                                         //Чтение фа
 
 int Update_MME_DB(void)                                      //Пересоздание массива информативных имен
 {
-   MyFreeMem(&(void*)MMe);
-   MyFreeMem(&(void*)tabMME);                                //Таблица соответствия имен
+   MyFreeMem(reinterpret_cast<void**>(&MMe));
+   MyFreeMem(reinterpret_cast<void**>(&tabMME));                                //Таблица соответствия имен
    return ReadMME_DB();                                      //Чтение файла базы записей
 }
 

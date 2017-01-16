@@ -101,8 +101,8 @@ static int CopyOneFileToHDD(char *NameF)                     //Запись ед
    Close_ProgressBar = Close_ProgressBar1;
    int ret = CopyOne_FileToHDD(NameF);                       //Запись единственного файла на HDD рекордера
    Close_ProgressBar();
-   MyFreeMem(&(void*)c_FAT1);
-   MyFreeMem(&(void*)spisF);
+   MyFreeMem(reinterpret_cast<void**>(&c_FAT1));
+   MyFreeMem(reinterpret_cast<void**>(&spisF));
    CloseFile(&inFile);
    return ret;
 }
@@ -187,8 +187,8 @@ static int Copy_File_ToHDD(int sm)                           //Запись не
    Close_ProgressBar = Close_ProgressBar1_2;
    int ret = CopyAll_FileToHDD(spisF);                       //Запись списка файла на HDD рекордера
    Close_ProgressBar2_2();
-   MyFreeMem(&(void*)c_FAT1);
-   MyFreeMem(&(void*)spisF);
+   MyFreeMem(reinterpret_cast<void**>(&c_FAT1));
+   MyFreeMem(reinterpret_cast<void**>(&spisF));
    return ret;
 }
 
@@ -257,8 +257,8 @@ static int Create_New_Folder_ToHDD(void)                     //Cоздание �
 #endif
    writeCl++;                                                //Число записанных кластеров
    ViewSize();                                               //Показа дискового пространства
-   MyFreeMem(&(void*)c_FAT1);
-   MyFreeMem(&(void*)spisF);
+   MyFreeMem(reinterpret_cast<void**>(&c_FAT1));
+   MyFreeMem(reinterpret_cast<void**>(&spisF));
    return 0;
 }
 
@@ -273,7 +273,7 @@ int New_Folder_ToHDD(void)                                   //Cоздание �
 
 //------------------------------------------------------------------------------
 
-typedef char OneExt[5];
+typedef char OneExt[6];
 static OneExt ExtEn[] =  { ".mp3", ".wma",
                            ".jpg",
                            ".avi", ".srt", ".smi", ".sub", ".txt", ".mpg", ".divx" };
@@ -283,7 +283,7 @@ static int pExt[3] = {0, 2, 3};                              //Позиция п
 static int Make_Spis(int *n)                                 //Создание списка файлов
 {
    char NameF[256];
-   char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT];
 
    WIN32_FIND_DATA Data;
    HANDLE File;
@@ -294,7 +294,7 @@ static int Make_Spis(int *n)                                 //Создание 
    if((File = FindFirstFile(NameF, &Data)) == INVALID_HANDLE_VALUE)  return -1; //Файл не найден (папка пустая)
    for(;;)
    {
-      fnsplit(Data.cFileName, Driv, Dir, Name, Ext);
+      _splitpath(Data.cFileName, Driv, Dir, Name, Ext);
       if(!(lstrcmp(Data.cFileName, ".") == 0 ||              //Имя файла  "." нас не интересует
            lstrcmp(Data.cFileName, "..") == 0))              //Имя файла  ".." нас не интересует
       {  //lstrcpy(NameF+l, Data.cFileName);                 //Сделали полное имя с путем
@@ -325,10 +325,10 @@ static int Make_Spis(int *n)                                 //Создание 
 
 int Folder_ToHDD(void)                                       //Запись папок на диск LG
 {
-   char NameDir[256], Driv[MAXDRIVE], Dir[MAXPATH], Ext[MAXEXT];
+   char NameDir[256], Driv[_MAX_DRIVE], Dir[_MAX_PATH], Ext[_MAX_EXT];
 
    if(Get_Name_Dir((Lan+186)->msg, NameDir, 1) < 0) return -1;//Запрос имени папки
-   fnsplit(NameDir, Driv, Dir, NameFoFi, Ext);
+   _splitpath(NameDir, Driv, Dir, NameFoFi, Ext);
    lstrcat(NameFoFi, Ext);                                   //У папки расширения нет как такового
    if(Create_New_Folder_ToHDD() < 0) return -1;              //Cоздание папки на диске LG
    ClStDir = nCl_1;                                          //Номер кластера каталога в который выполняется запись, т.е. вновь созданный каталог

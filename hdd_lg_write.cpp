@@ -80,8 +80,8 @@ int  WriteFileToHDD(int pr)                                  //Запись фа
       case 3: ret = RenameFiFo(indSel, aTree + itemSel.lParam); break; //Переименование
       case 4: ret = DeleteFiFo(indSel, aTree + itemSel.lParam); break; //Удаление
    }
-   MyFreeMem(&(void*)c_FAT1);
-   MyFreeMem(&(void*)spisF);
+   MyFreeMem(reinterpret_cast<void**>(&c_FAT1));
+   MyFreeMem(reinterpret_cast<void**>(&spisF));
    if(ret < 0)                                               //Если была ошибка, то дерево пересоздаем
    {  Update_Tree();                                         //Пересоздание дерева файлов и папок при изменении настроек
       ViewSize();                                            //Показа дискового пространства

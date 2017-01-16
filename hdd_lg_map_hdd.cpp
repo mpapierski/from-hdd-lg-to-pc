@@ -259,9 +259,9 @@ static LRESULT CALLBACK WndProc_MapHDD_W1(HWND hwnd, UINT Msg, WPARAM wParam, LP
 static void MapHDDWinM_OnDestroy(HWND hwnd)
 {
 #if defined TEST_FAT1                                        //Проверка FAT1
-   MyFreeMem(&(void*)cTestFAT1);
+   MyFreeMem(reinterpret_cast<void**>(&cTestFAT1));
 #endif
-   MyFreeMem(&(void*)Map);                                   //Память под карту HDD
+   MyFreeMem(reinterpret_cast<void**>(&Map));                                   //Память под карту HDD
    MapHDD_WinM = NULL;
 }
 

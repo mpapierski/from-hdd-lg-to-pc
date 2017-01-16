@@ -71,12 +71,12 @@ void Add_Spis(char *Str)                                     //Добавлен�
 
 static int SaveFileTxt(void)                                 //Сохранение листинга в текстовый файл
 {
-   char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[MAXDIR], Name[_MAX_FNAME], Ext[_MAX_EXT];
    char NameF[260];
 
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return -1;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
-   fnmerge(NameF, Driv, Dir, "!mme_db", ".txt");                  //Получили имя файла
+   _splitpath(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
+   _makepath(NameF, Driv, Dir, "!mme_db", ".txt");                  //Получили имя файла
    FILE *PrgF;
    if((PrgF = fopen(NameF, "at")) == NULL)
       return Error2(NameF, "Error open file.");

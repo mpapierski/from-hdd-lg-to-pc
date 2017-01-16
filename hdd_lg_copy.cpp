@@ -22,8 +22,9 @@ static DWORDLONG numAllOutCl;                                //Суммарны�
 
 static int Ctrl_OutName(char *outNameF)                      //Проверка, что длина имени менее предельной
 {
-// char Driv[MAXDRIVE+3], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT+3];
-// fnmerge(outNameF, Driv, Dir, Name, Ext);
+// char Driv[_MAX_DRIVE+3], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT+3];
+
+// _makepath(outNameF, Driv, Dir, Name, Ext);
    int l = lstrlen(outNameF);
    if(l > 255)  //if(l > 259)                                //Боремся с предельно длинными именвми
      return Error3(outNameF, "", (Lan+95)->msg);             //return Error3(outNameF, "", "Число символов в полном имени файла превышает предел для  Windows.");
@@ -104,13 +105,13 @@ static int Copy_One_File(PAR_FILE *pf, char *msg)            //Копирова�
 
 static int Copy_File1(DWORD ind)                             //Копирование выбранного файла на диск ПК
 {
-   char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT];
    char outNameF1[260], NameFF[260];
 
-   fnsplit(outNameF1, Driv, Dir, Name, Ext);
+   _splitpath(outNameF1, Driv, Dir, Name, Ext);
    lstrcpy(NameFF, (aTree+ind)->NameF);
    Ctrl_Name_Ch(NameFF);                                     //Проверка имени на недопустимые символы
-   fnmerge(outNameF1, Driv, Dir, NameFF, "");
+   _makepath(outNameF1, Driv, Dir, NameFF, "");
    indF = ind;                                               //Индекс копируемого файла
    if(OpenOutFileName_New(outNameF1, (aTree+ind)->pf.SizeF, &outFile) < 0) return -1; //Открытие выходного файла
    UpdateWindow(MainWin);                                    //Восстановили окно после диалога выбора файла
@@ -232,8 +233,8 @@ static int Copy_Folder(HTREEITEM hitem, char *NameFo)        //Копирова�
    ProgressBar = ProgressBar2;
    Close_ProgressBar = Close_ProgressBar1_2;
 
-   char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT], Path[MAXPATH], Ss[512];
-   fnsplit(Name_Dir, Driv, Dir, Name, Ext);
+   char Driv[_MAX_DRIVE], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT], Path[_MAX_PATH], Ss[512];
+   _splitpath(Name_Dir, Driv, Dir, Name, Ext);
    lstrcpy(Path, Driv);
    lstrcat(Path, "\\");
    DWORD SectorsPerCluster, BytesPerSector, NumberOfFreeClusters, TotalNumberOfClusters;
@@ -332,8 +333,8 @@ static int CopySelect(void)                                  //Копирова�
    ProgressBar = ProgressBar2;
    Close_ProgressBar = Close_ProgressBar1_2;
 
-   char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT], Path[MAXPATH];
-   fnsplit(Name_Dir, Driv, Dir, Name, Ext);
+   char Driv[_MAX_DRIVE], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT], Path[_MAX_PATH];
+   _splitpath(Name_Dir, Driv, Dir, Name, Ext);
    lstrcpy(Path, Driv);
    lstrcat(Path, "\\");
    DWORD SectorsPerCluster, BytesPerSector, NumberOfFreeClusters, TotalNumberOfClusters;

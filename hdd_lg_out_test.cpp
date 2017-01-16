@@ -21,15 +21,15 @@ static char *SW_Name = "SpTest";
 
 static int SaveDump(void)
 {
-   char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[MAXDIR], Name[_MAX_FNAME], Ext[_MAX_EXT];
    char NameF[260];
 
    SYSTEMTIME ST;
    GetLocalTime(&ST);
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return -1;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
+   _splitpath(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
    wsprintf(Name, "%04d_%02d_%02d_%02d_%02d_dump_for_val238", ST.wYear, ST.wMonth, ST.wDay, ST.wHour, ST.wMinute);
-   fnmerge(NameF, Driv, Dir, Name, ".txt");                  //Получили имя файла
+   _makepath(NameF, Driv, Dir, Name, ".txt");                  //Получили имя файла
    FILE *PrgF;
    if((PrgF = fopen(NameF, "wt")) == NULL)
       return Error2(NameF, "Error open file.");

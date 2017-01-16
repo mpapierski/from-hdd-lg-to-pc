@@ -11,7 +11,7 @@ void Ctrl_Name_Ch(char *Name);                               //Проверка 
 int  OpenOutFileName_New(char *Name, LONGLONG Size, HANDLE *File);//Открытие выходного файла
 int  OpenOutFileName_Yes(char *Name, LONGLONG Size, HANDLE *File);//Открытие выходного файла
      int prCopy;                                             //Признак действия при групповом копировании
-     char ndS[9] = { "/\\:*?\"<>|" };                        //Перечень недопустимых символов
+     char ndS[10] = { '/', '\\', ':', '*', '?', '"', '<', '>', '|', '"' };                        //Перечень недопустимых символов
 //   int  pr_ndS;                                            //Признак выполненной замены недопустимого символа. 1-была замена
 
 //------------------------------------------------------------------------------
@@ -92,12 +92,12 @@ static int Comp_TimeF(void)                                  //Сравнени�
 
 static int Mk_NewName(char *NameF)                           //Автоматическое формирование нового имени
 {
-   char Driv[MAXDRIVE+3], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
-   fnsplit(NameF, Driv, Dir, Name, Ext);
+   char Driv[_MAX_DRIVE+3], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT];
+   _splitpath(NameF, Driv, Dir, Name, Ext);
    int l = lstrlen(Name);
    for(DWORD i=1; i<0xFFFFFFFF; i++)
    {  sprintf(Name+l, ".%03d", i);
-      fnmerge(NameF, Driv, Dir, Name, Ext);
+      _makepath(NameF, Driv, Dir, Name, Ext);
       if(CtrlFileYesNo(NameF) == 0) return 0;                //Файла нет - Проверка наличия файла
   }
   return 0;

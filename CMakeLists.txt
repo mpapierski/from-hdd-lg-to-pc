@@ -43,7 +43,8 @@ set (from_hdd_lg_to_pc_HEADERS
 set (from_hdd_lg_to_pc_RESOURCES
     from_hdd_lg_to_pc_rc.rc)
 
-add_executable (from_hdd_lg_to_pc
+add_executable (from_hdd_lg_to_pc WIN32
     ${from_hdd_lg_to_pc_SOURCES}
     ${from_hdd_lg_to_pc_HEADERS}
     ${from_hdd_lg_to_pc_RESOURCES})
+target_link_libraries (from_hdd_lg_to_pc Comctl32)

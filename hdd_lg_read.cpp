@@ -200,7 +200,7 @@ static int Read_One_Dir(DWORD nClast, int prM)               //Чтение и �
    BYTE *buff = (BYTE *)MyAllocMem(sCl_B);                   //Память под число кластеров в каталоге
    if(buff == NULL)  return -1;
    int ret = Read_One_Dir_(buff, nClast, prM);               //Чтение и визуализация одного каталога
-   MyFreeMem(&(void*)buff);
+   MyFreeMem(reinterpret_cast<void**>(&buff));
    return ret;
 }
 

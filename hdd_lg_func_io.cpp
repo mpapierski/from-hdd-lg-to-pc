@@ -61,14 +61,14 @@ int GetName_OutFile(char *NameF)                             //Ввод имен
    char Filter[260];                                         //Фильтры поиска
    char *Title = (Lan+42)->msg;                              //"Укажите имя записываемого файла"
    char NameFile[260];
-   char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT];
 
    strcpy(NameFile, NameF);                                  //Начальный путь для поиска файлов
    *DirName = 0;                                             //На случай если имени небыло
    if(*NameFile != 0)                                        //Имя уже было
-   {  fnsplit(NameFile, Driv, Dir, Name, Ext);
-      fnmerge(DirName, Driv, Dir, NULL, NULL);
-      fnmerge(NameFile, NULL, NULL, Name, Ext);
+   {  _splitpath(NameFile, Driv, Dir, Name, Ext);
+      _makepath(DirName, Driv, Dir, NULL, NULL);
+      _makepath(NameFile, NULL, NULL, Name, Ext);
       if(*Name == '*') *Name = 0;                            //Если нет конкретного имени
    }
    sprintf(Filter, "%s *%s|*%s|%s (*.*)|*.*", (Lan+43)->msg, Ext, Ext, (Lan+44)->msg); //Фильтры поиска //sprintf(Filter, "Файлы *%s|*%s|Все файлы (*.*)|*.*", Ext, Ext);
@@ -220,10 +220,10 @@ static BOOL CALLBACK Dlg_FileSize(HWND hDlg, UINT Message, WPARAM wParam, LPARAM
 int DiskFreeSpaceEx(char *NameF, DWORDLONG Size)             //Проверка свободного места
 {
     ULARGE_INTEGER FreeBytes, TotalBytes, TotalFreeBytes;
-    char   Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT];
-    char   Path[MAXPATH];
+    char   Driv[_MAX_DRIVE], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT];
+    char   Path[_MAX_PATH];
 
-    fnsplit(NameF, Driv, Dir, Name, Ext);
+    _splitpath(NameF, Driv, Dir, Name, Ext);
     lstrcpy(Path, Driv);
     lstrcat(Path, "\\");
 
@@ -257,8 +257,8 @@ int DiskFreeSpaceEx(char *NameF, DWORDLONG Size)             //Проверка 
 int DiskFreeSpaceEx_F(char *Name_Dir, DWORDLONG Size)        //Проверка свободного места
 {
    ULARGE_INTEGER FreeBytes, TotalBytes, TotalFreeBytes;
-   char Driv[MAXDRIVE], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT], Path[MAXPATH];
-   fnsplit(Name_Dir, Driv, Dir, Name, Ext);
+   char Driv[_MAX_DRIVE], Dir[_MAX_PATH], Name[_MAX_FNAME], Ext[_MAX_EXT], Path[_MAX_PATH];
+   _splitpath(Name_Dir, Driv, Dir, Name, Ext);
    lstrcpy(Path, Driv);
    lstrcat(Path, "\\");
    if(GetDiskFreeSpaceEx(Path, &FreeBytes, &TotalBytes, &TotalFreeBytes) == FALSE)//Общее число свободных байт на диске (сумма всех свободных мест)

@@ -24,10 +24,10 @@ static int Write_Config(HANDLE *hFile)                       //Запись фа
    DWORD nb;
 
    char NameF[260];
-   char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[_MAX_DIR], Name[_MAX_FNAME], Ext[_MAX_EXT];
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return -1;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
-   fnmerge(NameF, Driv, Dir, Name, ".conf");                 //Получили имя файла
+   _splitpath(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
+   _makepath(NameF, Driv, Dir, Name, ".conf");                 //Получили имя файла
    *hFile = CreateFile(NameF, GENERIC_WRITE, 0, NULL,
                        CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
    if(*hFile == INVALID_HANDLE_VALUE)
@@ -75,7 +75,7 @@ static int SaveConfig(HWND hDlg)                             //Сохранен�
 
 static void Lan_Default(void)                                //Установка языка по умолчанию
 {
-   MyFreeMem(&(void*)msgLan);
+   MyFreeMem(reinterpret_cast<void**>(&msgLan));
    if(prLanDef == 0)                                         //Признак языка по умолчанию 0-русский,1-другой
    {  Lan = Lan_RU;                                          //Загрузили русскую страницу
       Conf.nLanguage = 0;                                    //0-русский, 1-английский, 2-внешний файл
@@ -139,7 +139,7 @@ static int ReadLanFile(char *NameF, HANDLE *hFile)           //Чтение фа
       return ErrorSys2(NameF, (Lan+85)->msg);                //return ErrorSys2(NameF, "Ошибка при запросе размера файла.");
    if(FSize < 120)
       return Error2(NameF, (Lan+86)->msg);                   //return Error2(NameF, "Недопустимо малый размер файла.");
-   MyFreeMem(&(void*)msgLan);
+   MyFreeMem(reinterpret_cast<void**>(msgLan));
    msgLan = (char *)MyAllocMem(FSize+1);                     //Память под один кластер
    if(msgLan == NULL)  return -1;
    if(ReadFile(*hFile, msgLan, FSize, &nb, NULL) == FALSE || nb != FSize)
@@ -194,10 +194,10 @@ static int LoadLanFile(void)                                 //Загрузка 
 {
    HANDLE hFile;
    char NameF[260];
-   char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[_MAX_DIR], Name[_MAX_FNAME], Ext[_MAX_EXT];
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return -1;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
-   fnmerge(NameF, Driv, Dir, NameF_Lan, "");                 //Получили имя файла
+   _splitpath(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
+   _makepath(NameF, Driv, Dir, NameF_Lan, "");                 //Получили имя файла
    int ret = ReadLanFile(NameF, &hFile);                     //Чтение файла языка
    CloseFile(&hFile);
    if(ret < 0) return -1;
@@ -223,10 +223,10 @@ static int SetNewLanguage(void)                              //Загрузка 
 int LoadConfig(void)                                        //Загрузка конфигурации
 {
    char NameF[260];
-   char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[_MAX_DIR], Name[_MAX_FNAME], Ext[_MAX_EXT];
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return -1;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
-   fnmerge(NameF, Driv, Dir, Name, ".conf");                 //Получили имя файла
+   _splitpath(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
+   _makepath(NameF, Driv, Dir, Name, ".conf");                 //Получили имя файла
 
    char LanDef[5];
    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ILANGUAGE, LanDef, 5);
@@ -387,10 +387,10 @@ static void Create_SpisLangF(HWND hDlg)                      //Создание 
    HANDLE File;
    WIN32_FIND_DATA Data;
    char NameF[260];
-   char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
+   char Driv[_MAX_DRIVE], Dir[_MAX_DIR], Name[_MAX_FNAME], Ext[_MAX_EXT];
    if(GetModuleFileName(NULL, NameF, sizeof(NameF)) == 0) return;
-   fnsplit(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
-   fnmerge(NameF, Driv, Dir, "*", ".lng");                   //Получили имя файла
+   _splitpath(NameF, Driv, Dir, Name, Ext);                     //Разложили имя файла
+   _makepath(NameF, Driv, Dir, "*", ".lng");                   //Получили имя файла
    if((File = FindFirstFile(NameF, &Data)) == INVALID_HANDLE_VALUE)  return; //Файл не найден
    for(;;)                                                   //Список языковых файлов
    {  SendDlgItemMessage(hDlg, IDC_LISTBOX1, LB_ADDSTRING, 0, (LPARAM)Data.cFileName);

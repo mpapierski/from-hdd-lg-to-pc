@@ -64,9 +64,9 @@ static int GetName_InFile(char *NameF)                       //Ввод имен
 // ofn.nMaxCustFilter                                        //Длина специального фильтра
    ofn.nFilterIndex = 1;                                     //Индекс для работы с фильтрами
    ofn.lpstrFile = NameFile;                                 //Имя файла в случае успеха
-   ofn.nMaxFile = sizeof(NameFile);                          //Длина поля имени файла
+   ofn.n_MAX_FNAME = sizeof(NameFile);                          //Длина поля имени файла
    ofn.lpstrFileTitle = FileTitle;                           //Маршрут и имя файла в случае успеха
-   ofn.nMaxFileTitle = sizeof(FileTitle);                    //Длина поля
+   ofn.n_MAX_FNAMETitle = sizeof(FileTitle);                    //Длина поля
    ofn.lpstrInitialDir = DirName;                            //Начальный каталог файлов
    ofn.lpstrTitle = "Укажите имя файла дампа";
    ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;

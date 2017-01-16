@@ -63,13 +63,13 @@ static void M_Win_OnDestroy(HWND hwnd)
    if(MyFont_Cur != NULL) DeleteObject(MyFont_Cur);          //Массив фонта
    if(FonBrush != NULL) DeleteObject(FonBrush);              //Фоновая кисть
    CloseFile(&hDrive);                                       //Закрыли входной файл
-   MyFreeMem(&(void*)FAT1);
-   MyFreeMem(&(void*)FAT2);
-   MyFreeMem(&(void*)aTree);
-   MyFreeMem(&(void*)MMe);
-   MyFreeMem(&(void*)tabMME);                                //Таблица соответствия имен
+   MyFreeMem(reinterpret_cast<void **>(&FAT1));
+   MyFreeMem(reinterpret_cast<void **>(&FAT2));
+   MyFreeMem(reinterpret_cast<void **>(&aTree));
+   MyFreeMem(reinterpret_cast<void **>(&MMe));
+   MyFreeMem(reinterpret_cast<void **>(&tabMME));                                //Таблица соответствия имен
 #if defined EMULATOR_HDD
-   MyFreeMem(&(void*)inBuf);
+   MyFreeMem(MyFreeMem(reinterpret_cast<void **>(&inBuf));
 #endif
    PostQuitMessage(0);
 }

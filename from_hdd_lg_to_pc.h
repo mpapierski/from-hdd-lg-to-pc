@@ -9,6 +9,7 @@
 #include <commctrl.h>
 #include <string.h>
 #include <stdio.h>
+
 #pragma hdrstop
 #include "defparam.h"
 #include "mme_db_head.h"
@@ -123,7 +124,7 @@ void Ctrl_Name_Ch(char *Name);                               //Проверка 
 int  OpenOutFileName_New(char *Name, LONGLONG Size, HANDLE *File);//Открытие выходного файла
 int  OpenOutFileName_Yes(char *Name, LONGLONG Size, HANDLE *File);//Открытие выходного файла
      extern int prCopy;                                      //Признак действия при групповом копировании
-     extern char ndS[9];                                     //Перечень недопустимых символов
+     extern char ndS[10];                                     //Перечень недопустимых символов
    //extern int  pr_ndS;                                     //Признак выполненной замены недопустимого символа. 1-была замена
 
 //============================ hdd_lg_language =================================
