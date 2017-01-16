@@ -111,7 +111,7 @@ int Save_FAT1(void)                                          //Сохранен�
    DWORD nb;
    LONGLONG Poz = LONGLONG(sSecB) * Start_SecFAT1;
    if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   if(WriteFile(hDrive, c_FAT1, Size_FAT1, &nb, NULL) == FALSE || nb != Size_FAT1)
+   if(WriteFile(hDrive, c_FAT1, Size_FAT1, &nb, NULL) == FALSE || nb != Size_FAT1)
       return ErrorSys1((Lan+176)->msg);                      //"Ошибка при записи FAT."
    CopyMemory(FAT1, c_FAT1, Size_FAT1);                      //Скопировали содержимое FAT1
    return 0;
@@ -132,7 +132,7 @@ void Ansi_To_Unicode(char *inANSI, WCHAR *outUNI, int maxN)  //Преобраз�
 
 static void NameToKat(char *NameF, char *ExtF, One_Str_Cat *Kat) //Формирование имени файла
 {
-   int n = lstrlen(NameF);
+   int n = lstrlen(NameF);
    if(n > 38)
    {  *(NameF + 38) = 0;                                     //Отсекли имя
        NumMsg38++;
@@ -260,6 +260,6 @@ int Save_Dir(void)                                           //Сохранен�
 
 #endif
 
-#endif
+#endif
 #endif
 

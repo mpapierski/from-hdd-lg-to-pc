@@ -8,7 +8,7 @@
 //============================ hdd_lg_remake_tree ==============================
 int  RemakeTree(void);                                       //Переформирование дерева с учетом многофайловых Titles
 
-static char *strSize[] = { "", "Kb", "Mb", "Gb" };
+static char *strSize[] = { "", "Kb", "Mb", "Gb" };
 static HTREEITEM hFOLDER;                                    //Вновь созданная папка
 static WORD indTitle;                                        //Индекс Title
 
@@ -171,5 +171,5 @@ int  RemakeTree(void)                                        //Переформ�
    return 0;                                                 //Папки MEDIA нет
 }
 
-#endif
+#endif
 

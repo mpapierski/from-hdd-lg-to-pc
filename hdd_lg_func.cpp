@@ -45,7 +45,7 @@ int CreateMyFont(void)                                       //Создание 
 
    memset(&LogFont, 0, sizeof(LOGFONT));                     //Заполнили нулями
    LogFont.lfCharSet = DEFAULT_CHARSET;
-   LogFont.lfHeight = 15;   LogFont.lfPitchAndFamily = FF_MODERN;                     //Моноширинный
+   LogFont.lfHeight = 15;   LogFont.lfPitchAndFamily = FF_MODERN;                     //Моноширинный
    strcpy(LogFont.lfFaceName, "Courier New");
    MyFont_Cur = CreateFontIndirect(&LogFont);
    if(MyFont_Cur == NULL)
@@ -111,10 +111,10 @@ char *FileSize_Txt(DWORDLONG Size)                           //Размер фа
 //------------------------------------------------------------------------------
 
 void CenterDlg(HWND hDlg, int yPoz)                          //Центрирование окна диалога в главном окне
-{
-   RECT RectD, RectW;
-   GetWindowRect(MainWin, &RectW);
-   GetWindowRect(hDlg, &RectD);
+{
+   RECT RectD, RectW;
+   GetWindowRect(MainWin, &RectW);
+   GetWindowRect(hDlg, &RectD);
    int xCent = (RectW.right + RectW.left) / 2;               //Центр главного окна
    int yCent = (RectW.bottom + RectW.top) / 2;               //Центр главного окна
    int xDlg =  xCent - (RectD.right - RectD.left) / 2;
@@ -290,7 +290,7 @@ void About(void)
 void AddToSpecSpis_VerWin(void)                              //Запись в дамп версии Windows
 {
    HKEY hKey;
-   char key[260], Ss[300];
+   char key[260], Ss[300];
    DWORD nb = sizeof(key);
    DWORD Type = REG_SZ;                                      //Тип - нуль терминированная строка
    int n;

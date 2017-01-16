@@ -35,9 +35,9 @@ static int nCl_3Cat;                                         //Номер кла
 
 //------------------------------------------------------------------------------
 
-static int CreateName(char *nam, char *ext, One_Str_Cat *Kat)//Формирование имени файла
-{
-   if(pr_tRec == 0)                                          //Признак рекордера 0 или 1 (старейшая серия)
+static int CreateName(char *nam, char *ext, One_Str_Cat *Kat)//Формирование имени файла
+{
+   if(pr_tRec == 0)                                          //Признак рекордера 0 или 1 (старейшая серия)
    {  UnicodeToAnsi(Kat->Name, nam, 41);                     //Преобразовали имя из UNICODE
       UnicodeToAnsi(Kat->Ext, ext, 4);                       //Преобразовали расширение из UNICODE
    }
@@ -142,8 +142,8 @@ static int Read_One_Dir_(BYTE *buff, DWORD nClast, int pr)   //Чтение и �
 {
    DWORD nSector = Start_SecDir1 + (nClast - 1) * sClSec;    //Номер сектора по номеру кластера
    if(ReadClast1_P(nSector, buff) < 0) return -1;            //Чтение кластера
-#if defined OUT_TEST
-   View_HEX_Any(buff, sCl_B);
+#if defined OUT_TEST
+   View_HEX_Any(buff, sCl_B);
 #endif
    if(pr == 1)                                               //Это самай первый каталог MEDIA
    {  if(*(DWORDLONG*)buff      == 0 && *(DWORDLONG*)(buff+ 8) == 0 &&//Проверка наличия имени
@@ -190,7 +190,7 @@ static int Read_One_Dir(DWORD nClast, int prM)               //Чтение и �
 #if defined OUT_TEST
    DWORD nSector = Start_SecDir1 + (nClast-1) * sClSec;      //Номер сектора по номеру кластера
    char Ss[300];
-   wsprintf(Ss, "Load Dir (claster %d, sector %d)", nClast, nSector);
+   wsprintf(Ss, "Load Dir (claster %d, sector %d)", nClast, nSector);
    Add_SpecSpis(Ss);
 #endif
    if(nClast == 0 || nClast >= maxZapFAT1)
@@ -200,8 +200,8 @@ static int Read_One_Dir(DWORD nClast, int prM)               //Чтение и �
    BYTE *buff = (BYTE *)MyAllocMem(sCl_B);                   //Память под число кластеров в каталоге
    if(buff == NULL)  return -1;
    int ret = Read_One_Dir_(buff, nClast, prM);               //Чтение и визуализация одного каталога
-   MyFreeMem(&(void*)buff);
-   return ret;
+   MyFreeMem(&(void*)buff);
+   return ret;
 }
 
 //------------------------------------------------------------------------------
@@ -221,20 +221,20 @@ static int Read_AllDir(void)                                 //Чтение вс
    numFolder = 0;                                            //Номер вложенной папки
    if(Read_One_Dir(1, 1) < 0) return -1;                     //Чтение и визуализация одного папки MEDIA
    if(stCl_Media2 != 0)                                      //Кластер начала второй части папки MEDIA
-     if(Read_One_Dir(stCl_Media2, 0) < 0) return -1;         //Чтение и визуализация второй части папки MEDIA
-#if !defined OUT_TEST
-   ViewAbsendName();                                         //Показ имен присутствующих в файле MME.DB, но отсутствующих в каталоге
-#endif
-   if(pr_tRec == 0 && nCl_3Cat != -1)                        //Была папка MEDIA
-     if(Read_One_Dir(nCl_3Cat, 2) < 0) return -1;            //Чтение и визуализация одного каталога (JUKEBOX, VIDEO и FOTO)
-   if(pr_tRec == 1 && numFolder > 0)                         //Cтарейшая серия рекордеров
-     for(int i=0; i<numFolder; i++)
-     {  AddItemToTree((F_Inf+i)->nam, NULL, &pf, 1);         //Добавили строку в дерево (папка самого верхнего уровня)
-        if(Read_One_Dir((F_Inf+i)->nCl, 2) < 0) return -1;   //Чтение и визуализация одного каталога (JUKEBOX, VIDEO и FOTO)
-     }
-   Expand_Tree(0);                                           //Распахнули дерево на первом (нулевом) уровне
-   return 0;
-}
+     if(Read_One_Dir(stCl_Media2, 0) < 0) return -1;         //Чтение и визуализация второй части папки MEDIA
+#if !defined OUT_TEST
+   ViewAbsendName();                                         //Показ имен присутствующих в файле MME.DB, но отсутствующих в каталоге
+#endif
+   if(pr_tRec == 0 && nCl_3Cat != -1)                        //Была папка MEDIA
+     if(Read_One_Dir(nCl_3Cat, 2) < 0) return -1;            //Чтение и визуализация одного каталога (JUKEBOX, VIDEO и FOTO)
+   if(pr_tRec == 1 && numFolder > 0)                         //Cтарейшая серия рекордеров
+     for(int i=0; i<numFolder; i++)
+     {  AddItemToTree((F_Inf+i)->nam, NULL, &pf, 1);         //Добавили строку в дерево (папка самого верхнего уровня)
+        if(Read_One_Dir((F_Inf+i)->nCl, 2) < 0) return -1;   //Чтение и визуализация одного каталога (JUKEBOX, VIDEO и FOTO)
+     }
+   Expand_Tree(0);                                           //Распахнули дерево на первом (нулевом) уровне
+   return 0;
+}
 
 //-------------------------------------------------------------------------------
 

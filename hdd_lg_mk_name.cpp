@@ -14,8 +14,8 @@ static char *strSize[] = { "", "Kb", "Mb", "Gb" };
 
 //------------------------------------------------------------------------------
 
-static int Ctrl_Get_Size_From_FAT(DWORD clSt, LONGLONG *SizeFromFAT)//Вычисление максимальной длины файла по FAT
-{
+static int Ctrl_Get_Size_From_FAT(DWORD clSt, LONGLONG *SizeFromFAT)//Вычисление максимальной длины файла по FAT
+{
    DWORD nCl = clSt;                                         //Текущий номер кластера равен первому кластеру файла
    DWORD numCl = 0;                                          //Число кластеров прописанное в FAT для данного файла
 /*
@@ -41,11 +41,11 @@ static char *strSize[] = { "", "Kb", "Mb", "Gb" };
 
 //------------------------------------------------------------------------------
 
-static int ChangeNameInMEDIA(char *nam, char *ext, PAR_FILE *pf)//Изменние имени в папке MEDIA
-{
-   int prF = -1;                                             //Тип файла
-   if(lstrcmp(ext, "idx") == 0) prF = 0;
-   if(lstrcmp(ext, "str") == 0) prF = 1;                     //
+static int ChangeNameInMEDIA(char *nam, char *ext, PAR_FILE *pf)//Изменние имени в папке MEDIA
+{
+   int prF = -1;                                             //Тип файла
+   if(lstrcmp(ext, "idx") == 0) prF = 0;
+   if(lstrcmp(ext, "str") == 0) prF = 1;                     //
    if((Conf.altName == 0 || Conf.ViewIDX == 0) && prF == 0) return 1; //Не показывать файлы  *.idx
    if((Conf.altName == 0 || Conf.Ren_STR == 0) && prF == 1)  //Менять расширение файлов *.str
        lstrcpy(ext, "vro");

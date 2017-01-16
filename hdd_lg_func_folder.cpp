@@ -41,9 +41,9 @@ SHSTDAPI_(LPITEMIDLIST) SHBrowseForFolder(LPBROWSEINFO lpbi);
 SHSTDAPI_(BOOL) SHGetPathFromIDList(LPCITEMIDLIST pidl, LPSTR pszPath);
 SHSTDAPI SHGetMalloc(LPMALLOC * ppMalloc);
 #define BFFM_INITIALIZED        1
-#define BFFM_SETSELECTION      (WM_USER + 102)
+#define BFFM_SETSELECTION      (WM_USER + 102)
 
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 #pragma argsused
 static int __stdcall BrowseProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)

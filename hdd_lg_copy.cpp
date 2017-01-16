@@ -23,7 +23,7 @@ static DWORDLONG numAllOutCl;                                //Суммарны�
 static int Ctrl_OutName(char *outNameF)                      //Проверка, что длина имени менее предельной
 {
 // char Driv[MAXDRIVE+3], Dir[MAXPATH], Name[MAXFILE], Ext[MAXEXT+3];
-// fnmerge(outNameF, Driv, Dir, Name, Ext);
+// fnmerge(outNameF, Driv, Dir, Name, Ext);
    int l = lstrlen(outNameF);
    if(l > 255)  //if(l > 259)                                //Боремся с предельно длинными именвми
      return Error3(outNameF, "", (Lan+95)->msg);             //return Error3(outNameF, "", "Число символов в полном имени файла превышает предел для  Windows.");

@@ -128,7 +128,7 @@ int Vost_FAT1(void)                                          //Чистка FAT1
    DWORD nb;
    LONGLONG Poz = LONGLONG(sSecB) * Start_SecFAT1;
    if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   if(WriteFile(hDrive, FAT1, Size_FAT1, &nb, NULL) == FALSE || nb != Size_FAT1)
+   if(WriteFile(hDrive, FAT1, Size_FAT1, &nb, NULL) == FALSE || nb != Size_FAT1)
       return ErrorSys1((Lan+176)->msg);                      //"Ошибка при записи FAT."
 #endif
    return 0;

@@ -49,9 +49,9 @@ int  ReadClast1_P(DWORD nSector, BYTE *buff)                 //Чтение кл
    LONGLONG Poz = LONGLONG(sSecB) * nSector;
 #if defined EMULATOR_HDD
    if(ReadClastEmul(Poz, buff) < 0) return -1;               //Чтение кластера эмулятором
-#else
-   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   if(ReadClast1(buff) < 0) return -1;                       //Чтение кластера
+#else
+   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
+   if(ReadClast1(buff) < 0) return -1;                       //Чтение кластера
 #endif
    return 0;
 }
@@ -76,9 +76,9 @@ int  ReadClast2_P(DWORD nSector, BYTE *buff)                 //Чтение кл
    LONGLONG Poz = LONGLONG(sSecB) * nSector;
 #if defined EMULATOR_HDD
    if(ReadClast2Emul(Poz, buff) < 0) return -1;              //Чтение кластера эмулятором
-#else
-   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   if(ReadClast2(buff) < 0) return -1;                       //Чтение кластера
+#else
+   if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
+   if(ReadClast2(buff) < 0) return -1;                       //Чтение кластера
 #endif
    return 0;
 }
@@ -108,7 +108,7 @@ static int Ctrl_FAT_For_File(DWORD clSt, LONGLONG SizeF)     //Проверка 
 }
 */
 
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 static int ReadFAT1(void)                                    //Чтение FAT первого раздела
 {
@@ -147,10 +147,10 @@ int Load_FAT1(void)                                          //Загрузка 
    if(FAT1 == NULL)  return -1;
    LONGLONG Poz = LONGLONG(sSecB) * Start_SecFAT1;
 #if defined EMULATOR_HDD
-   if(ReadFATEmul(Poz) < 0) return -1;                       //Чтение FAT эмулятором
+   if(ReadFATEmul(Poz) < 0) return -1;                       //Чтение FAT эмулятором
 #else
    if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   if(ReadFAT1() < 0) return -1;                             //Чтение FAT
+   if(ReadFAT1() < 0) return -1;                             //Чтение FAT
 #endif
 #if defined OUT_TEST
    View_HEX_Any((BYTE*)FAT1, Size_FAT1);
@@ -183,7 +183,7 @@ static int Find_FAT2(void)                                   //Поиск и Ч�
    int pr = -1;
    LONGLONG Poz = LONGLONG(sSecB) * (Start_SecFAT1 + num_SecFAT1); //Сразу за концом FAT первого раздела
    if(SetInFilePointer(Poz) < 0) return -1;                  //Изменение позиции указателя в файле
-   InitProgressBar(numTestSec, (Lan+21)->msg);               //InitProgressBar(nCycl, "Чтение служебной информации");
+   InitProgressBar(numTestSec, (Lan+21)->msg);               //InitProgressBar(nCycl, "Чтение служебной информации");
    for(int i=0; i<numTestSec; i++)
    {  if(ReadFile(hDrive, &Sec, sSecB, &nb, NULL) == FALSE || nb != sSecB)
       {  ErrorSys1((Lan+22)->msg);                           //ErrorSys1("Ошибка при чтении FAT.");
@@ -200,13 +200,13 @@ static int Find_FAT2(void)                                   //Поиск и Ч�
    if(pr == -1) return -1;
    DWORD stSec_FAT2 = pr + Start_SecFAT1 + num_SecFAT1;
    LONGLONG Poz_St = LONGLONG(sSecB) * stSec_FAT2;
-   if(SetInFilePointer(Poz_St) < 0) return -1;               //Изменение позиции указателя в файле
-   if(ReadFAT2() < 0) return -1;                             //Чтение FAT второго раздела
-   wsprintf(Ss, "Load FAT 2 (sector %d, size (sectors) %d)", stSec_FAT2, num_SecFAT2);
-   Add_SpecSpis(Ss);
+   if(SetInFilePointer(Poz_St) < 0) return -1;               //Изменение позиции указателя в файле
+   if(ReadFAT2() < 0) return -1;                             //Чтение FAT второго раздела
+   wsprintf(Ss, "Load FAT 2 (sector %d, size (sectors) %d)", stSec_FAT2, num_SecFAT2);
+   Add_SpecSpis(Ss);
    return 0;
-}
-#endif
+}
+#endif
 
 //-------------------------------------------------------------------------------
 
@@ -306,16 +306,16 @@ static void ReadAnySec(void)
    SEC_0 anySec;
    LONGLONG Poz = LONGLONG(sSecB) * 67;
    SetInFilePointer(Poz);
-   ReadSec((BYTE *)&anySec);                                 //Чтение сектора
-   Add_SpecSpis("Sector 67");
+   ReadSec((BYTE *)&anySec);                                 //Чтение сектора
+   Add_SpecSpis("Sector 67");
    View_HEX_Any((BYTE *)&anySec, 512);
    ReadSec((BYTE *)&anySec);                                 //Чтение сектора
    Add_SpecSpis("Sector 68");
    View_HEX_Any((BYTE *)&anySec, 512);
    Poz = LONGLONG(sSecB) * 70;
    SetInFilePointer(Poz);
-   ReadSec((BYTE *)&anySec);                                 //Чтение сектора
-   Add_SpecSpis("Sector 70");
+   ReadSec((BYTE *)&anySec);                                 //Чтение сектора
+   Add_SpecSpis("Sector 70");
    View_HEX_Any((BYTE *)&anySec, 512);
    ReadSec((BYTE *)&anySec);                                 //Чтение сектора
    Add_SpecSpis("Sector 71");
@@ -355,7 +355,7 @@ int FindHDD_LG(void)                                         //Поиск дис
       SEC_63 Sec63, Sec64;
       LONGLONG Poz = LONGLONG(sSecB) * 63;
       if(SetInFilePointer(Poz) < 0)  //return -1;            //Изменение позиции указателя в файле
-      {  CloseFile(&hDrive);  continue;  }                   //Почему-то не сработало
+      {  CloseFile(&hDrive);  continue;  }                   //Почему-то не сработало
       if(ReadSec((BYTE *)&Sec63) < 0) continue;              //Чтение сектора
       if(strncmp(Sec63.Met, "LGEINC  ", 8) != 0 ||
          strncmp(Sec63.Name, "VOLUMELABE FAT32   ", 19) != 0)

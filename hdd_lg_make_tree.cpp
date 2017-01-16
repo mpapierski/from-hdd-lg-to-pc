@@ -203,8 +203,8 @@ int ClearSelect(void)                                        //Снятие вс
    if(hitem == NULL) return -1;
    int ret = RemoveAllSelection(hitem);                      //Сняли все выделение файла в дереве
    if(ret < 0) return -1;
-   ViewNumSel();                                             //Вывод числа выбранных
-   StateButtonClear();                                       //Изменение состояния кнопки "Очистить"
+   ViewNumSel();                                             //Вывод числа выбранных
+   StateButtonClear();                                       //Изменение состояния кнопки "Очистить"
    return ret;
 }
 
@@ -236,7 +236,7 @@ static int Remove_Selection(HTREEITEM hitem, int n)          //Сняли выд
             Error1((Lan+151)->msg);
          (aTree + n)->prSel = 0;                             //Признак, файл скопирован
          return 1;
-      }
+      }
 
       if((aTree + item.lParam)->pf.type == 48 ||             //Очередное имя это вложенная папка
          (aTree + item.lParam)->pf.type == 47)               //Очередное имя это вложенная папка
@@ -257,7 +257,7 @@ static int Remove_Selection(HTREEITEM hitem, int n)          //Сняли выд
               Error1((Lan+151)->msg);
             (aTree + n)->prSel = 0;                          //Признак, файл скопирован
             num_Sel--;                                       //Число выбранных файлов
-            size_Sel -= (aTree + n)->pf.SizeF;
+            size_Sel -= (aTree + n)->pf.SizeF;
             return 1;
          }
       }
@@ -270,29 +270,29 @@ static int Remove_Selection(HTREEITEM hitem, int n)          //Сняли выд
 //------------------------------------------------------------------------------
 
 int RemoveSelectionFromCopy(int n)                           //Снятие выделение файла в дереве при копировании
-{
-   (aTree + n)->prSel = 2;                                   //Признак, файл скопирован
-   HTREEITEM hitem = TreeView_GetRoot(hwndTree);
-   if(hitem == NULL) return -1;
+{
+   (aTree + n)->prSel = 2;                                   //Признак, файл скопирован
+   HTREEITEM hitem = TreeView_GetRoot(hwndTree);
+   if(hitem == NULL) return -1;
    int ret = Remove_Selection(hitem, n);                     //Сняли выделение файла в дереве
    if(ret < 0) return -1;
-   if(ret == 0) return -1;
-   ViewNumSel();                                             //Вывод числа выбранных
-   return 0;
+   if(ret == 0) return -1;
+   ViewNumSel();                                             //Вывод числа выбранных
+   return 0;
 }
 
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-static int ChangeSelectFolder(HTREEITEM h_Item, DWORD indT, WORD prSel)  //Изменение выбора группы
-{
-   TV_ITEM tvi;
-   char nName[300];
+static int ChangeSelectFolder(HTREEITEM h_Item, DWORD indT, WORD prSel)  //Изменение выбора группы
+{
+   TV_ITEM tvi;
+   char nName[300];
 
    HTREEITEM hitem = TreeView_GetChild(hwndTree, h_Item);    //Вошли во внутренний уровень дерева
    if(hitem == NULL) return Error1((Lan+33)->msg);           //return Error1("Ошибка при запросе информации об элементе дерева.");
    for(;;)
-   {  tvi.mask = TVIF_PARAM | TVIF_TEXT;
-      tvi.pszText = nName;
+   {  tvi.mask = TVIF_PARAM | TVIF_TEXT;
+      tvi.pszText = nName;
       tvi.cchTextMax = sizeof(nName);
       tvi.hItem = hitem;
       if(TreeView_GetItem(hwndTree, &tvi) == FALSE)
@@ -321,16 +321,16 @@ int RemoveSelectionFromCopy(int n)                           //Снятие вы
       }
       hitem = TreeView_GetNextSibling(hwndTree, hitem);      //Следующая запись на том же уровне дерева
       if(hitem == NULL) break;                               //Больше записей данного уровня нет
-   }
+   }
    return 0;
-}
+}
 
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-static bool ChangeOneSelect(TV_ITEM *tvi, char *nName)       //Изменение выбора одного файла
-{
-   tvi->mask = TVIF_STATE | TVIF_TEXT;
-   if((aTree + tvi->lParam)->prSel == 0)                     //Данный файл не выделен
+static bool ChangeOneSelect(TV_ITEM *tvi, char *nName)       //Изменение выбора одного файла
+{
+   tvi->mask = TVIF_STATE | TVIF_TEXT;
+   if((aTree + tvi->lParam)->prSel == 0)                     //Данный файл не выделен
    {  tvi->state = TVIS_BOLD;// | TVIS_DROPHILITED;
       (aTree + tvi->lParam)->prSel = 1;                      //Данный файл выделен
       *nName = '+';
@@ -411,14 +411,14 @@ static void ViewShift(void)
 
 static bool Select_Group(void)                               //Изменение состояния всей группы файлов между строками
 {
-   Mark_Selected();
-   pr_tviSt = 0;                                             //Признак группового выбора
-   item_Sel[0] = item_Sel[1] = item_Par1 = NULL;
-   ViewShift();
-   return true;
-}
+   Mark_Selected();
+   pr_tviSt = 0;                                             //Признак группового выбора
+   item_Sel[0] = item_Sel[1] = item_Par1 = NULL;
+   ViewShift();
+   return true;
+}
 
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 bool ChangeSelect(int sShift)                                //Изменение выбора файлов в дерева
 {
@@ -450,7 +450,7 @@ bool ChangeSelect(int sShift)                                //Изменени�
     //  TreeView_SetInsertMark(hwndTree, item_Sel[0], false);//Марка первого выбора
       pr_tviSt = 0;                                          //Признак группового выбора
       item_Sel[0] = item_Sel[1] = item_Par1 = NULL;
-      ViewShift();
+      ViewShift();
       return true;
    }
    if(pr_tviSt == 0)                                         //Еще не отмечалась первая строкагруппового выбора
@@ -466,19 +466,19 @@ bool ChangeSelect(int sShift)                                //Изменени�
    return Select_Group();                                    //Изменение состояния всей группы файлов между строками
 }
 
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 bool ChangeSelect_and_Down(void)                             //Изменение выбора файлов в дерева
 {
    if(ChangeSelect(0) == false) return false;                //Изменение выбора файлов в дерева
-   HTREEITEM Selected = TreeView_GetSelection(hwndTree);     //Текущий выбор
+   HTREEITEM Selected = TreeView_GetSelection(hwndTree);     //Текущий выбор
    if(Selected == NULL) return false;
    HTREEITEM newSelected = TreeView_GetNextSibling(hwndTree, Selected); //Следующая строка в дереве
    if(newSelected == NULL) return false;                     //Больше нет строк на данном уровне
    return TreeView_SelectItem(hwndTree, newSelected);        //Отметили следующую стоку
 }
 
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 void ViewSize(void)                                          //Показа дискового пространства
 {

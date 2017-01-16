@@ -20,9 +20,9 @@ static char *SW_Name = "SpTest";
 //------------------------------------------------------------------------------
 
 static int SaveDump(void)
-{
-   char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
-   char NameF[260];
+{
+   char Driv[MAXDRIVE], Dir[MAXDIR], Name[MAXFILE], Ext[MAXEXT];
+   char NameF[260];
 
    SYSTEMTIME ST;
    GetLocalTime(&ST);
@@ -50,7 +50,7 @@ static int SaveDump(void)
    return 0;
 }
 
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 void Add_SpecSpis(char *Str)                                 //Добавление строки в список
 {

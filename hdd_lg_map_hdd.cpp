@@ -98,7 +98,7 @@ static void Create_MapHDD(HDC DC)                            //Карта зан
 //------------------------------------------------------------------------------
 
 static void MapHDDWin1_OnPaint(HWND hwnd)
-{
+{
    PAINTSTRUCT PaintStruct;                                  //Рабочая структура и контекст
    HDC PaintDC = BeginPaint(hwnd, &PaintStruct);
    Create_MapHDD(PaintDC);                                   //Карта занятости HDD
@@ -127,28 +127,28 @@ static BOOL MapHDDWinM_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
                      sw_xs+sw_ls-80, sw_y, 80, 24, hwnd, HMENU(IDOK),
                      MainInst, NULL);
    SendMessage(hClose, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
-#if defined TEST_FAT1_VOST                                 //Проверка и восстановление FAT1 на потерянные кластеры
-   HWND hVost = CreateWindow("button", "Вост.", //(Lan+6)->msg,
-                     WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
+#if defined TEST_FAT1_VOST                                 //Проверка и восстановление FAT1 на потерянные кластеры
+   HWND hVost = CreateWindow("button", "Вост.", //(Lan+6)->msg,
+                     WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
                      sw_xs+sw_ls-80-50, sw_y, 40, 24, hwnd, HMENU(IDC_VOST),
                      MainInst, NULL);
    SendMessage(hVost, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
-#endif
-   if(Init_Map() < 0) return FALSE;
-   char s1[200], s2[200], s3[200], s4[200], s5[200];
-   SIZE SizeTxt1, SizeTxt2, SizeTxt3, SizeTxt4, SizeTxt5;
-   wsprintf(s1, "%s: %3d", (Lan+136)->msg, NumCl_Bl);        //Число кластеров в одном блоке
-   wsprintf(s2, "   %s   ", (Lan+125)->msg);                 //Занято
-   wsprintf(s3, "   %s / %s   ", (Lan+125)->msg, (Lan+126)->msg); //Занято/Свободно
-   wsprintf(s4, "   %s   ", (Lan+126)->msg);                 //Свободно
-   wsprintf(s5, "   %s = %d  ", (Lan+137)->msg, numErr);     //Ошибки FAT
-#if defined TEST_FAT1                                        //Проверка FAT1
-   char s11[200], s12[200], s13[200];
-   SIZE SizeTxt11, SizeTxt12, SizeTxt13;
-   wsprintf(s11, "   %s   ", "Нет ошибок");                  //Нет ошибок
-   wsprintf(s12, "   %s   ", "Потерянные кластеры");         //Потерянные кластеры
-   double maxSize = double(maxZapFAT1 - 1) /1024.0/1024.0/1024.0 * sCl_B;
-//   double usedSize = double(writeCl) /1024.0/1024.0/1024.0 * sCl_B;
+#endif
+   if(Init_Map() < 0) return FALSE;
+   char s1[200], s2[200], s3[200], s4[200], s5[200];
+   SIZE SizeTxt1, SizeTxt2, SizeTxt3, SizeTxt4, SizeTxt5;
+   wsprintf(s1, "%s: %3d", (Lan+136)->msg, NumCl_Bl);        //Число кластеров в одном блоке
+   wsprintf(s2, "   %s   ", (Lan+125)->msg);                 //Занято
+   wsprintf(s3, "   %s / %s   ", (Lan+125)->msg, (Lan+126)->msg); //Занято/Свободно
+   wsprintf(s4, "   %s   ", (Lan+126)->msg);                 //Свободно
+   wsprintf(s5, "   %s = %d  ", (Lan+137)->msg, numErr);     //Ошибки FAT
+#if defined TEST_FAT1                                        //Проверка FAT1
+   char s11[200], s12[200], s13[200];
+   SIZE SizeTxt11, SizeTxt12, SizeTxt13;
+   wsprintf(s11, "   %s   ", "Нет ошибок");                  //Нет ошибок
+   wsprintf(s12, "   %s   ", "Потерянные кластеры");         //Потерянные кластеры
+   double maxSize = double(maxZapFAT1 - 1) /1024.0/1024.0/1024.0 * sCl_B;
+//   double usedSize = double(writeCl) /1024.0/1024.0/1024.0 * sCl_B;
 //   double freeSize = double(max_ZapFAT - 1 - writeCl) /1024.0/1024.0/1024.0 * sCl_B;
 
 //   int lostCl = writeCl+1 - sumClTestFAT1;                   //Если кластеры потеряны в результате сбоев в FAT
@@ -159,32 +159,32 @@ static BOOL MapHDDWinM_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
    sprintf(s13, "   %s: %d (%.2lf Gb) (%.1lf\%)", "Потеряно кластеров", numCl_Err, lostSize, lostSize/maxSize*100.0);
 #endif
    HDC DC = GetDC(hClose);
-   GetTextExtentPoint32(DC, s1, lstrlen(s1), &SizeTxt1);     //Число кластеров в одном блоке
-   GetTextExtentPoint32(DC, s2, lstrlen(s2), &SizeTxt2);     //Занято
-   GetTextExtentPoint32(DC, s3, lstrlen(s3), &SizeTxt3);     //Занято/Свободно
-   GetTextExtentPoint32(DC, s4, lstrlen(s4), &SizeTxt4);     //Свободно
-   GetTextExtentPoint32(DC, s5, lstrlen(s5), &SizeTxt5);     //Ошибки FAT
-#if defined TEST_FAT1                                        //Проверка FAT1
-   GetTextExtentPoint32(DC, s11, lstrlen(s11), &SizeTxt11);  //Число кластеров в одном блоке
-   GetTextExtentPoint32(DC, s12, lstrlen(s12), &SizeTxt12);  //Занято
-   GetTextExtentPoint32(DC, s13, lstrlen(s13), &SizeTxt13);  //Занято/Свободно
-#endif
-   ReleaseDC(hClose, DC);
-   hLegend1 = CreateWindow("static", s1,
-         //          WS_BORDER |                             //Черная рамка толщиной в пиксель
+   GetTextExtentPoint32(DC, s1, lstrlen(s1), &SizeTxt1);     //Число кластеров в одном блоке
+   GetTextExtentPoint32(DC, s2, lstrlen(s2), &SizeTxt2);     //Занято
+   GetTextExtentPoint32(DC, s3, lstrlen(s3), &SizeTxt3);     //Занято/Свободно
+   GetTextExtentPoint32(DC, s4, lstrlen(s4), &SizeTxt4);     //Свободно
+   GetTextExtentPoint32(DC, s5, lstrlen(s5), &SizeTxt5);     //Ошибки FAT
+#if defined TEST_FAT1                                        //Проверка FAT1
+   GetTextExtentPoint32(DC, s11, lstrlen(s11), &SizeTxt11);  //Число кластеров в одном блоке
+   GetTextExtentPoint32(DC, s12, lstrlen(s12), &SizeTxt12);  //Занято
+   GetTextExtentPoint32(DC, s13, lstrlen(s13), &SizeTxt13);  //Занято/Свободно
+#endif
+   ReleaseDC(hClose, DC);
+   hLegend1 = CreateWindow("static", s1,
+         //          WS_BORDER |                             //Черная рамка толщиной в пиксель
                      WS_CHILD | WS_VISIBLE,
                      sw_xs, sw_y+4, SizeTxt1.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend1, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 #if defined TEST_FAT1                                        //Проверка FAT1
-   hLegend4 = CreateWindow("static", s11,
-              //     WS_BORDER |                             //Черная рамка толщиной в пиксель
+   hLegend4 = CreateWindow("static", s11,
+              //     WS_BORDER |                             //Черная рамка толщиной в пиксель
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx, sw_y+4, SizeTxt11.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend4, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
    hLegend5 = CreateWindow("static", s12,
-              //     WS_BORDER |                             //Черная рамка толщиной в пиксель
+              //     WS_BORDER |                             //Черная рамка толщиной в пиксель
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx+SizeTxt11.cx, sw_y+4, SizeTxt12.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
@@ -197,33 +197,33 @@ static BOOL MapHDDWinM_OnCreate(HWND hwnd, CREATESTRUCT FAR *lpCreateStruct)
    SendMessage(hLostCl, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 #else
    hLegend2 = CreateWindow("static", s2,
-          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
+          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx, sw_y+4, SizeTxt2.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend2, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
    hLegend3 = CreateWindow("static", s3,
-          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
+          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx+SizeTxt2.cx, sw_y+4, SizeTxt3.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend3, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
    hLegend4 = CreateWindow("static", s4,
-          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
+          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx+SizeTxt2.cx+SizeTxt3.cx, sw_y+4, SizeTxt4.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend4, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
    if(numErr == 0) return TRUE;
-   hLegend5 = CreateWindow("static", s5,
-          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
+   hLegend5 = CreateWindow("static", s5,
+          //         WS_BORDER |                             //Черная рамка толщиной в пиксель
                      SS_CENTER | WS_CHILD | WS_VISIBLE,
                      sw_xs+SizeTxt1.cx+SizeTxt2.cx+SizeTxt3.cx+SizeTxt4.cx, sw_y+4, SizeTxt5.cx, 18, hwnd, HMENU(-1),
                      MainInst, NULL);
    SendMessage(hLegend5, WM_SETFONT, (WPARAM)MyFont, LPARAM(TRUE));
 #endif
-   return TRUE;
-}
+   return TRUE;
+}
 
 //------------------------------------------------------------------------------
 
