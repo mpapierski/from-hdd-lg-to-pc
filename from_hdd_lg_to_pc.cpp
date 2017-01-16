@@ -21,20 +21,20 @@
    HWND hCorr67;
    int prHDD_LG_Yes;                                         //Признак, присутствия HDD: 0-есть, 1-не найден
 #if defined EMULATOR_HDD
-   const char *NVER_TXT = N_VER_TXT"-emul";                  //Текст в "О Программе"
+   const char *NVER_TXT = N_VER_TXT "-emul";                  //Текст в "О Программе"
 #else
    const char *NVER_TXT = N_VER_TXT;
 #endif
 #if defined OUT_TEST                                         //Заголовок программы
-   char *AppName = " From_HDD_LG_to_PC ("N_VER_TXT".dump."TEST_N_VER_TXT") (The special test version with creation of a dump for Val238)";
+   char *AppName = " From_HDD_LG_to_PC (" N_VER_TXT ".dump." TEST_N_VER_TXT ") (The special test version with creation of a dump for Val238)";
 #else
 #if defined TEST_WIN
    char *AppName = " From_HDD_LG_to_PC TEST  TEST  TEST  TEST  TEST  TEST  TEST  TEST  TEST ";
 #else
 #if defined EMULATOR_HDD
-   char *AppName = " From_HDD_LG_to_PC ("N_VER_TXT"-emul)";
+   char *AppName = " From_HDD_LG_to_PC (" N_VER_TXT "-emul)";
 #else
-   char *AppName = " From_HDD_LG_to_PC ("N_VER_TXT")";
+   char *AppName = " From_HDD_LG_to_PC (" N_VER_TXT ")";
 #endif
 #endif
 #endif
