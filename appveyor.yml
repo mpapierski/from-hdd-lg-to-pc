@@ -19,6 +19,6 @@ build_script:
     - cmake --build . --config %PRJ_CFG% --clean-first
 
 artifacts:
-  - path: Release/from_hdd_lg_to_pc.exe
+  - path: build.msvc2015/Release/from_hdd_lg_to_pc.exe
     name: from_hdd_lg_to_pc
 
