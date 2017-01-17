@@ -17,3 +17,8 @@ build_script:
     - cd build.%BDIR%
     - cmake .. -G"%PRJ_GEN%"
     - cmake --build . --config %PRJ_CFG% --clean-first
+
+artifacts:
+  - path: Release/from_hdd_lg_to_pc.exe
+    name: from_hdd_lg_to_pc
+
