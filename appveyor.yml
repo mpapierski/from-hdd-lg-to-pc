@@ -19,6 +19,15 @@ build_script:
     - cmake --build . --config %PRJ_CFG% --clean-first
 
 artifacts:
-  - path: build.msvc2015/Release/from_hdd_lg_to_pc.exe
+  - path: build.*/Release/from_hdd_lg_to_pc.exe
     name: from_hdd_lg_to_pc
 
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: "kQB1dT0MxeVXCA1to7BC/iqo1s8N/WfAQPDMuD5S9xzrHqexaVe8kPjm8A6dWONf"
+  artifact: /from_hdd_lg_to_pc.exe/
+  draft: false
+  prerelease: false
+  on:
+    appveyor_repo_tag: true
