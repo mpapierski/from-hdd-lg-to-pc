@@ -436,7 +436,7 @@ static BOOL CALLBACK DlgPust(HWND hDlg, UINT Message, WPARAM wParam, LPARAM lPar
 {
    switch(Message)
    {   case WM_INITDIALOG:
-           SetClassLong(hDlg, GCL_HICON, (LONG)MyIcon);
+           SetClassLongPtr(hDlg, GCLP_HICON, (LONG_PTR)MyIcon);
            EndDialog(hDlg, FALSE);
            break;
       default: return FALSE;
